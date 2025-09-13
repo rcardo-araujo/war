@@ -1,11 +1,10 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { GameConfig } from '../configs/gameConfig'
 
 export class MainMenu extends Scene
 {
-    logoTween;
-
-    constructor ()
+     constructor ()
     {
         super('MainMenu');
     }
@@ -16,37 +15,37 @@ export class MainMenu extends Scene
             fontSize: 30,
             color: '#ffffff',
             align: 'center'
-        }).setOrigin(0.5, 0.5);
+        }).setOrigin(0.5);
 
         const paddingX = 20;
         const paddingY = 10;
         
-        const bg = this.add
+        const buttonBackground = this.add
             .rectangle(0, 0, buttonText.width + paddingX, buttonText.height + paddingY, 0xb3ff3b, 1)
-            .setOrigin(0.5, 0.5)
+            .setOrigin(0.5)
             .setVisible(false); 
 
         const buttonWidth = buttonText.width + paddingX;
         const adjustedX = x + (buttonWidth / 2);
         
-        const container = this.add.container(adjustedX, y, [bg, buttonText]);
+        const container = this.add.container(adjustedX, y, [buttonBackground, buttonText]);
 
-        container.setSize(bg.width, bg.height);
+        container.setSize(buttonBackground.width, buttonBackground.height);
         container.setInteractive({ useHandCursor: true });
 
         container.on('pointerover', () => {
-            bg.setVisible(true);       
+            buttonBackground.setVisible(true);       
             buttonText.setColor('#000'); 
-            this.sound.play('hoverSound', { volume: 0.9 }); 
+            this.sound.play('hover-sound', { volume: 0.9 }); 
         });
 
         container.on('pointerout', () => {
-            bg.setVisible(false);    
+            buttonBackground.setVisible(false);    
             buttonText.setColor('#ffffff'); 
         });
 
         container.on('pointerdown', () => {
-            this.sound.play('clickSound', { volume: 0.5 });
+            this.sound.play('click-sound', { volume: 0.5 });
             onClick(); 
         });
 
@@ -55,30 +54,26 @@ export class MainMenu extends Scene
 
 
     create () {
-        this.bgMusic = this.sound.add('bgMusic', {
+        this.add.image(0, 0, 'menu-background').setOrigin(0)  
+        
+        this.backgroundMusic = this.sound.add('background-music', {
             volume: 0.5,
             loop: true   
         });
 
-        this.bgMusic.play();
+        this.backgroundMusic.play();
 
-        const { width, height } = this.cameras.main;
-
-        this.add.image(0, 0, 'background')
-            .setOrigin(0)       
-            .setDisplaySize(width, height); 
-
-        const marginX = width * 0.075;
-        const marginY = height * 0.15;
+        const marginX = GameConfig.width * 0.075;
+        const marginY = GameConfig.height * 0.15;
 
         this.logo = this.add.image(marginX, marginY, 'logo')
-            .setOrigin(0, 0) 
+            .setOrigin(0) 
             .setDepth(100);
 
         const buttonSpacing = 60;
-        const startY = height - marginY * 2;
+        const startY = GameConfig.height - marginY * 2;
 
-        this.createMenuButton(marginX, startY - buttonSpacing * 2, 'JOGAR', () => console.log('Iniciar jogo'));
+        this.createMenuButton(marginX, startY - buttonSpacing * 2, 'JOGAR', () => this.changeScene());
         this.createMenuButton(marginX, startY - buttonSpacing, 'HISTÓRICO', () => console.log('Abrir histórico'));
         this.createMenuButton(marginX, startY, 'OPÇÕES', () => console.log('Abrir opções'));
 
@@ -87,46 +82,6 @@ export class MainMenu extends Scene
 
     changeScene ()
     {
-        if (this.logoTween)
-        {
-            this.logoTween.stop();
-            this.logoTween = null;
-        }
-
         this.scene.start('Game');
-    }
-
-    moveLogo (reactCallback)
-    {
-        if (this.logoTween)
-        {
-            if (this.logoTween.isPlaying())
-            {
-                this.logoTween.pause();
-            }
-            else
-            {
-                this.logoTween.play();
-            }
-        }
-        else
-        {
-            this.logoTween = this.tweens.add({
-                targets: this.logo,
-                x: { value: 750, duration: 3000, ease: 'Back.easeInOut' },
-                y: { value: 80, duration: 1500, ease: 'Sine.easeOut' },
-                yoyo: true,
-                repeat: -1,
-                onUpdate: () => {
-                    if (reactCallback)
-                    {
-                        reactCallback({
-                            x: Math.floor(this.logo.x),
-                            y: Math.floor(this.logo.y)
-                        });
-                    }
-                }
-            });
-        }
     }
 }

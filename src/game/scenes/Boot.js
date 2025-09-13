@@ -9,11 +9,7 @@ export class Boot extends Scene
 
     preload ()
     {
-        this.load.image('background', 'assets/bg.png');
-
-        this.load.audio('bgMusic', 'assets/audio/background.mp3');
-        this.load.audio('hoverSound', 'assets/audio/hover.mp3');
-        this.load.audio('clickSound', 'assets/audio/click.wav');
+        this.load.image('menu-background', 'assets/images/menu-background.png');
     }
 
     create ()
