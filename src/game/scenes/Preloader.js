@@ -1,6 +1,6 @@
 import { Game, Scene } from 'phaser';
-import { GameConfig } from '../configs/gameConfig'
-import { countries, strokePath, filledPath } from '../configs/countriesData'
+import { GameConfig } from '../config/gameConfig'
+import { countries, strokePath, filledPath } from '../config/countriesData'
 
 export class Preloader extends Scene
 {
