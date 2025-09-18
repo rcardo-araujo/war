@@ -47,8 +47,7 @@ export class Preloader extends Scene
         this.load.audio('hover-sound', 'assets/audio/hover.mp3');
         this.load.audio('click-sound', 'assets/audio/click.wav');
 
-        countries.forEach(country => {
-            const name = country.key;
+        Object.keys(countries).forEach(name => {
             this.load.image(`${name}-stroke`, `${strokePath}/${name}-stroke.png`);
             this.load.image(`${name}-filled`, `${filledPath}/${name}-filled.png`);
         });
