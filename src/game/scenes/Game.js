@@ -1,7 +1,8 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
-import { GameConfig } from '../configs/gameConfig';
-import { countries, strokeWeight } from '../configs/countriesData';
+import { GameConfig } from '../config/gameConfig';
+import { countries, strokeWeight } from '../config/countriesData';
+import { Colors } from '../config/colors';
 
 export class Game extends Scene
 {
@@ -9,8 +10,6 @@ export class Game extends Scene
     {
         super('Game');
     }
-
-
 
     create ()
     {

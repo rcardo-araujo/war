@@ -4,7 +4,7 @@ import { Game } from './scenes/Game';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
 
-import { GameConfig } from './configs/gameConfig'
+import { GameConfig } from './config/gameConfig'
 
 const config = {
     type: Phaser.AUTO,
