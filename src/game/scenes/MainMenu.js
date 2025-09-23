@@ -65,18 +65,19 @@ export class MainMenu extends Scene
         this.backgroundMusic.play();
 
         const marginX = GameConfig.width * 0.075;
-        const marginY = GameConfig.height * 0.15;
+        const marginY = GameConfig.height * 0.10;
 
         this.logo = this.add.image(marginX, marginY, 'logo')
             .setOrigin(0) 
             .setDepth(100);
 
         const buttonSpacing = 60;
-        const startY = GameConfig.height - marginY * 2;
+        const startY = GameConfig.height - marginY * 2.5;
 
-        this.createMenuButton(marginX, startY - buttonSpacing * 2, 'JOGAR', () => this.changeScene());
-        this.createMenuButton(marginX, startY - buttonSpacing, 'HISTÓRICO', () => console.log('Abrir histórico'));
-        this.createMenuButton(marginX, startY, 'OPÇÕES', () => console.log('Abrir opções'));
+        this.createMenuButton(marginX, startY - buttonSpacing * 3, 'JOGAR', () => this.changeScene());
+        this.createMenuButton(marginX, startY - buttonSpacing * 2, 'HISTÓRICO', () => console.log('Abrir histórico'));
+        this.createMenuButton(marginX, startY - buttonSpacing, 'OPÇÕES', () => console.log('Abrir opções'));
+        this.createMenuButton(marginX, startY, 'CRÉDITOS', () => console.log('Abrir créditos'));
 
         EventBus.emit('current-scene-ready', this);
     }
