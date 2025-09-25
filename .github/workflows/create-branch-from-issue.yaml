@@ -1,0 +1,39 @@
+name: Create Issue Branch
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  
+jobs:
+  create-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract label and descripption from tittle
+        id: parse_title
+        run: |
+          ISSUE_TITLE="${{ github.event.issue.title }}"
+          SANITIZED_TITLE=$(echo "$ISSUE_TITLE" | iconv -f utf-8 -t ascii//TRANSLIT)
+          LABEL=$(echo "$SANITIZED_TITLE" | sed -n 's/^\[\([^]]*\)\].*$/\1/p' | tr '[:upper:]' '[:lower:]')
+          DESCRIPTION=$(echo "$SANITIZED_TITLE" | sed 's/^\[[^]]*\][[:space:]]*//' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-zA-Z0-9-]/ /g' | tr -s ' ' | sed 's/ /-/g')
+          DESCRIPTION=$(echo "$DESCRIPTION" | sed 's/^-//; s/-$//')
+          
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+          echo "description=$DESCRIPTION" >> "$GITHUB_OUTPUT"
+      
+      - name: Create branch with custom name
+        run: |
+          BRANCH_NAME="${{ steps.parse_title.outputs.label }}/${{ steps.parse_title.outputs.description }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+
+          git checkout -b "$BRANCH_NAME"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git push -u origin "$BRANCH_NAME"
+
