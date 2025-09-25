@@ -51,6 +51,8 @@ export class Preloader extends Scene
             this.load.image(`${name}-stroke`, `${strokePath}/${name}-stroke.png`);
             this.load.image(`${name}-filled`, `${filledPath}/${name}-filled.png`);
         });
+
+        this.load.json('mapData', 'assets/data/mapData.json');
     }
 
     create ()

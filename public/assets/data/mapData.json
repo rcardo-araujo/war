@@ -1,0 +1,324 @@
+{
+    "continents": {
+        "south_america": {
+            "name": "América do Sul",
+            "bonus": 2
+        },
+        "north_america": {
+            "name": "América do Norte",
+            "bonus": 5
+        },
+        "africa": {
+            "name": "África",
+            "bonus": 5
+        },
+        "europe": {
+            "name": "Europa",
+            "bonus": 5
+        },
+        "asia": {
+            "name": "Ásia",
+            "bonus": 7
+        },
+        "oceania": {
+            "name": "Ásia",
+            "bonus": 7
+        }
+    },
+    "territories": [
+        {
+            "id": "brasil",
+            "name": "Brasil",
+            "continent": "south_america",
+            "neighbors": ["argentina", "andes", "venezuela", "argelia"],
+            "position": { "x": 293.74, "y": 431.5 }
+        },
+        {
+            "id": "argentina",
+            "name": "Argentina",
+            "continent": "south_america",
+            "neighbors": ["brasil", "andes"],
+            "position": { "x": 308.55, "y": 524 }
+        },
+        {
+            "id": "andes",
+            "name": "Andes",
+            "continent": "south_america",
+            "neighbors": ["brasil", "argentina", "venezuela"],
+            "position": { "x": 259.37, "y": 441.5 }
+        },
+        {
+            "id": "venezuela",
+            "name": "Venezuela",
+            "continent": "south_america",
+            "neighbors": ["brasil", "andes", "mexico"],
+            "position": { "x": 275.24, "y": 399 }
+        },
+        {
+            "id": "argelia",
+            "name": "Argélia",
+            "continent": "africa",
+            "neighbors": ["brasil", "egito", "sudao", "congo"],
+            "position": { "x": 481.99, "y": 341.5 }
+        },
+        {
+            "id": "congo",
+            "name": "Congo",
+            "continent": "africa",
+            "neighbors": ["africa_do_sul", "argelia", "sudao"],
+            "position": { "x": 587.22, "y": 464 }
+        },
+        {
+            "id": "africa_do_sul",
+            "name": "África do Sul",
+            "continent": "africa",
+            "neighbors": ["congo", "madagascar", "sudao"],
+            "position": { "x": 596.74, "y": 520 }
+        },
+        {
+            "id": "madagascar",
+            "name": "Madagascar",
+            "continent": "africa",
+            "neighbors": ["africa_do_sul", "sudao"],
+            "position": { "x": 723.64, "y": 515.5 }
+        },
+        {
+            "id": "sudao",
+            "name": "Sudão",
+            "continent": "africa",
+            "neighbors": ["argelia", "egito", "congo", "africa_do_sul", "madagascar"],
+            "position": { "x": 606.78, "y": 396 }
+        },
+        {
+            "id": "egito",
+            "name": "Egito",
+            "continent": "africa",
+            "neighbors": ["argelia", "sudao", "oriente_medio", "polonia", "peninsula_iberica"],
+            "position": { "x": 596.21, "y": 358 }
+        },
+        {
+            "id": "mexico",
+            "name": "México",
+            "continent": "north_america",
+            "neighbors": ["venezuela", "california", "nova_york"],
+            "position": { "x": 144.5, "y": 297.5 }
+        },
+        {
+            "id": "california",
+            "name": "Califórnia",
+            "continent": "north_america",
+            "neighbors": ["mexico", "nova_york", "vancouver", "ottawa"],
+            "position": { "x": 138.5, "y": 215 }
+        },
+        {
+            "id": "nova_york",
+            "name": "Nova York",
+            "continent": "north_america",
+            "neighbors": ["mexico", "california", "ottawa", "labrador"],
+            "position": { "x": 201.5, "y": 235.5 }
+        },
+        {
+            "id": "vancouver",
+            "name": "Vancouver",
+            "continent": "north_america",
+            "neighbors": ["california", "ottawa", "alaska", "mackenzie"],
+            "position": { "x": 149, "y": 134.04 }
+        },
+        {
+            "id": "ottawa",
+            "name": "Ottawa",
+            "continent": "north_america",
+            "neighbors": ["nova_york", "california", "vancouver", "mackenzie", "labrador"],
+            "position": { "x": 258, "y": 182.5 }
+        },
+        {
+            "id": "labrador",
+            "name": "Labrador",
+            "continent": "north_america",
+            "neighbors": ["nova_york", "ottawa", "groenlandia"],
+            "position": { "x": 327.5, "y": 179.5 }
+        },
+        {
+            "id": "alaska",
+            "name": "Alaska",
+            "continent": "north_america",
+            "neighbors": ["vancouver", "mackenzie", "vladivostok"],
+            "position": { "x": 59.63, "y": 47.08 }
+        },
+        {
+            "id": "mackenzie",
+            "name": "Mackenzie",
+            "continent": "north_america",
+            "neighbors": ["alaska", "vancouver", "ottawa", "groenlandia"],
+            "position": { "x": 191.5, "y": 78.55 }
+        },
+        {
+            "id": "groenlandia",
+            "name": "Groenlândia",
+            "continent": "north_america",
+            "neighbors": ["labrador", "mackenzie", "islandia"],
+            "position": { "x": 416, "y": 38 }
+        },
+        {
+            "id": "peninsula_iberica",
+            "name": "Península Ibérica",
+            "continent": "europe",
+            "neighbors": ["reino_unido", "alemanha", "polonia", "egito"],
+            "position": { "x": 521.4, "y": 252.25 }
+        },
+        {
+            "id": "reino_unido",
+            "name": "Reino Unido",
+            "continent": "europe",
+            "neighbors": ["islandia", "suecia", "alemanha", "peninsula_iberica"],
+            "position": { "x": 499.7, "y": 191.5 }
+        },
+        {
+            "id": "islandia",
+            "name": "Islândia",
+            "continent": "europe",
+            "neighbors": ["groenlandia", "reino_unido"],
+            "position": { "x": 496, "y": 126.5 }
+        },
+        {
+            "id": "suecia",
+            "name": "Suécia",
+            "continent": "europe",
+            "neighbors": ["reino_unido", "moscou"],
+            "position": { "x": 588.54, "y": 158 }
+        },
+        {
+            "id": "alemanha",
+            "name": "Alemanha",
+            "continent": "europe",
+            "neighbors": ["reino_unido", "peninsula_iberica", "polonia"],
+            "position": { "x": 574.26, "y": 219.5 }
+        },
+        {
+            "id": "polonia",
+            "name": "Polônia",
+            "continent": "europe",
+            "neighbors": ["alemanha", "peninsula_iberica", "moscou", "oriente_medio", "egito"],
+            "position": { "x": 602.81, "y": 243.5 }
+        },
+        {
+            "id": "moscou",
+            "name": "Moscou",
+            "continent": "europe",
+            "neighbors": ["suecia", "polonia", "omsk", "aral", "oriente_medio"],
+            "position": { "x": 643, "y": 166 }
+        },
+        {
+            "id": "oriente_medio",
+            "name": "Oriente Médio",
+            "continent": "asia",
+            "neighbors": ["egito", "polonia", "moscou", "aral", "india"],
+            "position": { "x": 664.42, "y": 282.5 }
+        },
+        {
+            "id": "india",
+            "name": "Índia",
+            "continent": "asia",
+            "neighbors": ["oriente_medio", "aral", "china", "vietna", "sumatra"],
+            "position": { "x": 801.9, "y": 299.5 }
+        },
+        {
+            "id": "vietna",
+            "name": "Vietnã",
+            "continent": "asia",
+            "neighbors": ["india", "china", "borneo"],
+            "position": { "x": 937.8, "y": 358 }
+        },
+        {
+            "id": "china",
+            "name": "China",
+            "continent": "asia",
+            "neighbors": ["india", "vietna", "aral", "omsk", "tchita", "mongolia"],
+            "position": { "x": 837.86, "y": 229 }
+        },
+        {
+            "id": "japao",
+            "name": "Japão",
+            "continent": "asia",
+            "neighbors": ["mongolia", "vladivostok"],
+            "position": { "x": 1098.02, "y": 271 }
+        },
+        {
+            "id": "mongolia",
+            "name": "Mongólia",
+            "continent": "asia",
+            "neighbors": ["china", "tchita", "vladivostok", "japao"],
+            "position": { "x": 906.6, "y": 243.5 }
+        },
+        {
+            "id": "tchita",
+            "name": "Tchita",
+            "continent": "asia",
+            "neighbors": ["omsk", "siberia", "dudinka", "vladivostok", "mongolia", "china"],
+            "position": { "x": 910.31, "y": 180.5 }
+        },
+        {
+            "id": "aral",
+            "name": "Aral",
+            "continent": "asia",
+            "neighbors": ["moscou", "omsk", "china", "india", "oriente_medio"],
+            "position": { "x": 737.92, "y": 232.5 }
+        },
+        {
+            "id": "omsk",
+            "name": "Omsk",
+            "continent": "asia",
+            "neighbors": ["moscou", "aral", "china", "tchita", "dudinka"],
+            "position": { "x": 732.63, "y": 159 }
+        },
+        {
+            "id": "dudinka",
+            "name": "Dudinka",
+            "continent": "asia",
+            "neighbors": ["omsk", "tchita", "siberia"],
+            "position": { "x": 779.17, "y": 133 }
+        },
+        {
+            "id": "siberia",
+            "name": "Sibéria",
+            "continent": "asia",
+            "neighbors": ["dudinka", "tchita", "vladivostok"],
+            "position": { "x": 833.1, "y": 84 }
+        },
+        {
+            "id": "vladivostok",
+            "name": "Vladivostok",
+            "continent": "asia",
+            "neighbors": ["siberia", "tchita", "mongolia", "japao", "alaska"],
+            "position": { "x": 905.55, "y": 77 }
+        },
+        {
+            "id": "australia",
+            "name": "Austrália",
+            "continent": "oceania",
+            "neighbors": ["borneo", "nova_guine", "sumatra"],
+            "position": { "x": 998.08, "y": 556 }
+        },
+        {
+            "id": "sumatra",
+            "name": "Sumatra",
+            "continent": "oceania",
+            "neighbors": ["india", "australia"],
+            "position": { "x": 936.74, "y": 490 }
+        },
+        {
+            "id": "borneo",
+            "name": "Bornéu",
+            "continent": "oceania",
+            "neighbors": ["vietna", "nova_guine", "australia"],
+            "position": { "x": 1017.65, "y": 469.5 }
+        },
+        {
+            "id": "nova_guine",
+            "name": "Nova Guiné",
+            "continent": "oceania",
+            "neighbors": ["borneo", "australia"],
+            "position": { "x": 1102.78, "y": 487 }
+        }
+    ]
+}
