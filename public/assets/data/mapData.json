@@ -69,7 +69,7 @@
             "position": { "x": 587.22, "y": 464 }
         },
         {
-            "id": "africa_do_sul",
+            "id": "africa-do-sul",
             "name": "África do Sul",
             "continent": "africa",
             "neighbors": ["congo", "madagascar", "sudao"],
@@ -111,7 +111,7 @@
             "position": { "x": 138.5, "y": 215 }
         },
         {
-            "id": "nova_york",
+            "id": "nova-york",
             "name": "Nova York",
             "continent": "north_america",
             "neighbors": ["mexico", "california", "ottawa", "labrador"],
@@ -160,14 +160,14 @@
             "position": { "x": 416, "y": 38 }
         },
         {
-            "id": "peninsula_iberica",
+            "id": "peninsula-iberica",
             "name": "Península Ibérica",
             "continent": "europe",
             "neighbors": ["reino_unido", "alemanha", "polonia", "egito"],
             "position": { "x": 521.4, "y": 252.25 }
         },
         {
-            "id": "reino_unido",
+            "id": "reino-unido",
             "name": "Reino Unido",
             "continent": "europe",
             "neighbors": ["islandia", "suecia", "alemanha", "peninsula_iberica"],
@@ -209,7 +209,7 @@
             "position": { "x": 643, "y": 166 }
         },
         {
-            "id": "oriente_medio",
+            "id": "oriente-medio",
             "name": "Oriente Médio",
             "continent": "asia",
             "neighbors": ["egito", "polonia", "moscou", "aral", "india"],
@@ -314,7 +314,7 @@
             "position": { "x": 1017.65, "y": 469.5 }
         },
         {
-            "id": "nova_guine",
+            "id": "nova-guine",
             "name": "Nova Guiné",
             "continent": "oceania",
             "neighbors": ["borneo", "australia"],
