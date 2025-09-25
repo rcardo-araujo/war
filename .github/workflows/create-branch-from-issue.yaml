@@ -31,9 +31,10 @@ jobs:
           BRANCH_NAME="${{ steps.parse_title.outputs.label }}/${{ steps.parse_title.outputs.description }}"
           ISSUE_NUMBER="${{ github.event.issue.number }}"
 
-          git checkout -b "$BRANCH_NAME"
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
+          
+          git fetch origin dev
+          git checkout -b "$BRANCH_NAME" origin/dev
           git push -u origin "$BRANCH_NAME"
 
