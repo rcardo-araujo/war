@@ -1,13 +1,15 @@
 import { Colors } from "./colors";
 import { GameConfig } from "./gameConfig";
 
+export const CARD_WIDTH = 220;
+export const CARD_HEIGHT = 550;
+export const CARD_SPACING = 16;
 export const CARD_Y = (
     (GameConfig.height / 2) 
     - (CARD_HEIGHT / 2)
 );
-export const CARD_WIDTH = 220;
-export const CARD_HEIGHT = 350;
-export const CARD_SPACING = 58;
+
+export const SCENE_PADDING_X = 58;
 
 export const NAME_COMPONENT = { 
     height: 32, 
@@ -23,8 +25,6 @@ export const SELECTOR_COMPONENT = {
     height: 64,
     y: IMAGE_COMPONENT.y + IMAGE_COMPONENT.height
 };
-
-export const SCENE_PADDING_X = 50;
 
 export const CARD_LAYOUTS = {
     player1: {
