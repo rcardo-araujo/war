@@ -2,7 +2,7 @@ import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
 import { CARD_LAYOUTS, CARD_WIDTH, IMAGE_COMPONENT, NAME_COMPONENT, SELECTOR_COMPONENT } from "../config/playerSelectionCardData";
-import { Colors } from "../config/colors";
+import { COLOR } from "../config/colors";
 
 export class PlayerSelection extends Scene {
     constructor () {
@@ -39,7 +39,7 @@ export class PlayerSelection extends Scene {
             .rectangle(
                 player.x, SELECTOR_COMPONENT.y, 
                 CARD_WIDTH, SELECTOR_COMPONENT.height, 
-                Colors.primary, 1
+                COLOR.primary, 1
             )
             .setOrigin(0)
             .setVisible(true);   

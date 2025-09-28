@@ -1,4 +1,4 @@
-import { Colors } from "./colors";
+import { COLOR } from "./colors";
 import { GameConfig } from "./gameConfig";
 
 export const CARD_WIDTH = 220;
@@ -29,22 +29,22 @@ export const SELECTOR_COMPONENT = {
 export const CARD_LAYOUTS = {
     player1: {
         x: SCENE_PADDING_X,
-        color: Colors.brand
+        color: COLOR.brand
     },
     player2: {
         x: SCENE_PADDING_X + CARD_WIDTH + CARD_SPACING,
-        color: Colors.brand
+        color: COLOR.pink
     },
     player3: {
         x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 2,
-        color: Colors.brand
+        color: COLOR.blue
     },
     player4: {
         x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 3,
-        color: Colors.brand
+        color: COLOR.orange
     },
     player5: {
         x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 4,
-        color: Colors.brand
+        color: COLOR.purple
     }
 }
