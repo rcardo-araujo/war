@@ -39,7 +39,7 @@ export class PlayerSelection extends Scene {
             .rectangle(
                 player.x, SELECTOR_COMPONENT.y, 
                 CARD_WIDTH, SELECTOR_COMPONENT.height, 
-                COLOR.primary, 1
+                COLOR.secondary, 1
             )
             .setOrigin(0)
             .setVisible(true);   
