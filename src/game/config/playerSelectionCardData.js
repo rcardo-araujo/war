@@ -1,50 +1,45 @@
 import { COLOR } from "./colors";
-import { GameConfig } from "./gameConfig";
+import { defineComponent } from "../utils/defineComponent";
 
-export const CARD_WIDTH = 220;
-export const CARD_HEIGHT = 550;
-export const CARD_SPACING = 16;
-export const CARD_Y = (
-    (GameConfig.height / 2) 
-    - (CARD_HEIGHT / 2)
-);
-
-export const SCENE_PADDING_X = 58;
-
-export const NAME_COMPONENT = { 
-    height: 32, 
-    y: CARD_Y
+export const SCENE_PADDING = {
+    x: 58,
+    y: 85
 };
 
-export const IMAGE_COMPONENT = { 
-    height: 448,
-    y: CARD_Y + NAME_COMPONENT.height + 6
+export const CARD = {
+    y: SCENE_PADDING.y,
+    width: 220,
+    height: 550,
+    spacing: 16
 };
 
-export const SELECTOR_COMPONENT = {
-    height: 64,
-    y: IMAGE_COMPONENT.y + IMAGE_COMPONENT.height
-};
-
-export const CARD_LAYOUTS = {
-    player1: {
-        x: SCENE_PADDING_X,
-        color: COLOR.brand
-    },
-    player2: {
-        x: SCENE_PADDING_X + CARD_WIDTH + CARD_SPACING,
-        color: COLOR.pink
-    },
-    player3: {
-        x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 2,
-        color: COLOR.blue
-    },
-    player4: {
-        x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 3,
-        color: COLOR.orange
-    },
-    player5: {
-        x: SCENE_PADDING_X + (CARD_WIDTH + CARD_SPACING) * 4,
-        color: COLOR.purple
-    }
+export const COMPONENTS = {
+    name: defineComponent(null, 32),
+    image: defineComponent({ y: CARD.y, height: 32 }, 448, 6),
+    selector: defineComponent({ y: CARD.y + 32 + 6, height: 448 }, 64)
 }
+
+export const ARROW_Y = CARD.y + 509;
+const LEFT_ARROW_OFFSET = 24;
+const RIGHT_ARROW_OFFSET = 189;  
+
+const PLAYER_COLORS = [
+  COLOR.brand,
+  COLOR.pink,
+  COLOR.blue,
+  COLOR.orange,
+  COLOR.purple
+];
+
+export const CARD_LAYOUTS = PLAYER_COLORS.map((color, index) => {
+    const cardX = SCENE_PADDING.x + index * (CARD.width + CARD.spacing);
+    const leftArrowX = cardX + LEFT_ARROW_OFFSET;
+    const rightArrowX = cardX + RIGHT_ARROW_OFFSET;
+
+    return {
+        x: cardX,
+        color,
+        leftArrowX,
+        rightArrowX
+    };
+});
