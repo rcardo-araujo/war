@@ -1,8 +1,8 @@
 import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
-import { CARD_LAYOUTS, CARD_WIDTH, IMAGE_COMPONENT, NAME_COMPONENT, SELECTOR_COMPONENT } from "../config/playerSelectionCardData";
 import { COLOR } from "../config/colors";
+import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS } from "../config/playerSelectionCardData";
 
 export class PlayerSelection extends Scene {
     constructor () {
@@ -12,39 +12,53 @@ export class PlayerSelection extends Scene {
     createNameComponent(player) {
         const componentRectangle = this.add
             .rectangle(
-                player.x, NAME_COMPONENT.y, 
-                CARD_WIDTH, NAME_COMPONENT.height, 
+                player.x, COMPONENTS.name.y, 
+                CARD.width, COMPONENTS.name.height, 
                 player.color, 1
             )
             .setOrigin(0)
             .setVisible(true);   
-        
-        return componentRectangle;
     }
 
     createImageComponent(player) {
         const componentRectangle = this.add
             .image(
-                player.x, IMAGE_COMPONENT.y, 
+                player.x, COMPONENTS.image.y, 
                 'image-component-background'
             )
             .setOrigin(0)
             .setVisible(true); 
-        
-        return componentRectangle;
     }
 
     createSelectorComponent(player) {
         const componentRectangle = this.add
             .rectangle(
-                player.x, SELECTOR_COMPONENT.y, 
-                CARD_WIDTH, SELECTOR_COMPONENT.height, 
+                player.x, COMPONENTS.selector.y, 
+                CARD.width, COMPONENTS.selector.height, 
                 COLOR.secondary, 1
             )
             .setOrigin(0)
             .setVisible(true);   
         
-        return componentRectangle;
+        const leftArrow = this.add.image(
+            player.leftArrowX, ARROW_Y,
+            'left-arrow'
+        )
+        .setOrigin(0)
+        .setVisible(true);
+
+        const rightArrow = this.add.image(
+            player.rightArrowX, ARROW_Y,
+            'right-arrow'
+        )
+        .setOrigin(0)
+        .setVisible(true);
+    }
+
+    createCard(player) {
+        const name = this.createNameComponent(player);
+        const image = this.createImageComponent(player);
+        const selector = this.createSelectorComponent(player);
     }
 
     create () {
@@ -67,23 +81,7 @@ export class PlayerSelection extends Scene {
             this.changeScene();
         });
 
-        this.createNameComponent(CARD_LAYOUTS.player1);
-        this.createNameComponent(CARD_LAYOUTS.player2);
-        this.createNameComponent(CARD_LAYOUTS.player3);
-        this.createNameComponent(CARD_LAYOUTS.player4);
-        this.createNameComponent(CARD_LAYOUTS.player5);
-
-        this.createImageComponent(CARD_LAYOUTS.player1);
-        this.createImageComponent(CARD_LAYOUTS.player2);
-        this.createImageComponent(CARD_LAYOUTS.player3);
-        this.createImageComponent(CARD_LAYOUTS.player4);
-        this.createImageComponent(CARD_LAYOUTS.player5);
-        
-        this.createSelectorComponent(CARD_LAYOUTS.player1);
-        this.createSelectorComponent(CARD_LAYOUTS.player2);
-        this.createSelectorComponent(CARD_LAYOUTS.player3);
-        this.createSelectorComponent(CARD_LAYOUTS.player4);
-        this.createSelectorComponent(CARD_LAYOUTS.player5);
+        CARD_LAYOUTS.forEach((player) => this.createCard(player));
 
         EventBus.emit('current-scene-ready', this);
     }
