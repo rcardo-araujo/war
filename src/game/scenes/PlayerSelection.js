@@ -1,7 +1,7 @@
 import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
-import { CARD_LAYOUTS, CARD_WIDTH, NAME_COMPONENT, SELECTOR_COMPONENT } from "../config/playerSelectionCardData";
+import { CARD_LAYOUTS, CARD_WIDTH, IMAGE_COMPONENT, NAME_COMPONENT, SELECTOR_COMPONENT } from "../config/playerSelectionCardData";
 import { Colors } from "../config/colors";
 
 export class PlayerSelection extends Scene {
@@ -28,6 +28,19 @@ export class PlayerSelection extends Scene {
                 player.x, SELECTOR_COMPONENT.y, 
                 CARD_WIDTH, SELECTOR_COMPONENT.height, 
                 Colors.primary, 1
+            )
+            .setOrigin(0)
+            .setVisible(true);   
+        
+        return componentRectangle;
+    }
+
+    createImageComponent(player) {
+        const componentRectangle = this.add
+            .rectangle(
+                player.x, IMAGE_COMPONENT.y, 
+                CARD_WIDTH, IMAGE_COMPONENT.height, 
+                0xffffff, 1
             )
             .setOrigin(0)
             .setVisible(true);   
@@ -66,6 +79,12 @@ export class PlayerSelection extends Scene {
         this.createSelectorComponent(CARD_LAYOUTS.player3);
         this.createSelectorComponent(CARD_LAYOUTS.player4);
         this.createSelectorComponent(CARD_LAYOUTS.player5);
+        
+        this.createImageComponent(CARD_LAYOUTS.player1);
+        this.createImageComponent(CARD_LAYOUTS.player2);
+        this.createImageComponent(CARD_LAYOUTS.player3);
+        this.createImageComponent(CARD_LAYOUTS.player4);
+        this.createImageComponent(CARD_LAYOUTS.player5);
 
         EventBus.emit('current-scene-ready', this);
     }
