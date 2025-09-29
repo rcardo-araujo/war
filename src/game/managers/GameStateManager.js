@@ -1,13 +1,17 @@
 import Territory from '../gameObjects/Territory';
+import { TurnManager } from './TurnManager';
 
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene) {
         super();
         this.scene = scene;
+        this.players = this.scene.players;
         this.territories = {};
         this.continents = {};
         this.initializeMap();
+
+        this.turnManager = new TurnManager(this.players);
     }
 
     initializeMap() {

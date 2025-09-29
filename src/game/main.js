@@ -5,6 +5,7 @@ import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
 
 import { GameConfig } from './config/gameConfig'
+import { UIScene } from './scenes/UIScene';
 
 const config = {
     type: Phaser.AUTO,
@@ -15,6 +16,7 @@ const config = {
         Preloader,
         MainMenu,
         Game,
+        UIScene
     ]
 };
 

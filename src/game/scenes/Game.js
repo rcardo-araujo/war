@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { Colors } from '../config/colors';
+import Player from '../gameObjects/Player';
 
 export class Game extends Scene
 {
@@ -13,7 +14,17 @@ export class Game extends Scene
 
     create ()
     {
+        // Creating players
+        this.players = [new Player("Rick", "blue"),
+        new Player("Igor", "red"), 
+            new Player("Gê", "green"),
+            new Player("Wallac", "white")
+        ]
+
         this.gameState = new GameStateManager(this);
+
+
+        this.scene.launch("UIScene", {gameStateManager: this.gameState});
 
         this.add.image(0, 0, 'board-background')
             .setOrigin(0)
@@ -25,7 +36,7 @@ export class Game extends Scene
         this.setupInteractivity();
     }
     
-    loop ()
+    update ()
     { 
         
     }
