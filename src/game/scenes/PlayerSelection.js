@@ -45,20 +45,26 @@ export class PlayerSelection extends Scene {
             'left-arrow'
         )
         .setOrigin(0)
-        .setVisible(true);
+        .setVisible(true)
+        .setInteractive();
 
         const rightArrow = this.add.image(
             player.rightArrowX, ARROW_Y,
             'right-arrow'
         )
         .setOrigin(0)
-        .setVisible(true);
+        .setVisible(true)
+        .setInteractive();
+
+        return { componentRectangle, leftArrow, rightArrow };
     }
 
     createCard(player) {
         const name = this.createNameComponent(player);
         const image = this.createImageComponent(player);
         const selector = this.createSelectorComponent(player);
+
+        return { selector };
     }
 
     create () {
@@ -81,7 +87,11 @@ export class PlayerSelection extends Scene {
             this.changeScene();
         });
 
-        CARD_LAYOUTS.forEach((player) => this.createCard(player));
+        const cards = CARD_LAYOUTS.map((player) => this.createCard(player));
+
+        cards[0].selector.leftArrow.on('pointerdown', () => {
+            cards[0].selector.leftArrow.setTintFill(COLOR.pink);
+        });
 
         EventBus.emit('current-scene-ready', this);
     }
