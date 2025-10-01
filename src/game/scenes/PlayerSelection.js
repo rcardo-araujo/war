@@ -56,6 +56,8 @@ export class PlayerSelection extends Scene {
         .setVisible(true)
         .setInteractive();
 
+        
+
         return { componentRectangle, leftArrow, rightArrow };
     }
 
@@ -65,6 +67,38 @@ export class PlayerSelection extends Scene {
         const selector = this.createSelectorComponent(player);
 
         return { selector };
+    }
+
+    typeTexts() {
+        const iaText = this.add.text(
+            (CARD_LAYOUTS[0].x * 2 + CARD.width) / 2, 
+            (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
+            'IA', 
+            {
+                fontFamily: 'JetBrainsMono',
+                fontSize: 18,
+                color: '#ffffff',
+                align: 'center'
+            }
+        )
+        .setOrigin(0.5)
+        .setVisible(false);
+
+        const playerText = this.add.text(
+            (CARD_LAYOUTS[0].x * 2 + CARD.width) / 2, 
+            (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
+            'PLAYER', 
+            {
+                fontFamily: 'JetBrainsMono',
+                fontSize: 18,
+                color: '#ffffff',
+                align: 'center'
+            }
+        )
+        .setOrigin(0.5)
+        .setVisible(false);
+
+        return { iaText, playerText }
     }
 
     create () {
@@ -89,8 +123,33 @@ export class PlayerSelection extends Scene {
 
         const cards = CARD_LAYOUTS.map((player) => this.createCard(player));
 
+        let cardOneState = 'player';
+        const cardOneTexts = this.typeTexts();
+        
+        cardOneTexts.playerText.setVisible(true);
+
         cards[0].selector.leftArrow.on('pointerdown', () => {
-            cards[0].selector.leftArrow.setTintFill(COLOR.pink);
+            if (cardOneState.localeCompare('player') == 0) {
+                cardOneState = 'ia';
+                cardOneTexts.playerText.setVisible(false);
+                cardOneTexts.iaText.setVisible(true);
+            } else {
+                cardOneState = 'player';
+                cardOneTexts.iaText.setVisible(false);
+                cardOneTexts.playerText.setVisible(true);
+            }
+        });
+
+        cards[0].selector.rightArrow.on('pointerdown', () => {
+            if (cardOneState.localeCompare('player') == 0) {
+                cardOneState = 'ia';
+                cardOneTexts.playerText.setVisible(false);
+                cardOneTexts.iaText.setVisible(true);
+            } else {
+                cardOneState = 'player';
+                cardOneTexts.iaText.setVisible(false);
+                cardOneTexts.playerText.setVisible(true);
+            }
         });
 
         EventBus.emit('current-scene-ready', this);
