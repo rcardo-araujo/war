@@ -3,10 +3,18 @@ import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
 import { COLOR } from "../config/colors";
 import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS } from "../config/playerSelectionCardData";
+import { PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
 
 export class PlayerSelection extends Scene {
     constructor () {
         super('PlayerSelection');
+        
+        this.cards = [];
+        this.typeOrder = [
+            PLAYER_TYPES.HUMAN, 
+            PLAYER_TYPES.BOT, 
+            PLAYER_TYPES.NONE
+        ];
     }
 
     createNameComponent(player) {
@@ -30,8 +38,8 @@ export class PlayerSelection extends Scene {
             .setVisible(true); 
     }
 
-    createSelectorComponent(player) {
-        const componentRectangle = this.add
+    createSelectorComponent(player, cardIndex) {
+        const background = this.add
             .rectangle(
                 player.x, COMPONENTS.selector.y, 
                 CARD.width, COMPONENTS.selector.height, 
@@ -56,49 +64,63 @@ export class PlayerSelection extends Scene {
         .setVisible(true)
         .setInteractive();
 
+        const typeTexts = {};
+        this.typeOrder.forEach(type => {
+            typeTexts[type] = this.add.text(
+                (CARD_LAYOUTS[cardIndex].x * 2 + CARD.width) / 2, 
+                (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
+                PLAYER_TYPE_LABELS[type], 
+                {
+                    fontFamily: 'JetBrainsMono',
+                    fontSize: 18,
+                    color: '#ffffff',
+                    align: 'center'
+                }
+            )
+            .setOrigin(0.5)
+            .setVisible(type === PLAYER_TYPES.HUMAN);
+        });
+
+        const toggleHandler = () => this.togglePlayerType(cardIndex);
+        leftArrow.on('pointerdown', toggleHandler);
+        rightArrow.on('pointerdown', toggleHandler);
+
+        return {
+            background,
+            leftArrow,
+            rightArrow,
+            typeTexts 
+        };
+    }
+
+    updateSelectorDisplay(card) {
+        const { selector, playerType } = card;
         
-
-        return { componentRectangle, leftArrow, rightArrow };
+        this.typeOrder.forEach(type => {
+            selector.typeTexts[type].setVisible(type === playerType);
+        });
     }
 
-    createCard(player) {
-        const name = this.createNameComponent(player);
-        const image = this.createImageComponent(player);
-        const selector = this.createSelectorComponent(player);
-
-        return { selector };
+    togglePlayerType(cardIndex) {
+        const card = this.cards[cardIndex];
+        
+        const currentIndex = this.typeOrder.indexOf(card.playerType);
+        const nextIndex = (currentIndex + 1) % this.typeOrder.length;
+        
+        card.playerType = this.typeOrder[nextIndex];
+        
+        this.updateSelectorDisplay(card);
     }
 
-    typeTexts() {
-        const iaText = this.add.text(
-            (CARD_LAYOUTS[0].x * 2 + CARD.width) / 2, 
-            (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
-            'IA', 
-            {
-                fontFamily: 'JetBrainsMono',
-                fontSize: 18,
-                color: '#ffffff',
-                align: 'center'
-            }
-        )
-        .setOrigin(0.5)
-        .setVisible(false);
+    createCard(player, cardIndex) {
+        const card = {
+            name: this.createNameComponent(player),
+            image: this.createImageComponent(player),
+            selector: this.createSelectorComponent(player, cardIndex),
+            playerType: PLAYER_TYPES.HUMAN
+        };
 
-        const playerText = this.add.text(
-            (CARD_LAYOUTS[0].x * 2 + CARD.width) / 2, 
-            (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
-            'PLAYER', 
-            {
-                fontFamily: 'JetBrainsMono',
-                fontSize: 18,
-                color: '#ffffff',
-                align: 'center'
-            }
-        )
-        .setOrigin(0.5)
-        .setVisible(false);
-
-        return { iaText, playerText }
+        return card;
     }
 
     create () {
@@ -121,35 +143,9 @@ export class PlayerSelection extends Scene {
             this.changeScene();
         });
 
-        const cards = CARD_LAYOUTS.map((player) => this.createCard(player));
-
-        let cardOneState = 'player';
-        const cardOneTexts = this.typeTexts();
-        
-        cardOneTexts.playerText.setVisible(true);
-
-        cards[0].selector.leftArrow.on('pointerdown', () => {
-            if (cardOneState.localeCompare('player') == 0) {
-                cardOneState = 'ia';
-                cardOneTexts.playerText.setVisible(false);
-                cardOneTexts.iaText.setVisible(true);
-            } else {
-                cardOneState = 'player';
-                cardOneTexts.iaText.setVisible(false);
-                cardOneTexts.playerText.setVisible(true);
-            }
-        });
-
-        cards[0].selector.rightArrow.on('pointerdown', () => {
-            if (cardOneState.localeCompare('player') == 0) {
-                cardOneState = 'ia';
-                cardOneTexts.playerText.setVisible(false);
-                cardOneTexts.iaText.setVisible(true);
-            } else {
-                cardOneState = 'player';
-                cardOneTexts.iaText.setVisible(false);
-                cardOneTexts.playerText.setVisible(true);
-            }
+        CARD_LAYOUTS.forEach((cardLayout, index) => {
+            const card = this.createCard(cardLayout, index);
+            this.cards.push(card);
         });
 
         EventBus.emit('current-scene-ready', this);
