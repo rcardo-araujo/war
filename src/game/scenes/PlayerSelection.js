@@ -2,7 +2,7 @@ import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
 import { COLOR } from "../config/colors";
-import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS } from "../config/playerSelectionCardData";
+import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS, PLAYER_NAMES } from "../config/playerSelectionCardData";
 import { PLAYER_TYPE_IMAGES, PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
 
 export class PlayerSelection extends Scene {
@@ -17,7 +17,7 @@ export class PlayerSelection extends Scene {
         ];
     }
 
-    createNameComponent(cardLayout) {
+    createNameComponent(cardLayout, playerName) {
         const background = this.add
             .rectangle(
                 cardLayout.x, COMPONENTS.name.y, 
@@ -26,6 +26,21 @@ export class PlayerSelection extends Scene {
             )
             .setOrigin(0)
             .setVisible(true);   
+        
+        const name = this.add.text(
+            (cardLayout.x * 2 + CARD.width) / 2, 
+            (COMPONENTS.name.y * 2 + COMPONENTS.name.height) / 2, 
+            playerName, 
+            {
+                fontFamily: 'JetBrainsMono',
+                fontSize: 18,
+                fontStyle: 'bold',
+                lineSpacing: 10,
+                color: COLOR.primary,
+                align: 'center'
+            }
+        )
+        .setOrigin(0.5);
     }
 
     createImageComponent(cardLayout) {
@@ -132,9 +147,9 @@ export class PlayerSelection extends Scene {
         this.updateSelectorDisplay(card);
     }
 
-    createCard(cardLayout, cardIndex) {
+    createCard(cardLayout, cardIndex, playerName) {
         const card = {
-            name: this.createNameComponent(cardLayout),
+            name: this.createNameComponent(cardLayout, playerName),
             image: this.createImageComponent(cardLayout),
             selector: this.createSelectorComponent(cardLayout, cardIndex),
             playerType: PLAYER_TYPES.HUMAN
@@ -164,7 +179,9 @@ export class PlayerSelection extends Scene {
         });
 
         CARD_LAYOUTS.forEach((cardLayout, index) => {
-            const card = this.createCard(cardLayout, index);
+            const playerName = PLAYER_NAMES[index];
+
+            const card = this.createCard(cardLayout, index, playerName);
             this.cards.push(card);
         });
 

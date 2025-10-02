@@ -31,6 +31,14 @@ const PLAYER_COLORS = [
   COLOR.purple
 ];
 
+export const PLAYER_NAMES = [
+    'Neumann',
+    'Lovelace',
+    'Hopper',
+    'Turing',
+    'Dijkstra'
+]
+
 export const CARD_LAYOUTS = PLAYER_COLORS.map((color, index) => {
     const cardX = SCENE_PADDING.x + index * (CARD.width + CARD.spacing);
     const leftArrowX = cardX + LEFT_ARROW_OFFSET;
