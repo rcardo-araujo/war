@@ -3,7 +3,7 @@ import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
 import { COLOR } from "../config/colors";
 import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS } from "../config/playerSelectionCardData";
-import { PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
+import { PLAYER_TYPE_IMAGES, PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
 
 export class PlayerSelection extends Scene {
     constructor () {
@@ -29,13 +29,30 @@ export class PlayerSelection extends Scene {
     }
 
     createImageComponent(player) {
-        const componentRectangle = this.add
+        const background = this.add
             .image(
                 player.x, COMPONENTS.image.y, 
                 'image-component-background'
             )
             .setOrigin(0)
             .setVisible(true); 
+        
+        const typeImages = {};
+        this.typeOrder.forEach(type => {
+            const imageName = PLAYER_TYPE_IMAGES[type];
+
+            typeImages[type] = this.add.image(
+                player.x, COMPONENTS.image.y,
+                imageName
+            )
+            .setOrigin(0)
+            .setVisible(type === PLAYER_TYPES.HUMAN);
+        });
+
+        return {
+            background,
+            typeImages
+        };
     }
 
     createSelectorComponent(player, cardIndex) {
@@ -94,10 +111,14 @@ export class PlayerSelection extends Scene {
     }
 
     updateSelectorDisplay(card) {
-        const { selector, playerType } = card;
+        const { playerType, selector, image } = card;
         
         this.typeOrder.forEach(type => {
             selector.typeTexts[type].setVisible(type === playerType);
+        });
+
+        this.typeOrder.forEach(type => {
+            image.typeImages[type].setVisible(type === playerType);
         });
     }
 
@@ -151,7 +172,13 @@ export class PlayerSelection extends Scene {
         EventBus.emit('current-scene-ready', this);
     }
 
-    changeScene() {
+    preload () {
+        this.load.image('human-image', 'assets/images/selector_cards/human.png');
+        this.load.image('bot-image', 'assets/images/selector_cards/bot.png');
+        this.load.image('none-image', 'assets/images/selector_cards/human-transparent.png');
+    }
+
+    changeScene () {
         this.scene.start('Game');
     }
 }
