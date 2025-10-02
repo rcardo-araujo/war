@@ -29,13 +29,12 @@ export class PlayerSelection extends Scene {
     }
 
     createImageComponent(player) {
-        const background = this.add
-            .image(
-                player.x, COMPONENTS.image.y, 
-                'image-component-background'
-            )
-            .setOrigin(0)
-            .setVisible(true); 
+        const background = this.add.rectangle(
+            player.x, COMPONENTS.image.y,
+            CARD.width, COMPONENTS.image.height,
+            COLOR.primary
+        )
+        .setOrigin(0);
         
         const typeImages = {};
         this.typeOrder.forEach(type => {
