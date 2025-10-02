@@ -41,6 +41,11 @@ export class PlayerSelection extends Scene {
             }
         )
         .setOrigin(0.5);
+
+        return {
+            background, 
+            name
+        };
     }
 
     createImageComponent(cardLayout) {
@@ -192,6 +197,9 @@ export class PlayerSelection extends Scene {
         this.load.image('human-image', 'assets/images/selector_cards/human.png');
         this.load.image('bot-image', 'assets/images/selector_cards/bot.png');
         this.load.image('none-image', 'assets/images/selector_cards/human-transparent.png');
+
+        this.load.image('left-arrow', 'assets/images/selector_cards/left-arrow.png');
+        this.load.image('right-arrow', 'assets/images/selector_cards/right-arrow.png');
     }
 
     changeScene () {

@@ -42,10 +42,6 @@ export class Preloader extends Scene
         this.load.image('logo', 'assets/images/logo.png');
         this.load.image('board-background', 'assets/images/maps/board-background.png');
         this.load.image('main-background', 'assets/images/main-background.png');
-        this.load.image('image-component-background', 'assets/images/selector_cards/image-component-background.png');
-
-        this.load.image('left-arrow', 'assets/images/selector_cards/left-arrow.png');
-        this.load.image('right-arrow', 'assets/images/selector_cards/right-arrow.png');
 
         this.load.audio('background-music', 'assets/audio/background.mp3');
         this.load.audio('hover-sound', 'assets/audio/hover.mp3');
