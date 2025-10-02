@@ -10,7 +10,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.continents = {};
         this.players = []
         this.initializeMap();
-        // must be called with parameters from UI
         this.initializePlayers();
         console.log(this.players)
         this.distributeTerritories();
@@ -57,13 +56,9 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     }
     
     initializePlayers(playerParams = []){
-        // TODO
-        // Mock implementation to test
-        const p1 = new Player("gdac", "#f0b069")
-        const p2 = new Player("rick", "#55c1db")
-        const p3 = new Player("pcb", "#d2cfca")
-        const p4 = new Player("igor", "#ff0088")
-        this.players.push(p1, p2, p3, p4)
+        // TODO: Implementation
+        // Create players and add to this.players
+        return null;
     }
 
 
