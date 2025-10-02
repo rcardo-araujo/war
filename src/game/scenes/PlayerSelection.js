@@ -17,20 +17,20 @@ export class PlayerSelection extends Scene {
         ];
     }
 
-    createNameComponent(player) {
-        const componentRectangle = this.add
+    createNameComponent(cardLayout) {
+        const background = this.add
             .rectangle(
-                player.x, COMPONENTS.name.y, 
+                cardLayout.x, COMPONENTS.name.y, 
                 CARD.width, COMPONENTS.name.height, 
-                player.color, 1
+                cardLayout.color, 1
             )
             .setOrigin(0)
             .setVisible(true);   
     }
 
-    createImageComponent(player) {
+    createImageComponent(cardLayout) {
         const background = this.add.rectangle(
-            player.x, COMPONENTS.image.y,
+            cardLayout.x, COMPONENTS.image.y,
             CARD.width, COMPONENTS.image.height,
             COLOR.primary
         )
@@ -41,7 +41,7 @@ export class PlayerSelection extends Scene {
             const imageName = PLAYER_TYPE_IMAGES[type];
 
             typeImages[type] = this.add.image(
-                player.x, COMPONENTS.image.y,
+                cardLayout.x, COMPONENTS.image.y,
                 imageName
             )
             .setOrigin(0)
@@ -54,10 +54,10 @@ export class PlayerSelection extends Scene {
         };
     }
 
-    createSelectorComponent(player, cardIndex) {
+    createSelectorComponent(cardLayout, cardIndex) {
         const background = this.add
             .rectangle(
-                player.x, COMPONENTS.selector.y, 
+                cardLayout.x, COMPONENTS.selector.y, 
                 CARD.width, COMPONENTS.selector.height, 
                 COLOR.secondary, 1
             )
@@ -65,7 +65,7 @@ export class PlayerSelection extends Scene {
             .setVisible(true);   
         
         const leftArrow = this.add.image(
-            player.leftArrowX, ARROW_Y,
+            cardLayout.leftArrowX, ARROW_Y,
             'left-arrow'
         )
         .setOrigin(0)
@@ -73,7 +73,7 @@ export class PlayerSelection extends Scene {
         .setInteractive();
 
         const rightArrow = this.add.image(
-            player.rightArrowX, ARROW_Y,
+            cardLayout.rightArrowX, ARROW_Y,
             'right-arrow'
         )
         .setOrigin(0)
@@ -132,11 +132,11 @@ export class PlayerSelection extends Scene {
         this.updateSelectorDisplay(card);
     }
 
-    createCard(player, cardIndex) {
+    createCard(cardLayout, cardIndex) {
         const card = {
-            name: this.createNameComponent(player),
-            image: this.createImageComponent(player),
-            selector: this.createSelectorComponent(player, cardIndex),
+            name: this.createNameComponent(cardLayout),
+            image: this.createImageComponent(cardLayout),
+            selector: this.createSelectorComponent(cardLayout, cardIndex),
             playerType: PLAYER_TYPES.HUMAN
         };
 
