@@ -157,10 +157,21 @@ export class PlayerSelection extends Scene {
             name: this.createNameComponent(cardLayout, playerName),
             image: this.createImageComponent(cardLayout),
             selector: this.createSelectorComponent(cardLayout, cardIndex),
-            playerType: PLAYER_TYPES.HUMAN
+
+            playerType: PLAYER_TYPES.HUMAN,
+            playerName: playerName,
+            playerColor:cardLayout.color
         };
 
         return card;
+    }
+
+    getPlayersData() {
+        return this.cards.map(card => ({
+            name: card.playerName,
+            type: card.playerType,
+            color: card.playerColor
+        }));
     }
 
     create () {
@@ -203,6 +214,8 @@ export class PlayerSelection extends Scene {
     }
 
     changeScene () {
-        this.scene.start('Game');
+        const playersData = this.getPlayersData();
+
+        this.scene.start('Game', { players: playersData });
     }
 }
