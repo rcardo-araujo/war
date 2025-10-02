@@ -4,6 +4,7 @@ import { GameConfig } from "../config/gameConfig";
 import { COLOR } from "../config/colors";
 import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS, PLAYER_NAMES } from "../config/playerSelectionCardData";
 import { PLAYER_TYPE_IMAGES, PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
+import { createTextButton } from "../utils/createTextButton";
 
 export class PlayerSelection extends Scene {
     constructor () {
@@ -177,22 +178,11 @@ export class PlayerSelection extends Scene {
     create () {
         this.add.image(0, 0, 'main-background').setOrigin(0);
 
-        const buttonText = this.add.text(
-            (GameConfig.width / 2), (GameConfig.height - 20), 
-            'INICIAR', 
-            {
-                fontFamily: 'JetBrainsMono',
-                fontSize: 20,
-                color: '#ffffff',
-                align: 'center'
-            }
-        )
-        .setOrigin(0.5)
-        .setInteractive();
-
-        buttonText.on('pointerdown', () => {
-            this.changeScene();
-        });
+        createTextButton(this,
+            (GameConfig.width / 2),
+            (GameConfig.height + (CARD.y + CARD.height)) / 2,
+            'INICIAR', 20, () => this.changeScene() 
+        );
 
         CARD_LAYOUTS.forEach((cardLayout, index) => {
             const playerName = PLAYER_NAMES[index];
