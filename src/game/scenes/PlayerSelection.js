@@ -50,10 +50,9 @@ export class PlayerSelection extends Scene {
     }
 
     createImageComponent(cardLayout) {
-        const background = this.add.rectangle(
+        const background = this.add.image(
             cardLayout.x, COMPONENTS.image.y,
-            CARD.width, COMPONENTS.image.height,
-            COLOR.primary
+            'image-component-background'
         )
         .setOrigin(0);
         
@@ -195,6 +194,8 @@ export class PlayerSelection extends Scene {
     }
 
     preload () {
+        this.load.image('image-component-background', 'assets/images/selector_cards/image-component-background.png');
+
         this.load.image('human-image', 'assets/images/selector_cards/human.png');
         this.load.image('bot-image', 'assets/images/selector_cards/bot.png');
         this.load.image('none-image', 'assets/images/selector_cards/human-transparent.png');
