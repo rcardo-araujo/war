@@ -11,7 +11,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.players = []
         this.initializeMap();
         this.initializePlayers();
-        console.log(this.players)
         this.distributeTerritories();
     
     }
@@ -36,6 +35,8 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     }
 
     distributeTerritories(){
+        if (this.players.length === 0)
+            return
         const territoriesIds = Object.values(this.territories).map(terrt => terrt.id);
         
         for (let i = territoriesIds.length - 1; i > 0; i--){
