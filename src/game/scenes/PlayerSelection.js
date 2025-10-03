@@ -2,7 +2,7 @@ import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
 import { COLOR } from "../config/colors";
-import { ARROW_Y, CARD, CARD_LAYOUTS, COMPONENTS, PLAYER_NAMES } from "../config/playerSelectionCardData";
+import { ARROW_Y, CARDS, CARD_LAYOUTS, COMPONENTS, PLAYER_NAMES } from "../config/playerSelectionCardData";
 import { PLAYER_TYPE_IMAGES, PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
 import { createTextButton } from "../utils/createTextButton";
 
@@ -22,14 +22,14 @@ export class PlayerSelection extends Scene {
         const background = this.add
             .rectangle(
                 cardLayout.x, COMPONENTS.name.y, 
-                CARD.width, COMPONENTS.name.height, 
+                CARDS.width, COMPONENTS.name.height, 
                 cardLayout.color, 1
             )
             .setOrigin(0)
             .setVisible(true);   
         
         const name = this.add.text(
-            (cardLayout.x * 2 + CARD.width) / 2, 
+            (cardLayout.x * 2 + CARDS.width) / 2, 
             (COMPONENTS.name.y * 2 + COMPONENTS.name.height) / 2, 
             playerName, 
             {
@@ -78,7 +78,7 @@ export class PlayerSelection extends Scene {
         const background = this.add
             .rectangle(
                 cardLayout.x, COMPONENTS.selector.y, 
-                CARD.width, COMPONENTS.selector.height, 
+                CARDS.width, COMPONENTS.selector.height, 
                 COLOR.secondary, 1
             )
             .setOrigin(0)
@@ -103,7 +103,7 @@ export class PlayerSelection extends Scene {
         const typeTexts = {};
         this.typeOrder.forEach(type => {
             typeTexts[type] = this.add.text(
-                (CARD_LAYOUTS[cardIndex].x * 2 + CARD.width) / 2, 
+                (CARD_LAYOUTS[cardIndex].x * 2 + CARDS.width) / 2, 
                 (COMPONENTS.selector.y * 2 + COMPONENTS.selector.height) / 2, 
                 PLAYER_TYPE_LABELS[type], 
                 {
@@ -160,7 +160,7 @@ export class PlayerSelection extends Scene {
 
             playerType: PLAYER_TYPES.HUMAN,
             playerName: playerName,
-            playerColor:cardLayout.color
+            playerColor: cardLayout.color
         };
 
         return card;
@@ -179,7 +179,7 @@ export class PlayerSelection extends Scene {
 
         createTextButton(this,
             (GameConfig.width / 2),
-            (GameConfig.height + (CARD.y + CARD.height)) / 2,
+            (GameConfig.height + (CARDS.y + CARDS.height)) / 2,
             'INICIAR', 20, () => this.changeScene() 
         );
 
