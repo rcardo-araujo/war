@@ -2,7 +2,6 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
-import { countries, strokeWeight } from '../config/countriesData';
 import { COLORS } from '../config/colors';
 
 export class Game extends Scene
