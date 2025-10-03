@@ -11,7 +11,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.players = []
         this.initializeMap();
         this.initializePlayers();
-        console.log(this.players)
         this.distributeTerritories();
     
     }
