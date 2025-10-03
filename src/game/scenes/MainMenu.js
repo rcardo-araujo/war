@@ -1,7 +1,7 @@
 import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig'
-import { COLOR } from '../config/colors';
+import { COLORS } from '../config/colors';
 
 export class MainMenu extends Scene
 {
@@ -22,7 +22,7 @@ export class MainMenu extends Scene
         const paddingY = 10;
         
         const buttonBackground = this.add
-            .rectangle(0, 0, buttonText.width + paddingX, buttonText.height + paddingY, COLOR.brand, 1)
+            .rectangle(0, 0, buttonText.width + paddingX, buttonText.height + paddingY, COLORS.brand, 1)
             .setOrigin(0.5)
             .setVisible(false); 
 
@@ -36,7 +36,7 @@ export class MainMenu extends Scene
 
         container.on('pointerover', () => {
             buttonBackground.setVisible(true);       
-            buttonText.setColor(COLOR.primary); 
+            buttonText.setColor(COLORS.primary); 
             this.sound.play('hover-sound', { volume: 0.9 }); 
         });
 

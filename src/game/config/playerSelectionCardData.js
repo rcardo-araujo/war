@@ -1,4 +1,4 @@
-import { COLOR } from "./colors";
+import { COLORS } from "./colors";
 import { defineComponent } from "../utils/defineComponent";
 
 const SCENE_PADDING = {
@@ -24,11 +24,11 @@ const LEFT_ARROW_OFFSET = 24;
 const RIGHT_ARROW_OFFSET = 189;  
 
 const PLAYER_COLORS = [
-  COLOR.brand,
-  COLOR.pink,
-  COLOR.blue,
-  COLOR.orange,
-  COLOR.purple
+  COLORS.brand,
+  COLORS.pink,
+  COLORS.blue,
+  COLORS.orange,
+  COLORS.purple
 ];
 
 export const PLAYER_NAMES = [

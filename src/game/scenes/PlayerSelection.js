@@ -1,7 +1,7 @@
 import { Scene } from "phaser"
 import { EventBus } from "../EventBus";
 import { GameConfig } from "../config/gameConfig";
-import { COLOR } from "../config/colors";
+import { COLORS } from "../config/colors";
 import { ARROW_Y, CARDS, CARD_LAYOUTS, COMPONENTS, PLAYER_NAMES } from "../config/playerSelectionCardData";
 import { PLAYER_TYPE_IMAGES, PLAYER_TYPE_LABELS, PLAYER_TYPES } from "../config/playerTypes";
 import { createTextButton } from "../utils/createTextButton";
@@ -37,7 +37,7 @@ export class PlayerSelection extends Scene {
                 fontSize: 18,
                 fontStyle: 'bold',
                 lineSpacing: 10,
-                color: COLOR.primary,
+                color: COLORS.primary,
                 align: 'center'
             }
         )
@@ -79,7 +79,7 @@ export class PlayerSelection extends Scene {
             .rectangle(
                 cardLayout.x, COMPONENTS.selector.y, 
                 CARDS.width, COMPONENTS.selector.height, 
-                COLOR.secondary, 1
+                COLORS.secondary, 1
             )
             .setOrigin(0)
             .setVisible(true);   

@@ -1,4 +1,4 @@
-import { COLOR } from "../config/colors";
+import { COLORS } from "../config/colors";
 
 export function createTextButton(scene, x, y, label, fontSize, onClick) {
     const text = scene.add.text(0, 0, label, {
@@ -17,7 +17,7 @@ export function createTextButton(scene, x, y, label, fontSize, onClick) {
         0, 0, 
         text.width + paddingX, 
         text.height + paddingY, 
-        COLOR.brand, 1
+        COLORS.brand, 1
     )
     .setOrigin(0.5);
 
