@@ -4,6 +4,7 @@ export function createTextButton(scene, x, y, label, fontSize, onClick) {
     const text = scene.add.text(0, 0, label, {
         fontFamily: 'JetBrainsMono',
         fontSize: fontSize,
+        fontStyle: 'bold',
         color: '#1c1c1c',
         align: 'center'
     })
