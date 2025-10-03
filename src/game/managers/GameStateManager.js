@@ -56,6 +56,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                 const territory = this.territories[id];
                 player.addTerritory(territory);
                 territory.setOwner(player);
+                territory.addTroops(1);
             }
         )
     }
@@ -63,6 +64,14 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     initializePlayers(playerParams = []){
         // TODO: Implementation
         // Create players and add to this.players
+        // Creating players
+        
+        // Prototype players
+        this.players = [new Player("Rick", "0x0000FF"),
+        new Player("Igor", "0xFF0000"), 
+            new Player("Gê", "0x00FF00"),
+            new Player("Wallac", "0x800080")
+        ]
         return null;
     } 
 }

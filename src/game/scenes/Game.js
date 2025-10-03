@@ -14,16 +14,9 @@ export class Game extends Scene
 
     create ()
     {
-        // Creating players
-        this.players = [new Player("Rick", "blue"),
-        new Player("Igor", "red"), 
-            new Player("Gê", "green"),
-            new Player("Wallac", "white")
-        ]
-
         this.gameState = new GameStateManager(this);
 
-
+        // UI is in a different scene that overlaps
         this.scene.launch("UIScene", {gameStateManager: this.gameState});
 
         this.add.image(0, 0, 'board-background')
@@ -55,16 +48,22 @@ export class Game extends Scene
 
             const filledSprite = this.add.image(position.x, position.y, `${id}-filled`).setOrigin(0);
             const strokeSprite = this.add.image(position.x - 5 / 2, position.y - 5 / 2, `${id}-stroke`).setOrigin(0);
+            const troopCount = this.add.text(position.x + filledSprite.width / 2, position.y + filledSprite.height / 2, territoryLogic.troops, {
+                fontSize: '24px',
+                color: '#ffffff',
+                fontStyle: 'bold'
+            }).setOrigin(0.5);
 
             filledSprite.setData('logic', territoryLogic);
             filledSprite.setInteractive({ pixelPerfect: true });
 
             this.territorySprites[id] = {
                 filled: filledSprite,
-                stroke: strokeSprite
+                stroke: strokeSprite,
+                toops: troopCount
             };
             
-            filledSprite.setTint(0x000000);
+            filledSprite.setTint(territoryLogic.color);
             strokeSprite.setTint(0xffff00);
         })
     }
@@ -75,8 +74,12 @@ export class Game extends Scene
             const stroke = this.territorySprites[gameObject.getData('logic').id].stroke;
             stroke.setScale(1.1);
             stroke.setTint(0xffffff);
+            const troopCount = this.territorySprites[gameObject.getData('logic').id].toops;
+            troopCount.setScale(1.1);
+
             this.children.bringToTop(gameObject);
             this.children.bringToTop(stroke);
+            this.children.bringToTop(troopCount);
         });
 
         this.input.on('gameobjectout', (pointer, gameObject) => {
@@ -84,6 +87,8 @@ export class Game extends Scene
             const stroke = this.territorySprites[gameObject.getData('logic').id].stroke;
             stroke.setScale(1);
             stroke.setTint(0xffff00);
+            const troopCount = this.territorySprites[gameObject.getData('logic').id].toops;
+            troopCount.setScale(1);
         });
     }
 
