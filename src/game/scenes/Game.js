@@ -2,7 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
-import { Colors } from '../config/colors';
+import { COLORS } from '../config/colors';
 
 export class Game extends Scene
 {
