@@ -9,7 +9,8 @@ import { createTextButton } from "../utils/createTextButton";
 export class PlayerSelection extends Scene {
     constructor () {
         super('PlayerSelection');
-        
+        this.playerCount = 5;
+        this.botCount = 0;
         this.cards = [];
         this.typeOrder = [
             PLAYER_TYPES.HUMAN, 
@@ -145,6 +146,23 @@ export class PlayerSelection extends Scene {
         const card = this.cards[cardIndex];
         
         const currentIndex = this.typeOrder.indexOf(card.playerType);
+        //block bot addition at 4 bots
+        switch(currentIndex){
+            case 0:
+                if(this.botCount==this.playerCount-1){
+                    return;
+                } else{
+                    this.botCount=this.botCount+1;
+                break;
+                }
+            case 1:
+                this.playerCount = this.playerCount-1;
+                this.botCount = this.botCount-1;
+                break;
+            case 2:
+                this.playerCount = this.playerCount+1;
+                break;
+            }
         const nextIndex = (currentIndex + 1) % this.typeOrder.length;
         
         card.playerType = this.typeOrder[nextIndex];
