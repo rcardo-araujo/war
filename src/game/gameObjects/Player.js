@@ -1,7 +1,8 @@
 export default class Player {
-    constructor(name, color) {
+    constructor(name, color, colorName) {
         this.name = name;
         this.color = color;
+        this.colorName = colorName;
         this.ownedTerritories = new Set();
         this.cards = [];
     }

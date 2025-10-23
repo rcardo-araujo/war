@@ -1,7 +1,7 @@
 import { PLAYER_TYPES } from '../config/playerTypes';
 import Player from '../gameObjects/Player';
 import Territory from '../gameObjects/Territory';
-
+import { COLORS } from "../config/colors";
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -59,14 +59,21 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     }
     
     initializePlayers(playerConfigs = []){
+        console.log(playerConfigs[0].color)
         this.players = playerConfigs.filter(
             cfg => cfg.type != PLAYER_TYPES.NONE
-        ).map(cfg => new Player(cfg.name, cfg.color));
+        ).map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColor(cfg.color)));
+        console.log(this.players)
     } 
 
-    initializeObjectives(players = []){
+    initializeObjectives(){
         const objectivesData = this.scene.cache.json.get("objectivesData");
-        console.log(objectivesData);
+        
+    }
+
+    getPlayerColor(hexColor){
+        const colorEntry = Object.entries(COLORS).find(([, value]) => value === hexColor);
+        return colorEntry ? colorEntry[0] : null;
     }
 
 }
