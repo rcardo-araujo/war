@@ -17,3 +17,12 @@ export function chooseObjectiveType(types, conquestDeckSize, playerCount){
     const randomIndex = Math.floor(Math.random() * filteredTypes.length);
     return filteredTypes[randomIndex];
 }
+
+export function getRandomOpponent(player, playersList){
+    const opponents = playersList.filter(current => current !== player);
+    if (opponents.length === 0){
+        return null;
+    }
+    const randomIndex = Math.floor(Math.random() * opponents.length);
+    return opponents[randomIndex];
+}
