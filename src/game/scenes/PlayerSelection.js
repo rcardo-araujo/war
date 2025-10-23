@@ -146,15 +146,10 @@ export class PlayerSelection extends Scene {
         const card = this.cards[cardIndex];
         
         const currentIndex = this.typeOrder.indexOf(card.playerType);
-        //block bot addition at 4 bots
         switch(currentIndex){
             case 0:
-                if(this.botCount==this.playerCount-1){
-                    return;
-                } else{
-                    this.botCount=this.botCount+1;
+                this.botCount=this.botCount+1;
                 break;
-                }
             case 1:
                 this.playerCount = this.playerCount-1;
                 this.botCount = this.botCount-1;
@@ -168,8 +163,23 @@ export class PlayerSelection extends Scene {
         card.playerType = this.typeOrder[nextIndex];
         
         this.updateSelectorDisplay(card);
+        this.updateArrow()
     }
-
+    updateArrow(){
+        if (this.botCount==this.playerCount-1){
+            this.cards.forEach((card, index) =>{
+                if(card.playerType==PLAYER_TYPES.HUMAN){
+                    card.selector.leftArrow.setVisible(false);
+                    card.selector.rightArrow.setVisible(false);
+                } 
+            });
+        }else{
+            this.cards.forEach((card, index) =>{
+                card.selector.leftArrow.setVisible(true);
+                card.selector.rightArrow.setVisible(true);
+            });
+    }
+    }
     createCard(cardLayout, cardIndex, playerName) {
         const card = {
             name: this.createNameComponent(cardLayout, playerName),
