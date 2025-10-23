@@ -11,9 +11,13 @@ export class Game extends Scene
         super('Game');
     }
 
+    init(data){
+        this.playerSetup = data.players;
+    }
+
     create ()
     {
-        this.gameState = new GameStateManager(this);
+        this.gameState = new GameStateManager(this, this.playerSetup);
 
         this.add.image(0, 0, 'board-background')
             .setOrigin(0)

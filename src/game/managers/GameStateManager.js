@@ -1,16 +1,20 @@
+import { PLAYER_TYPES } from '../config/playerTypes';
 import Player from '../gameObjects/Player';
 import Territory from '../gameObjects/Territory';
-
+import { COLORS } from "../config/colors";
+import Objective from '../gameObjects/Objective';
+import { shuffleInPlace, chooseObjectiveType, getRandomOpponent} from '../utils/objectiveDistribution';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
-    constructor(scene) {
+    constructor(scene, playerSetup = []) {
         super();
         this.scene = scene;
         this.territories = {};
         this.continents = {};
         this.players = []
         this.initializeMap();
-        this.initializePlayers();
+        this.initializePlayers(playerSetup);
+        this.initializeObjectives(this.players);
         this.distributeTerritories();
 
     }
@@ -56,19 +60,71 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
             }
         )
     }
+    
+    initializePlayers(playerConfigs = []){
+        this.players = playerConfigs.filter(
+            cfg => cfg.type != PLAYER_TYPES.NONE
+        ).map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color)));
+    } 
 
-    initializePlayers(playerParams = []) {
-        if (Array.isArray(playerParams) && playerParams.length > 2) {
-            playerParams.forEach(p => {
-                const name = p.name || 'Player';
-                const color = p.color === undefined ? null : p.color;
-                this.players.push(new Player(name, color));
-            });
-        } else {
-            this.players.push(new Player('Player 1', null));
-            this.players.push(new Player('Player 2', null));
+    initializeObjectives(){
+        if (this.players.length == 0){
+            return;
+        }
+        const objectivesData = this.scene.cache.json.get("objectivesData");
+        if (!objectivesData){
+            return;
         }
 
-        return this.players;
+        const fallbackDefinition = objectivesData.fallback;
+
+        const conquestDeck = Array.isArray(objectivesData.conquest) ? 
+        objectivesData.conquest.map(definition => new Objective({
+            type: 'conquest',
+            description: definition.description,
+            main: definition.main,
+            fallback:  fallbackDefinition
+        })) : [];
+        
+        shuffleInPlace(conquestDeck);
+        
+        const availableTypes = Array.isArray(objectivesData.types) ? [...objectivesData.types] : ["conquest"];
+        const destructionDefinition = objectivesData.destruction ?? null;
+
+        this.players.forEach(player => {
+            const type = chooseObjectiveType(availableTypes, conquestDeck.length, this.players.length);
+            if (type === "destruction" && destructionDefinition){
+                const opponent = getRandomOpponent(player, this.players);
+                if (opponent){
+                    const colorKey = opponent.colorKey;
+                    const colorLabel = destructionDefinition.colorLabels?.[colorKey];
+                    const descriptionTemplate = destructionDefinition.description ?? '';
+                    const description = descriptionTemplate.replace(/{{colorLabel}}/g, colorLabel);
+                    const objective = new Objective({
+                        type: 'destruction',
+                        description: description,
+                        main: {targetColor: colorKey},
+                        fallback: fallbackDefinition,
+                        target: opponent
+                    });
+                    player.setObjective(objective);
+                    return;
+                }
+            }
+
+            const conquestObjective = conquestDeck.pop();
+            if (conquestObjective){
+                player.setObjective(conquestObjective);
+            }
+        });
+        
+        
+
     }
+
+    getPlayerColorName(hexColor){
+        const colorEntry = Object.entries(COLORS).find(([, value]) => value === hexColor);
+        return colorEntry ? colorEntry[0] : null;
+    }
+
 }
