@@ -146,7 +146,17 @@ export class PlayerSelection extends Scene {
         const card = this.cards[cardIndex];
         
         const currentIndex = this.typeOrder.indexOf(card.playerType);
-        switch(currentIndex){
+        this.updatePlayerCount(currentIndex);
+        const nextIndex = (currentIndex + 1) % this.typeOrder.length;
+        
+        card.playerType = this.typeOrder[nextIndex];
+        
+        this.updateSelectorDisplay(card);
+        this.updateArrow()
+    }
+
+    updatePlayerCount(type){
+        switch(type){
             case 0:
                 this.botCount=this.botCount+1;
                 break;
@@ -158,12 +168,6 @@ export class PlayerSelection extends Scene {
                 this.playerCount = this.playerCount+1;
                 break;
             }
-        const nextIndex = (currentIndex + 1) % this.typeOrder.length;
-        
-        card.playerType = this.typeOrder[nextIndex];
-        
-        this.updateSelectorDisplay(card);
-        this.updateArrow()
     }
     updateArrow(){
         if (this.botCount==this.playerCount-1){
