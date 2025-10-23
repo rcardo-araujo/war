@@ -66,7 +66,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     } 
 
     initializeObjectives(){
-        const objectivesData = this.scene.cache.json.get("objectivesData");
         
     }
 

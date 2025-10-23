@@ -5,6 +5,11 @@ export default class Player {
         this.colorName = colorName;
         this.ownedTerritories = new Set();
         this.cards = [];
+        this.objective = null
+    }
+
+    addObjective(objective){
+        this.objective = objective
     }
 
     addTerritory(territory) {
