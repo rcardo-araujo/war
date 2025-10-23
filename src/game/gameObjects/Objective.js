@@ -1,5 +1,5 @@
 export default class Objective {
-    constructor({main, fallback, type, description}){
+    constructor({main, fallback, type, description, target = null}){
         this.type = type;
         this.target = target;
         this.main = main;
