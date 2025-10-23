@@ -16,7 +16,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.initializePlayers(playerSetup);
         this.initializeObjectives(this.players);
         this.distributeTerritories();
-    
+
     }
 
     initializeMap() {
@@ -38,17 +38,17 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         });
     }
 
-    distributeTerritories(){
+    distributeTerritories() {
         if (this.players.length === 0)
             return
         const territoriesIds = Object.values(this.territories).map(terrt => terrt.id);
-        
-        for (let i = territoriesIds.length - 1; i > 0; i--){
+
+        for (let i = territoriesIds.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [territoriesIds[i], territoriesIds[j]] = [territoriesIds[j], territoriesIds[i]];
         }
 
-        
+
         territoriesIds.forEach(
             (id, index) => {
                 const playerIndex = index % this.players.length;
@@ -56,6 +56,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                 const territory = this.territories[id];
                 player.addTerritory(territory);
                 territory.setOwner(player);
+                territory.addTroops(1);
             }
         )
     }
