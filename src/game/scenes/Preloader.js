@@ -48,7 +48,7 @@ export class Preloader extends Scene
         this.load.audio('click-sound', 'assets/audio/click.wav');
 
         this.load.json('mapData', 'assets/data/mapData.json');
-
+        this.load.json('objectivesData', 'assets/data/objectives.json');
         this.load.on('filecomplete-json-mapData', (key, type, data) => {
             data.territories.forEach(territory => {
                 const id = territory.id;
