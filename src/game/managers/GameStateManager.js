@@ -65,7 +65,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                 this.players.push(new Player(name, color));
             });
         } else {
-            // Default: two players
             this.players.push(new Player('Player 1', null));
             this.players.push(new Player('Player 2', null));
         }
