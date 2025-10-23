@@ -3,6 +3,7 @@ import Player from '../gameObjects/Player';
 import Territory from '../gameObjects/Territory';
 import { COLORS } from "../config/colors";
 import Objective from '../gameObjects/Objective';
+import { shuffleInPlace, chooseObjectiveType, getRandomOpponent} from '../utils/objectiveDistribution';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -74,37 +75,33 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
             return;
         }
 
-        const fallbackDefinition = objectivesData.fallback ?? null;
-        const fallbackFactory = () => fallbackDefinition ? new Objective({
-            type: fallbackDefinition.type ?? "fallback",
-            description: fallbackDefinition.description,
-            main: fallbackDefinition.main ?? null
-        }) : null;
+        const fallbackDefinition = objectivesData.fallback;
 
-        const conquestDeck = Array.isArray(objectivesData.conquest) 
-        ? objectivesData.conquest.map(definition => new Objective({
-            type: "conquest",
+        const conquestDeck = Array.isArray(objectivesData.conquest) ? 
+        objectivesData.conquest.map(definition => new Objective({
+            type: 'conquest',
             description: definition.description,
-            main: definition.main ?? null,
-            fallback: fallbackDefinition
-        })): [];
-
+            main: definition.main,
+            fallback:  fallbackDefinition
+        })) : [];
+        
         shuffleInPlace(conquestDeck);
-        const availableTypes = Array.isArray(objectivesData.types) ? [...objectivesData.types] : ['conquest'];
+        
+        const availableTypes = Array.isArray(objectivesData.types) ? [...objectivesData.types] : ["conquest"];
         const destructionDefinition = objectivesData.destruction ?? null;
 
         this.players.forEach(player => {
             const type = chooseObjectiveType(availableTypes, conquestDeck.length, this.players.length);
             if (type === "destruction" && destructionDefinition){
-                const opponent = getRandomOpponent(player);
+                const opponent = getRandomOpponent(player, this.players);
                 if (opponent){
                     const colorKey = opponent.colorKey;
-                    const colorLabel = destructionDefinition.colorLabels?.[colorKey] ?? opponent.name;
+                    const colorLabel = destructionDefinition.colorLabels?.[colorKey];
                     const descriptionTemplate = destructionDefinition.description ?? '';
                     const description = descriptionTemplate.replace(/{{colorLabel}}/g, colorLabel);
                     const objective = new Objective({
                         type: 'destruction',
-                        description,
+                        description: description,
                         main: {targetColor: colorKey},
                         fallback: fallbackDefinition,
                         target: opponent
@@ -114,12 +111,11 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                 }
             }
 
-            const conquestObjective = conquestDeck.pop() ?? fallbackFactory();
-            if (conquestObjective) {
+            const conquestObjective = conquestDeck.pop();
+            if (conquestObjective){
                 player.setObjective(conquestObjective);
             }
-
-        })
+        });
         
         
 
