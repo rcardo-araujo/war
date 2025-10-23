@@ -12,6 +12,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.players = []
         this.initializeMap();
         this.initializePlayers(playerSetup);
+        this.initializeObjectives(this.players);
         this.distributeTerritories();
     
     }
@@ -60,7 +61,12 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     initializePlayers(playerConfigs = []){
         this.players = playerConfigs.filter(
             cfg => cfg.type != PLAYER_TYPES.NONE
-        ).map(cfg => new Player(cfg.name, cfg.color))
+        ).map(cfg => new Player(cfg.name, cfg.color));
     } 
+
+    initializeObjectives(players = []){
+        const objectivesData = this.scene.cache.json.get("objectives");
+        
+    }
 
 }
