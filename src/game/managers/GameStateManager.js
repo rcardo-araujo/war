@@ -1,16 +1,17 @@
+import { PLAYER_TYPES } from '../config/playerTypes';
 import Player from '../gameObjects/Player';
 import Territory from '../gameObjects/Territory';
 
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
-    constructor(scene) {
+    constructor(scene, playerSetup = []) {
         super();
         this.scene = scene;
         this.territories = {};
         this.continents = {};
         this.players = []
         this.initializeMap();
-        this.initializePlayers();
+        this.initializePlayers(playerSetup);
         this.distributeTerritories();
     
     }
@@ -56,9 +57,10 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         )
     }
     
-    initializePlayers(playerParams = []){
-        // TODO: Implementation
-        // Create players and add to this.players
-        return null;
+    initializePlayers(playerConfigs = []){
+        this.players = playerConfigs.filter(
+            cfg => cfg.type != PLAYER_TYPES.NONE
+        ).map(cfg => new Player(cfg.name, cfg.color))
     } 
+
 }
