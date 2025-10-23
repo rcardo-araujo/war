@@ -11,6 +11,10 @@ export class Game extends Scene
         super('Game');
     }
 
+    init(data){
+        this.playerSetup = data.players;
+    }
+
     create ()
     {
         this.gameState = new GameStateManager(this);
