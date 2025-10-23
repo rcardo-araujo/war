@@ -2,8 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
-import { Colors } from '../config/colors';
-import Player from '../gameObjects/Player';
+import { COLORS } from '../config/colors';
 
 export class Game extends Scene
 {
@@ -12,12 +11,13 @@ export class Game extends Scene
         super('Game');
     }
 
+    init(data){
+        this.playerSetup = data.players;
+    }
+
     create ()
     {
-        this.gameState = new GameStateManager(this);
-
-        // UI is in a different scene that overlaps
-        this.scene.launch("UIScene", {gameStateManager: this.gameState});
+        this.gameState = new GameStateManager(this, this.playerSetup);
 
         this.add.image(0, 0, 'board-background')
             .setOrigin(0)

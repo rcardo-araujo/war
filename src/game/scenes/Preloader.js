@@ -41,13 +41,14 @@ export class Preloader extends Scene
     {
         this.load.image('logo', 'assets/images/logo.png');
         this.load.image('board-background', 'assets/images/maps/board-background.png');
+        this.load.image('main-background', 'assets/images/main-background.png');
 
         this.load.audio('background-music', 'assets/audio/background.mp3');
         this.load.audio('hover-sound', 'assets/audio/hover.mp3');
         this.load.audio('click-sound', 'assets/audio/click.wav');
 
         this.load.json('mapData', 'assets/data/mapData.json');
-
+        this.load.json('objectivesData', 'assets/data/objectives.json');
         this.load.on('filecomplete-json-mapData', (key, type, data) => {
             data.territories.forEach(territory => {
                 const id = territory.id;
