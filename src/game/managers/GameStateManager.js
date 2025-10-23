@@ -63,7 +63,6 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.players = playerConfigs.filter(
             cfg => cfg.type != PLAYER_TYPES.NONE
         ).map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColor(cfg.color)));
-        console.log(this.players)
     } 
 
     initializeObjectives(){
