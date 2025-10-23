@@ -1,0 +1,19 @@
+{
+    "types": ["destruction", "conquest"],
+    "destruction":{
+        "description": "destruir totalmente os EXÉRCITOS {{colorName}}\nse é você quem possui os exércitos {{colorName}} ou se o jogador que possui for eliminado por outro jogador, o seu objetivo passa a ser automaticamente conquistar 24 territórios"
+    },
+    "conquest": [
+        {"description": "conquistar na totalidade a AMÉRICA DO NORTE e a ÁFRICA"},
+        {"description": "conquistar na totalidade a ÁSIA e a ÁFRICA"},
+        {"description": "conquistar na totalidade a AMÉRICA DO NORTE e a OCEANIA"},
+        {"description": "conquistar na totalidade a EUROPA, a AMÉRICA DO SUL e mais um continente à sua escolha"},
+        {"description": "conquistar na totalidade a ÁSIA e a AMÉRICA DO SUL"},
+        {"description": "conquistar na totalidade a EUROPA, a OCEANIA e mais um terceiro continente à sua escolha"},
+        {"description": "conquistar 18 TERRITÓRIOS e ocupar cada um deles com pelo menos dois exércitos"},
+        {"description": "conquistar 24 territórios à sua escolha"}
+    ],
+    "fallback": {
+        "description": "conquistar 24 TERRITÓRIOS"
+    }
+}
