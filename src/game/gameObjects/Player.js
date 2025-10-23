@@ -1,15 +1,15 @@
 export default class Player {
-    constructor(name, color, colorName) {
+    constructor(name, color, colorKey = null) {
         this.name = name;
         this.color = color;
-        this.colorName = colorName;
+        this.colorKey = colorKey;
         this.ownedTerritories = new Set();
         this.cards = [];
-        this.objective = null
+        this.objective = null;
     }
 
-    addObjective(objective){
-        this.objective = objective
+    setObjective(objective) {
+        this.objective = objective;
     }
 
     addTerritory(territory) {
@@ -25,7 +25,7 @@ export default class Player {
     }
 
     calculateReinforcements() {
-        const territoryBonus = Math.floor(this.ownedTerritories.size() / 2);
+        const territoryBonus = Math.floor(this.ownedTerritories.size / 2);
         const continentBonus = this.calculateContinentBonus();
 
         return Math.max(3, territoryBonus) + continentBonus;
