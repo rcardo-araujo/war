@@ -1,3 +1,4 @@
+import Player from '../gameObjects/Player';
 import Territory from '../gameObjects/Territory';
 
 
@@ -7,7 +8,11 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.scene = scene;
         this.territories = {};
         this.continents = {};
+        this.players = []
         this.initializeMap();
+        this.initializePlayers();
+        this.distributeTerritories();
+
     }
 
     initializeMap() {
@@ -27,5 +32,44 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                 }
             });
         });
+    }
+
+    distributeTerritories() {
+        if (this.players.length === 0)
+            return
+        const territoriesIds = Object.values(this.territories).map(terrt => terrt.id);
+
+        for (let i = territoriesIds.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [territoriesIds[i], territoriesIds[j]] = [territoriesIds[j], territoriesIds[i]];
+        }
+
+
+        territoriesIds.forEach(
+            (id, index) => {
+                const playerIndex = index % this.players.length;
+                const player = this.players[playerIndex];
+                const territory = this.territories[id];
+                player.addTerritory(territory);
+                territory.setOwner(player);
+                territory.addTroops(1);
+            }
+        )
+    }
+
+    initializePlayers(playerParams = []) {
+        if (Array.isArray(playerParams) && playerParams.length > 2) {
+            playerParams.forEach(p => {
+                const name = p.name || 'Player';
+                const color = p.color === undefined ? null : p.color;
+                this.players.push(new Player(name, color));
+            });
+        } else {
+            // Default: two players
+            this.players.push(new Player('Player 1', null));
+            this.players.push(new Player('Player 2', null));
+        }
+
+        return this.players;
     }
 }
