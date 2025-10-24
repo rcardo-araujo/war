@@ -12,6 +12,7 @@ export class PlayerSelection extends Scene {
         this.playerCount = 5;
         this.botCount = 0;
         this.cards = [];
+        this.startButton = null;
         this.typeOrder = [
             PLAYER_TYPES.HUMAN, 
             PLAYER_TYPES.BOT, 
@@ -209,7 +210,7 @@ export class PlayerSelection extends Scene {
     create () {
         this.add.image(0, 0, 'main-background').setOrigin(0);
 
-        createTextButton(this,
+        this.startButton = createTextButton(this,
             (GameConfig.width / 2),
             (GameConfig.height + (CARDS.y + CARDS.height)) / 2,
             'INICIAR', 20, () => this.changeScene() 
