@@ -251,13 +251,8 @@ export class PlayerSelection extends Scene {
     }
 
     changeScene () {
-        if (this.playerCount<3){
-            window.alert("mínimo de 3 jogadores (jogador ou bot)");
-        }else{
-            const playersData = this.getPlayersData();
+        const playersData = this.getPlayersData();
 
-            this.scene.start('Game', { players: playersData });
-        }
-        
+        this.scene.start('Game', { players: playersData });
     }
 }
