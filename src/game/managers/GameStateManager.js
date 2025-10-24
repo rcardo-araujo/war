@@ -5,6 +5,7 @@ import { COLORS } from "../config/colors";
 import Objective from '../gameObjects/Objective';
 import { shuffleInPlace, chooseObjectiveType, getRandomOpponent} from '../utils/objectiveDistribution';
 import TurnManager, {TURN_PHASES} from './TurnManager';
+import MovementController from './MovementController';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -14,9 +15,11 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.continents = {};
         this.players = []
         this.TurnManager = null;
+        this.MovementController = null;
         this.initializeMap();
         this.initializePlayers(playerSetup);
         this.initializeTurnManager();
+        this.initializeMovementController();
         this.initializeObjectives(this.players);
         this.distributeTerritories();
 
@@ -72,6 +75,13 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
 
     initializeTurnManager(){
         this.TurnManager = new TurnManager(this.players)
+    }
+
+    initializeMovementController(){
+        if (!this.TurnManager){
+            throw new Error('Turn manager must be initialized before creating movement controller');
+        }
+        this.MovementController = new MovementController(this);
     }
 
     initializeObjectives(){
@@ -138,6 +148,26 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
 
     beginStrategicPhase(){
         this.setTurnPhase(TURN_PHASES.STRATEGIC);
+        if (!this.MovementController){
+            throw new Error('Movement controller not initialized');
+        }
+        this.MovementController.startStrategicMovement();
+    }
+
+    requestStrategicMove({fromId, toId, troops}){
+        if (!this.MovementController){
+            throw new Error('Movement controller not initialized');
+        }
+        return this.MovementController.moveTroopsBetweenTerritories({fromId, toId, troops});
+    }
+
+    endStrategicPhase(){
+        if (!this.MovementController){
+            throw new Error('Movement controller not inizialized');
+        }
+        this.MovementController.endStrategicMovement();
+        this.TurnManager.markStrategicMovePerformed();
+        this.TurnManager.setPhase(TURN_PHASES.END);
     }
 
     getPlayerColorName(hexColor){
