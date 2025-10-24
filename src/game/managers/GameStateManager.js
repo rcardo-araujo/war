@@ -4,6 +4,7 @@ import Territory from '../gameObjects/Territory';
 import { COLORS } from "../config/colors";
 import Objective from '../gameObjects/Objective';
 import { shuffleInPlace, chooseObjectiveType, getRandomOpponent} from '../utils/objectiveDistribution';
+import TurnManager, {TURN_PHASES} from './TurnManager';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -12,8 +13,10 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.territories = {};
         this.continents = {};
         this.players = []
+        this.TurnManager = null;
         this.initializeMap();
         this.initializePlayers(playerSetup);
+        this.initializeTurnManager();
         this.initializeObjectives(this.players);
         this.distributeTerritories();
 
@@ -66,6 +69,10 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
             cfg => cfg.type != PLAYER_TYPES.NONE
         ).map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color)));
     } 
+
+    initializeTurnManager(){
+        this.TurnManager = new TurnManager(this.players)
+    }
 
     initializeObjectives(){
         if (this.players.length == 0){
@@ -122,9 +129,35 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
 
     }
 
+    endCurrentTurn() {
+        if (!this.TurnManager){
+            throw new Error('Turn manager not initialized');
+        }
+        this.TurnManager.endTurn();
+    }
+
+    beginStrategicPhase(){
+        this.setTurnPhase(TURN_PHASES.STRATEGIC);
+    }
+
     getPlayerColorName(hexColor){
         const colorEntry = Object.entries(COLORS).find(([, value]) => value === hexColor);
         return colorEntry ? colorEntry[0] : null;
+    }
+
+    getCurrentPlayer(){
+        return this.TurnManager ? this.TurnManager.getCurrentPlayer() : null;
+    }
+
+    getTurnPhase(){
+        return this.TurnManager ? this.TurnManager.getCurrentPhase() : null;
+    }
+
+    setTurnPhase(phase){
+        if (!this.TurnManager){
+            throw new Error('Turn manager not initialized');
+        }
+        this.TurnManager.setPhase(phase);
     }
 
 }
