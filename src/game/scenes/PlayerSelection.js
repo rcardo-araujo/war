@@ -253,6 +253,6 @@ export class PlayerSelection extends Scene {
     changeScene () {
         const playersData = this.getPlayersData();
 
-        this.scene.start('Game', { players: playersData });
+        this.scene.start('Game', { players: playersData});
     }
 }
