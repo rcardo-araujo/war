@@ -28,4 +28,12 @@ export default class Territory {
     isNeighbor(territory) {
         return this.neighbors.has(territory.id);
     }
+
+    getNeighborIds() {
+        return Array.from(this.neighbors);
+    }
+
+    getTroopCount(){
+        return this.troops;
+    }
 }
