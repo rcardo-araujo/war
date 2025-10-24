@@ -153,7 +153,8 @@ export class PlayerSelection extends Scene {
         card.playerType = this.typeOrder[nextIndex];
         
         this.updateSelectorDisplay(card);
-        this.updateArrow()
+        this.updateArrow();
+        this.updateStartButton();
     }
 
     updatePlayerCount(type){
@@ -170,21 +171,33 @@ export class PlayerSelection extends Scene {
                 break;
             }
     }
+    
     updateArrow(){
-        if (this.botCount==this.playerCount-1){
+        if (this.botCount == (this.playerCount - 1)){
             this.cards.forEach((card, index) =>{
                 if(card.playerType==PLAYER_TYPES.HUMAN){
                     card.selector.leftArrow.setVisible(false);
                     card.selector.rightArrow.setVisible(false);
                 } 
             });
-        }else{
+        } else {
             this.cards.forEach((card, index) =>{
                 card.selector.leftArrow.setVisible(true);
                 card.selector.rightArrow.setVisible(true);
             });
+        }
     }
+
+    updateStartButton(){
+        if (this.playerCount < 3) {
+            this.startButton.setAlpha(0.2);
+            this.startButton.disableInteractive();
+        } else {
+            this.startButton.setAlpha(255); 
+            this.startButton.setInteractive();
+        }
     }
+
     createCard(cardLayout, cardIndex, playerName) {
         const card = {
             name: this.createNameComponent(cardLayout, playerName),
