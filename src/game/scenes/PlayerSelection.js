@@ -159,13 +159,16 @@ export class PlayerSelection extends Scene {
 
     updatePlayerCount(type){
         switch(type){
+            //Trocando o tipo HUMAN para BOT
             case 0:
                 this.botCount=this.botCount+1;
                 break;
+            //Tirando um Bot, Bot também está na quantidade de players
             case 1:
                 this.playerCount = this.playerCount-1;
                 this.botCount = this.botCount-1;
                 break;
+            //Trocando o tipo NONE para HUMAN
             case 2:
                 this.playerCount = this.playerCount+1;
                 break;
