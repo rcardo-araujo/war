@@ -13,38 +13,38 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
-        const centerX = this.cameras.main.centerX;
-        const bottomY = this.cameras.main.height - 50; // 50px acima da borda inferior
+        const padding = 20;
+        const bottomY = this.cameras.main.height - padding;
+        const leftX = padding;
 
-        // Texto do turno (parte debaixo da tela)
-        this.label = this.add.text(centerX, bottomY, 'Turno do Jogador #', {
-            font: '32px Arial',
+        let currentPlayer = this.gameStateManager.turnManager.getCurrentPlayer();
+        this.label = this.add.text(leftX, bottomY, 'Turno do Jogador #' + currentPlayer.name, {
+            font: '15px Arial',
             fill: '#ffffff',
-            backgroundColor: '#ff0000',
+            backgroundColor: `#${currentPlayer.color.toString(16).padStart(6, '0')}`,
             padding: { x: 10, y: 10 },
             align: 'center'
-        }).setOrigin(0.5, 1); // 1 para que a base do texto fique alinhada com bottomY
+        }).setOrigin(0, 1);
 
-        // Botão (um pouco acima do texto, se quiser)
-        let button = this.add.text(centerX, bottomY - 60, 'Próximo turno', {
-            font: '32px Arial',
+        let button = this.add.text(leftX, bottomY - this.label.height, 'Próximo turno', {
+            font: '12px Arial',
             fill: '#ffffff',
             backgroundColor: '#007bff',
-            padding: { x: 10, y: 10 },
+            padding: { x: 8, y: 8 },
             align: 'center'
         })
-            .setOrigin(0.5)
+            .setOrigin(0, 1)
             .setInteractive();
 
-        // Evento de clique no botão
         button.on('pointerdown', () => {
             this.gameStateManager.turnManager.nextTurn();
         });
 
-        // Atualiza o texto quando o turno muda
         this.gameStateManager.turnManager.on('nextTurn', (turn) => {
             this.label.setText("Turno do jogador # " + turn.getCurrentPlayer().name);
-            this.label.setStyle({ backgroundColor: `#${turn.getCurrentPlayer().color.toString(16).padStart(6, '0')}` });
+            this.label.setStyle({
+                backgroundColor: `#${turn.getCurrentPlayer().color.toString(16).padStart(6, '0')}`
+            });
         });
 
         this.setupEvents();
@@ -58,6 +58,7 @@ export class UIScene extends Phaser.Scene {
     }
 
     showTroopInput(territory, currentPlayer) {
+        console.log(currentPlayer.name);
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
