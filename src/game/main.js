@@ -3,6 +3,7 @@ import { Boot } from './scenes/Boot';
 import { Game } from './scenes/Game';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
+import { UIScene } from './scenes/UIScene';
 
 import { GameConfig } from './config/gameConfig'
 import { PlayerSelection } from './scenes/PlayerSelection';
@@ -18,7 +19,10 @@ const config = {
         PlayerSelection,
         Game,
         UIScene
-    ]
+    ],
+    dom: {
+        createContainer: true 
+    }
 };
 
 const StartGame = (parent) => {

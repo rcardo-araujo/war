@@ -4,6 +4,7 @@ import Territory from '../gameObjects/Territory';
 import { COLORS } from "../config/colors";
 import Objective from '../gameObjects/Objective';
 import { shuffleInPlace, chooseObjectiveType, getRandomOpponent} from '../utils/objectiveDistribution';
+import { TurnManager } from './TurnManager';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -17,7 +18,8 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.initializePlayers(playerSetup);
         this.initializeObjectives(this.players);
         this.distributeTerritories();
-
+        this.turnManager = new TurnManager(this.players);
+        
     }
 
     initializeMap() {
