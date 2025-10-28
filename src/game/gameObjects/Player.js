@@ -15,12 +15,10 @@ export default class Player {
 
     addTerritory(territory) {
         this.ownedTerritories.add(territory);
-        this.availableTroops = this.calculateReinforcements();
     }
 
     removeTerritory(territory) {
         this.ownedTerritories.delete(territory);
-        this.availableTroops = this.calculateReinforcements();
     }
 
     addCard(card) {
@@ -34,8 +32,8 @@ export default class Player {
         return Math.max(3, territoryBonus) + continentBonus;
     }
 
-    setAvailableTroops(amount) {
-        this.availableTroops = amount;
+    setAvailableTroops() {
+        this.availableTroops = this.calculateReinforcements();
     }
     
     calculateContinentBonus() {
