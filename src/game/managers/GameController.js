@@ -1,4 +1,5 @@
 import { TURN_PHASES } from './TurnManager';
+import { executeCombat } from '../utils/diceRoller';
 
 export default class GameController {
     constructor(gameStateManager) {
@@ -16,6 +17,8 @@ export default class GameController {
         this.gsm.on('ui:endPhaseClicked', this.handleEndPhaseRequest, this);
         this.gsm.on('troopsAllocated', this.handleTroopsAllocated, this);
         this.gsm.on('ui:territoryClicked', this.handleTerritoryClick, this);
+
+        this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
@@ -125,5 +128,9 @@ export default class GameController {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
+    }
+
+    handleAttackConfirm(){
+        executeCombat(3,this.attackTerritories.defender);
     }
 }
