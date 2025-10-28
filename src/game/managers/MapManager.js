@@ -45,6 +45,24 @@ export default class MapManager {
         });
     }
 
+    changePlayerTerritoryOwnership(territoryId, newOwner) {
+        const territory = this.getTerritory(territoryId);
+        if (territory) {
+            territory.setOwner(newOwner);
+        }
+    }
+
+    attackResolution(attackerTroops, defenderTroops, attackerTerritory, defenseTerritory) {
+
+        attackerTerritory.removeTroops(attackerTroops);
+        defenseTerritory.removeTroops(defenderTroops);
+        
+        if (defenderTroops <= 0) {
+            changePlayerTerritoryOwnership(defenseTerritory.id, attackerTerritory.owner);
+            //Logica de UI
+        }
+    }
+
     getTerritory(id) {
         return this.territories[id];
     }
