@@ -114,7 +114,7 @@
                         this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
                         inputContainer.destroy();
                     } else {
-                        alert(`Digite um número válido entre 1 e ${currentPlayer.availableTroops}!`);
+                        this.gameStateManager.emit('game:error', `Digite um número válido entre 1 e ${currentPlayer.availableTroops}!`, this);
                     }
                 } else if (event.target.id === 'cancelButton') {
                     this.gameStateManager.emit('troopsAllocated', { troops: 0, territory: territory });
@@ -122,7 +122,6 @@
                 }
             });
         }
-
 
         update(time, delta) {
         }
