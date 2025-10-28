@@ -1,8 +1,9 @@
 export const TURN_PHASES = Object.freeze({
+    FIRST_REINFORCEMENT: "first_reinforcement",
     REINFORCEMENT: "reinforcement",
     ATTACK: "attack",
     STRATEGIC: "strategic",
-    END: "END"
+    END: "end"
 })
 
 export default class TurnManager extends Phaser.Events.EventEmitter {
@@ -12,8 +13,7 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         this.currentPlayerIndex = 0;
         this.currentPhase = TURN_PHASES.FIRST_REINFORCEMENT;
         this.currentTurnCount = 0;
-        this.currentRoundCount = 0;   
-        this.hasPerformedStrategicMove = false;
+        this.currentRoundCount = 0;
     }
 
     setPlayers(players = []){
@@ -23,7 +23,7 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
     }
 
     resetTurnState(){
-        this.currentPhase = TURN_PHASES.REINFORCEMENT;
+        this.setPhase(TURN_PHASES.REINFORCEMENT);
         this.hasPerformedStrategicMove = false;
     }
 
@@ -44,6 +44,8 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         if (phase == TURN_PHASES.STRATEGIC){
             this.hasPerformedStrategicMove = false;
         }
+
+        this.emit("phaseChanged", this.currentPhase);
     }
 
     markStrategicMovePerformed(){
@@ -51,22 +53,37 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
     }
 
     hasStrategicMoveAvailable(){
-        return this.getCurrentPhase === TURN_PHASES.STRATEGIC && !this.hasPerformedStrategicMove;
+        return this.getCurrentPhase() === TURN_PHASES.STRATEGIC && !this.hasPerformedStrategicMove;
+    }
+
+    endPhase(){
+        switch (this.currentPhase){
+            case TURN_PHASES.REINFORCEMENT:
+                this.setPhase(TURN_PHASES.ATTACK);
+                break;
+            case TURN_PHASES.ATTACK:
+                this.setPhase(TURN_PHASES.STRATEGIC);
+                break;
+            case TURN_PHASES.STRATEGIC:
+                this.setPhase(TURN_PHASES.END);
+                break;
+            default:
+                this.endTurn();
+                break;
+        }
     }
 
     endTurn(){
+        console.log('Terminando turno...');
         if(++this.currentTurnCount % this.players.length === 0){
             this.currentRoundCount++;
         }
-        
-        if (this.players.length === 0){
-            this.currentPlayerIndex = 0;
-            this.resetTurnState();
-            this.emit("nextTurn", this);
-            return;
-        }
+
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-        this.resetTurnState();
+        
+        if(this.currentRoundCount != 0){
+            this.resetTurnState();
+        }
         this.emit("nextTurn", this);
     }
 }
