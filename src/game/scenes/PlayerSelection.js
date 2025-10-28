@@ -9,8 +9,10 @@ import { createTextButton } from "../utils/createTextButton";
 export class PlayerSelection extends Scene {
     constructor () {
         super('PlayerSelection');
-        
+        this.playerCount = 5;
+        this.botCount = 0;
         this.cards = [];
+        this.startButton = null;
         this.typeOrder = [
             PLAYER_TYPES.HUMAN, 
             PLAYER_TYPES.BOT, 
@@ -145,11 +147,58 @@ export class PlayerSelection extends Scene {
         const card = this.cards[cardIndex];
         
         const currentIndex = this.typeOrder.indexOf(card.playerType);
+        this.updatePlayerCount(currentIndex);
         const nextIndex = (currentIndex + 1) % this.typeOrder.length;
         
         card.playerType = this.typeOrder[nextIndex];
         
         this.updateSelectorDisplay(card);
+        this.updateArrow();
+        this.updateStartButton();
+    }
+
+    updatePlayerCount(type){
+        switch(type){
+            //Trocando o tipo HUMAN para BOT
+            case 0:
+                this.botCount=this.botCount+1;
+                break;
+            //Tirando um Bot, Bot também está na quantidade de players
+            case 1:
+                this.playerCount = this.playerCount-1;
+                this.botCount = this.botCount-1;
+                break;
+            //Trocando o tipo NONE para HUMAN
+            case 2:
+                this.playerCount = this.playerCount+1;
+                break;
+            }
+    }
+    
+    updateArrow(){
+        if (this.botCount == (this.playerCount - 1)){
+            this.cards.forEach((card, index) =>{
+                if(card.playerType==PLAYER_TYPES.HUMAN){
+                    card.selector.leftArrow.setVisible(false);
+                    card.selector.rightArrow.setVisible(false);
+                } 
+            });
+        } else {
+            this.cards.forEach((card, index) =>{
+                card.selector.leftArrow.setVisible(true);
+                card.selector.rightArrow.setVisible(true);
+            });
+        }
+    }
+
+    updateStartButton(){
+        if (this.playerCount < 3) {
+            this.startButton.setAlpha(0.2);
+            this.startButton.disableInteractive();
+        } else {
+            this.startButton.setAlpha(255); 
+            this.startButton.setInteractive();
+        }
     }
 
     createCard(cardLayout, cardIndex, playerName) {
@@ -177,7 +226,7 @@ export class PlayerSelection extends Scene {
     create () {
         this.add.image(0, 0, 'main-background').setOrigin(0);
 
-        createTextButton(this,
+        this.startButton = createTextButton(this,
             (GameConfig.width / 2),
             (GameConfig.height + (CARDS.y + CARDS.height)) / 2,
             'INICIAR', 20, () => this.changeScene() 
