@@ -1,9 +1,7 @@
-import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { COLORS } from '../config/colors';
-import { TURN_PHASES } from '../managers/TurnManager';
 
 export class Game extends Scene {
     constructor() {
@@ -25,16 +23,12 @@ export class Game extends Scene {
 
         this.drawMap();
         this.setupInteractivity();
+        this.setupGameEventListeners();
 
         this.scene.launch('UIScene', { gameStateManager: this.gameState });
     }
 
     update() {
-
-    }
-
-    changeScene() {
-        this.scene.start('GameOver');
     }
 
     drawMap() {
@@ -42,7 +36,7 @@ export class Game extends Scene {
 
         mapData.territories.forEach(territoryData => {
             const { id, name, position } = territoryData;
-            const territoryLogic = this.gameState.territories[id];
+            const territoryLogic = this.gameState.mapManager.getTerritory(id);
 
             const filledSprite = this.add.image(position.x, position.y, `${id}-filled`).setOrigin(0);
             const strokeSprite = this.add.image(position.x - 5 / 2, position.y - 5 / 2, `${id}-stroke`).setOrigin(0);
@@ -63,13 +57,34 @@ export class Game extends Scene {
 
             filledSprite.setTint(territoryLogic.color);
             strokeSprite.setTint(0xffff00);
-        })
+        });
     }
 
-    updateTroops(id) {
-        const territory = this.gameState.territories[id];
-        const troopText = this.territorySprites[id].troops;
-        troopText.setText(territory.troops);
+    setupGameEventListeners() {
+        this.gameState.on('game:troopCountChanged', (territoryId, newTroopCount) => {
+            this.updateTroops(territoryId, newTroopCount);
+        }, this);
+
+        this.gameState.on('game:ownerChanged', (territoryId, newColor) => {
+            this.updateTerritoryColor(territoryId, newColor);
+        }, this);
+        
+        this.gameState.on('game:setMapInteractive', (isInteractive) => {
+            if (isInteractive) {
+                this.enableInteractivity();
+            } else {
+                this.disableInteractivity();
+            }
+        }, this);
+    }
+    
+    updateTroops(territoryId, newTroopCount) {
+        const troopText = this.territorySprites[territoryId].troops;
+        troopText.setText(newTroopCount);
+    }
+
+    updateTerritoryColor(territoryId, newColor) {
+        this.territorySprites[territoryId].filled.setTint(newColor);
     }
 
     setupInteractivity() {
@@ -80,10 +95,9 @@ export class Game extends Scene {
             stroke.setTint(0xffffff);
             const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
             troopCount.setScale(1.1);
-
             this.children.bringToTop(gameObject);
             this.children.bringToTop(stroke);
-            this.children.bringToTop(troopCount);
+            this.children.bringToTop(troopCount); 
         });
 
         this.input.on('gameobjectout', (pointer, gameObject) => {
@@ -92,11 +106,11 @@ export class Game extends Scene {
             stroke.setScale(1);
             stroke.setTint(0xffff00);
             const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
-            troopCount.setScale(1);
+            troopCount.setScale(1); 
         });
 
         this.input.on('gameobjectdown', (pointer, gameObject) => {
-            this.processTerritoryClick(gameObject.getData('logic'));
+            this.gameState.emit('ui:territoryClicked', gameObject.getData('logic'));
         });
     }
 
@@ -106,7 +120,7 @@ export class Game extends Scene {
             troops.setScale(1);
             filled.setScale(1);
             filled.disableInteractive();
-        });
+        }); 
     }
 
     enableInteractivity() {
@@ -115,38 +129,6 @@ export class Game extends Scene {
             troops.setScale(1);
             filled.setScale(1);
             filled.setInteractive({ pixelPerfect: true });
-        });
+        }); 
     }
-
-    processTerritoryClick(territory) {
-        if (this.gameState.TurnManager.currentRoundCount === 0) {
-            const currentPlayer = this.gameState.getCurrentPlayer();
-            if (territory.owner === currentPlayer) {
-
-                const handler = (value) => {
-                    this.enableInteractivity();
-                    if (value > currentPlayer.availableTroops) {
-                        alert("Você não tem tropas suficientes para alocar essa quantidade.");
-                        return;
-                    }
-
-                    territory.addTroops(value);
-                    currentPlayer.availableTroops -= value;
-                    this.updateTroops(territory.id);
-
-                    this.gameState.off('troopsAllocated', handler);
-                };
-
-                this.gameState.on('troopsAllocated', handler);
-
-                this.disableInteractivity();
-
-                this.gameState.emit('territorySelected', territory, currentPlayer);
-            }
-            else {
-                alert("Você não possui esse território!");
-            }
-        }
-    }
-
 }
