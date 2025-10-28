@@ -17,7 +17,7 @@ export class UIScene extends Phaser.Scene {
         const bottomY = this.cameras.main.height - padding;
         const leftX = padding;
 
-        let currentPlayer = this.gameStateManager.turnManager.getCurrentPlayer();
+        let currentPlayer = this.gameStateManager.getCurrentPlayer();
         this.label = this.add.text(leftX, bottomY, 'Turno do Jogador #' + currentPlayer.name, {
             font: '15px Arial',
             fill: '#ffffff',
@@ -37,10 +37,10 @@ export class UIScene extends Phaser.Scene {
             .setInteractive();
 
         button.on('pointerdown', () => {
-            this.gameStateManager.turnManager.nextTurn();
+            this.gameStateManager.endCurrentTurn();
         });
 
-        this.gameStateManager.turnManager.on('nextTurn', (turn) => {
+        this.gameStateManager.TurnManager.on('nextTurn', (turn) => {
             this.label.setText("Turno do jogador # " + turn.getCurrentPlayer().name);
             this.label.setStyle({
                 backgroundColor: `#${turn.getCurrentPlayer().color.toString(16).padStart(6, '0')}`

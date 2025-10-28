@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { COLORS } from '../config/colors';
+import { TURN_PHASES } from '../managers/TurnManager';
 
 export class Game extends Scene {
     constructor() {
@@ -118,8 +119,8 @@ export class Game extends Scene {
     }
 
     processTerritoryClick(territory) {
-        if (this.gameState.turnManager.currentRound === 0) {
-            const currentPlayer = this.gameState.turnManager.getCurrentPlayer();
+        if (this.gameState.TurnManager.currentRoundCount === 0) {
+            const currentPlayer = this.gameState.getCurrentPlayer();
             if (territory.owner === currentPlayer) {
 
                 const handler = (value) => {

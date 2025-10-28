@@ -19,12 +19,10 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.MovementController = null;
         this.initializeMap();
         this.initializePlayers(playerSetup);
-        this.initializeTurnManager();
+        this.initializeTurnManager(this.players);
         this.initializeMovementController();
         this.initializeObjectives(this.players);
-        this.distributeTerritories();
-        this.turnManager = new TurnManager(this.players);
-        
+        this.distributeTerritories();        
     }
 
     initializeMap() {
