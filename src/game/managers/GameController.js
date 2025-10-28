@@ -19,6 +19,7 @@ export default class GameController {
         this.gsm.on('ui:territoryClicked', this.handleTerritoryClick, this);
 
         this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
+        this.gsm.on('game:attackCommitted', this.onAttackCommit, this);
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
@@ -111,13 +112,31 @@ export default class GameController {
                 this.gsm.emit('game:error', "Você só pode atacar territórios vizinhos!");
             } else {
                 this.attackTerritories.defender = territory;
-                this.gsm.emit('game:defenderSelected', territory);
+                this.gsm.emit('game:defenderSelected', territory, this.attackTerritories.attacker);
             }
         } else {
             this.attackTerritories.attacker = null;
             this.attackTerritories.defender = null;
             this.gsm.emit('game:unselectAttacker', territory);
         }
+    }
+
+    onAttackCommit({ attackDice, attacker, defender }) {
+        if (attackDice === 0){
+            this.gameStateManager.emit('game:unselectAttacker', attacker);
+            this.attackTerritories.attacker = null;
+            this.attackTerritories.defender = null;
+            return;
+        }
+        const casualties = executeCombat(attackDice, defender);
+        this.attackTerritories.attacker.removeTroops(casualties[0]);
+        this.attackTerritories.defender.removeTroops(casualties[1]);
+        
+        if (defender.getTroopCount() === 0) {
+            // this.gameStateManager.emit('game:territoryConquered', )
+        }
+        
+        this.gsm.emit('setMapInteractive', true);
     }
 
     onPhaseChanged(newPhase) {
@@ -131,6 +150,6 @@ export default class GameController {
     }
 
     handleAttackConfirm(){
-        executeCombat(3,this.attackTerritories.defender);
+        this.gsm.emit('setMapInteractive', false);
     }
 }

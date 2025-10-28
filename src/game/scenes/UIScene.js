@@ -59,11 +59,14 @@
             this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
                 this.showTroopInput(territory, currentPlayer);
             });
-            this.gameStateManager.on('game:defenderSelected', (territory) => {
-                this.showConfirmAttack();
+            this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
+                this.showConfirmAttack({"defender": defenderTerritory, "attacker": attackerTerritory});
             }, this);
             this.gameStateManager.on('game:unselectAttacker', (territory) => {
                 this.hideConfirmAttack();
+            }, this);
+            this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
+                this.showAttackInput(defenderTerritory, attackerTerritory);
             }, this);
         }
 
@@ -91,23 +94,23 @@
             const centerY = this.cameras.main.centerY;
 
             const html = `
-        <div style="
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            color: white;
-            font-family: Arial;
-        ">
-            <p>Território: <strong>${territory.name}</strong></p>
-            <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops}</strong></p>
-            <p>Quantas tropas colocar?</p>
-            <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops}" value="1" style="width: 60px; text-align: center;">
-            <br><br>
-            <button id="confirmButton">Confirmar</button>
-            <button id="cancelButton">Cancelar</button>
-        </div>
-        `;
+                <div style="
+                    background: rgba(0,0,0,0.8);
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: center;
+                    color: white;
+                    font-family: Arial;
+                ">
+                    <p>Território: <strong>${territory.name}</strong></p>
+                    <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops}</strong></p>
+                    <p>Quantas tropas colocar?</p>
+                    <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops}" value="1" style="width: 60px; text-align: center;">
+                    <br><br>
+                    <button id="confirmButton">Confirmar</button>
+                    <button id="cancelButton">Cancelar</button>
+                </div>
+                `;
 
             const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
 
@@ -129,9 +132,77 @@
             });
         }
 
-        showConfirmAttack() {
+        showAttackInput(attackerTerritory, defenderTerritory) {
+            const centerX = this.cameras.main.centerX;
+            const centerY = this.cameras.main.centerY;
+
+            const maxAttackDice = Math.min(3, attackerTerritory.troops - 1);
+
+            const html = `
+            <div style="
+                background: rgba(0,0,0,0.8);
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                color: white;
+                font-family: Arial;
+            ">
+                <p style="font-size: 18px; margin-top: 0;"><strong>ATAQUE</strong></p>
+                <p>De: <strong>${attackerTerritory.name}</strong> (${attackerTerritory.troops} tropas)</p>
+                <p>Para: <strong>${defenderTerritory.name}</strong> (${defenderTerritory.troops} tropas)</p>
+                <hr style="border-color: #555;">
+                <p>Atacar com quantas tropas (dados)?</p>
+                
+                <input 
+                    id="attack-troops-input" 
+                    type="number" 
+                    min="1" 
+                    max="${maxAttackDice}" 
+                    value="${maxAttackDice}" 
+                    style="width: 60px; text-align: center;"
+                >
+                
+                <br><br>
+                <button id="confirmAttackButton">Atacar!</button>
+                <button id="cancelAttackButton">Cancelar</button>
+            </div>
+            `;
+
+            const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
+
+            inputContainer.addListener('click');
+            inputContainer.on('click', (event) => {
+                
+                if (event.target.id === 'confirmAttackButton') {
+                    const value = parseInt(inputContainer.getChildByID('attack-troops-input').value, 10);
+                    if (!isNaN(value) && value >= 1 && value <= maxAttackDice) {
+                        this.gameStateManager.emit('game:attackCommitted', { 
+                            attackDice: value, 
+                            attacker: attackerTerritory, 
+                            defender: defenderTerritory 
+                        });
+                        
+                        inputContainer.destroy();
+                    } else {
+                        this.gameStateManager.emit('game:error', `Número inválido. Deve ser entre 1 e ${maxAttackDice}.`, this);
+                    }
+                    
+                } else if (event.target.id === 'cancelAttackButton') {
+                    this.gameStateManager.emit('game:attackCommitted', { 
+                        attackDice: 0, 
+                        attacker: attackerTerritory, 
+                        defender: defenderTerritory 
+                    });
+                    
+                    inputContainer.destroy();
+                }
+            });
+        }
+
+        showConfirmAttack(territories) {
             const centerX = this.cameras.main.centerX;
             const bottomY = this.cameras.main.height - 20;
+            const { defender, attacker } = territories;
 
             this.attackButton = this.add.text(centerX, bottomY, 'Confirmar Ataque', {
                 font: '16px Arial',
@@ -144,7 +215,7 @@
             .setInteractive();
 
             this.attackButton.on('pointerdown', () => {
-                this.gameStateManager.emit('game:attackConfirmed');
+                this.gameStateManager.emit('game:attackConfirmed', defender, attacker, this);
             });
         }
 
