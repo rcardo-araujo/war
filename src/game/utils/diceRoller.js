@@ -1,3 +1,5 @@
+import Territory from "../gameObjects/Territory";
+
 export function executeCombat(attackingTroops, territory) {
     const defense = Math.min(3,territory.getTroopCount());
     // gera valores em ordem decrescente
@@ -14,11 +16,13 @@ export function executeCombat(attackingTroops, territory) {
             casualties[0]++;
         }
     }
+    // remover alerta ao adicionar atualizar território após combate
+    window.alert(casualties)
     return casualties;
 }
 
 function rollDice(ammount) {
-    result = []
+    let result = []
 
         //adicionar efeito visual para a rolagem de dados
 
