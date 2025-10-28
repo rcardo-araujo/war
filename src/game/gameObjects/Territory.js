@@ -6,11 +6,13 @@ export default class Territory {
         this.neighbors = new Set();
 
         this.owner = null;
+        this.color = null;
         this.troops = 0;
     }
 
     setOwner(player) {
         this.owner = player;
+        this.color = player.color;
     }
 
     addTroops(amount) {

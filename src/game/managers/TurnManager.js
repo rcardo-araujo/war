@@ -5,11 +5,14 @@ export const TURN_PHASES = Object.freeze({
     END: "END"
 })
 
-export default class TurnManager {
-    constructor(player = []){
-        this.players = this.players;
+export default class TurnManager extends Phaser.Events.EventEmitter {
+    constructor(players){
+        super();
+        this.players = players;
         this.currentPlayerIndex = 0;
-        this.currentPhase = TURN_PHASES.REINFORCEMENT;
+        this.currentPhase = TURN_PHASES.FIRST_REINFORCEMENT;
+        this.currentTurnCount = 0;
+        this.currentRoundCount = 0;   
         this.hasPerformedStrategicMove = false;
     }
 
@@ -52,12 +55,18 @@ export default class TurnManager {
     }
 
     endTurn(){
+        if(++this.currentTurnCount % this.players.length === 0){
+            this.currentRoundCount++;
+        }
+        
         if (this.players.length === 0){
             this.currentPlayerIndex = 0;
             this.resetTurnState();
+            this.emit("nextTurn", this);
             return;
         }
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
         this.resetTurnState();
+        this.emit("nextTurn", this);
     }
 }

@@ -11,6 +11,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
         super();
         this.scene = scene;
+        this.players = this.scene.players;
         this.territories = {};
         this.continents = {};
         this.players = []
@@ -18,11 +19,10 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.MovementController = null;
         this.initializeMap();
         this.initializePlayers(playerSetup);
-        this.initializeTurnManager();
+        this.initializeTurnManager(this.players);
         this.initializeMovementController();
         this.initializeObjectives(this.players);
-        this.distributeTerritories();
-
+        this.distributeTerritories();        
     }
 
     initializeMap() {
