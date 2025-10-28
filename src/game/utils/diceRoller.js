@@ -1,5 +1,5 @@
 export function executeCombat(attackingTroops, territory) {
-    const defense = territory.getTroopCount
+    const defense = Math.min(3,territory.getTroopCount());
     // gera valores em ordem decrescente
     let attackDice = rollDice(attackingTroops);
     let defenseDice = rollDice(defense);
