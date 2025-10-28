@@ -42,6 +42,7 @@
             this.button.on('pointerdown', () => {
                 this.gameStateManager.emit('ui:endPhaseClicked');
             });
+            this.attackButton = null;
 
             this.setupEvents();
             this.updateButtonText(this.gameStateManager.getCurrentPhase());
@@ -58,6 +59,12 @@
             this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
                 this.showTroopInput(territory, currentPlayer);
             });
+            this.gameStateManager.on('game:defenderSelected', (territory) => {
+                this.showConfirmAttack();
+            }, this);
+            this.gameStateManager.on('game:unselectAttacker', (territory) => {
+                this.hideConfirmAttack();
+            }, this);
         }
 
         updateTurnLabel(newPlayer) {
@@ -80,7 +87,6 @@
         }
 
         showTroopInput(territory, currentPlayer) {
-            console.log(currentPlayer.name);
             const centerX = this.cameras.main.centerX;
             const centerY = this.cameras.main.centerY;
 
@@ -121,6 +127,32 @@
                     inputContainer.destroy();
                 }
             });
+        }
+
+        showConfirmAttack() {
+            const centerX = this.cameras.main.centerX;
+            const bottomY = this.cameras.main.height - 20;
+
+            this.attackButton = this.add.text(centerX, bottomY, 'Confirmar Ataque', {
+                font: '16px Arial',
+                fill: '#ffffff',
+                backgroundColor: '#dc3545',
+                padding: { x: 10, y: 10 },
+                align: 'center'
+            })
+            .setOrigin(0, 1)
+            .setInteractive();
+
+            this.attackButton.on('pointerdown', () => {
+                this.gameStateManager.emit('game:attackConfirmed');
+            });
+        }
+
+        hideConfirmAttack() {
+            if (this.attackButton) {
+                this.attackButton.destroy();
+                this.attackButton = null;
+            }
         }
 
         update(time, delta) {

@@ -74,7 +74,6 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
     }
 
     endTurn(){
-        console.log('Terminando turno...');
         if(++this.currentTurnCount % this.players.length === 0){
             this.currentRoundCount++;
         }

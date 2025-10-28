@@ -3,7 +3,7 @@ import MapManager from './MapManager';
 import PlayerManager from './PlayerManager';
 import TurnManager from './TurnManager';
 import MovementController from './MovementController';
-import GameController from './GameController'; // O novo arquivo!
+import GameController from './GameController';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {

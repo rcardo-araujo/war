@@ -20,6 +20,8 @@ export class Game extends Scene {
             .setDisplaySize(GameConfig.width, GameConfig.height);
 
         this.territorySprites = {};
+        this.highlightedAttacker = null;
+        this.highlightedDefender = null;
 
         this.drawMap();
         this.setupInteractivity();
@@ -76,6 +78,16 @@ export class Game extends Scene {
                 this.disableInteractivity();
             }
         }, this);
+
+        this.gameState.on('game:attackerSelected', (territory) => {
+            this.highlightAttacker(territory);
+        }, this);
+        this.gameState.on('game:defenderSelected', (territory) => {
+            this.highlightDefender(territory);
+        }, this);
+        this.gameState.on('game:unselectAttacker', (territory) => {
+            this.clearHighlights();
+        }, this);
     }
     
     updateTroops(territoryId, newTroopCount) {
@@ -87,12 +99,63 @@ export class Game extends Scene {
         this.territorySprites[territoryId].filled.setTint(newColor);
     }
 
+    highlightAttacker(territory){
+        this.clearHighlights();
+
+        this.highlightedAttacker = territory;
+        const sprites = this.territorySprites[territory.id];
+        sprites.stroke.setTint(0xff0000);
+        sprites.filled.setScale(1.1);
+        sprites.stroke.setScale(1.1);
+        sprites.troops.setScale(1.1);
+
+        this.children.bringToTop(sprites.filled);
+        this.children.bringToTop(sprites.stroke);
+        this.children.bringToTop(sprites.troops);
+    }
+
+    highlightDefender(territory) {
+        this.highlightedDefender = territory;
+        const sprites = this.territorySprites[territory.id];
+
+        sprites.stroke.setTint(0x0000ff);
+        sprites.filled.setScale(1.1);
+        sprites.stroke.setScale(1.1);
+        sprites.troops.setScale(1.1);
+
+        this.children.bringToTop(sprites.filled);
+        this.children.bringToTop(sprites.stroke);
+        this.children.bringToTop(sprites.troops);
+    }
+
+    clearHighlights() {
+        if (this.highlightedAttacker) {
+            const sprites = this.territorySprites[this.highlightedAttacker.id];
+            sprites.stroke.setTint(0xffff00);
+            sprites.filled.setScale(1);
+            sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
+        }
+        if (this.highlightedDefender) {
+            const sprites = this.territorySprites[this.highlightedDefender.id];
+            sprites.stroke.setTint(0xffff00);
+            sprites.filled.setScale(1);
+            sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
+        }
+        
+        this.highlightedAttacker = null;
+        this.highlightedDefender = null;
+    }
+
     setupInteractivity() {
         this.input.on('gameobjectover', (pointer, gameObject) => {
             gameObject.setScale(1.1);
             const stroke = this.territorySprites[gameObject.getData('logic').id].stroke;
             stroke.setScale(1.1);
-            stroke.setTint(0xffffff);
+            if (this.highlightedAttacker && gameObject.getData('logic').id !== this.highlightedAttacker.id){
+                stroke.setTint(0xffffff);
+            }
             const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
             troopCount.setScale(1.1);
             this.children.bringToTop(gameObject);
@@ -101,12 +164,19 @@ export class Game extends Scene {
         });
 
         this.input.on('gameobjectout', (pointer, gameObject) => {
-            gameObject.setScale(1);
-            const stroke = this.territorySprites[gameObject.getData('logic').id].stroke;
-            stroke.setScale(1);
-            stroke.setTint(0xffff00);
-            const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
-            troopCount.setScale(1); 
+            const territoryLogic = gameObject.getData('logic');
+            const sprites = this.territorySprites[territoryLogic.id];
+
+            if (territoryLogic !== this.highlightedAttacker && territoryLogic !== this.highlightedDefender) {
+                sprites.filled.setScale(1);
+                sprites.stroke.setScale(1);
+                sprites.troops.setScale(1);
+                sprites.stroke.setTint(0xffff00);
+            } else if (territoryLogic === this.highlightedAttacker) {
+                sprites.stroke.setTint(0xff0000);
+            } else if (territoryLogic === this.highlightedDefender) {
+                sprites.stroke.setTint(0x0000ff);
+            }
         });
 
         this.input.on('gameobjectdown', (pointer, gameObject) => {

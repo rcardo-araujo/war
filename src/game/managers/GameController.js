@@ -6,6 +6,10 @@ export default class GameController {
         this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
+        this.attackTerritories = {
+            attacker: null,
+            defender: null
+        }
     }
 
     setupEventListeners() {
@@ -58,7 +62,7 @@ export default class GameController {
                 this.handleReinforcementClick(territory);
                 break;
             case TURN_PHASES.ATTACK:
-                // this.handleAttackClick(territory);
+                this.handleAttackClick(territory);
                 break;
             case TURN_PHASES.STRATEGIC:
                 // this.handleStrategicClick(territory);
@@ -77,6 +81,39 @@ export default class GameController {
         }
         else {
             this.gsm.emit('game:error', "Você não possui esse território!");
+        }
+    }
+
+    handleAttackClick(territory) {
+        const currentPlayer = this.gsm.getCurrentPlayer();
+        console.log(this.attackTerritories);
+        if (this.attackTerritories.attacker === null) {
+            if (territory.owner !== currentPlayer) {
+                this.gsm.emit('game:error', "Você só pode atacar a partir de seus próprios territórios!");
+            } else if (territory.getTroopCount() < 2) {
+                this.gsm.emit('game:error', "Você precisa de pelo menos 2 tropas para atacar!");
+            } else {
+                this.attackTerritories.attacker = territory;
+                this.gsm.emit('game:attackerSelected', territory);
+            }
+        } else if (this.attackTerritories.defender === null) {
+            if (territory === this.attackTerritories.attacker) {
+                this.attackTerritories.attacker = null;
+                this.gsm.emit('game:unselectAttacker', territory);
+            } else if (territory.owner === currentPlayer) {
+                this.attackTerritories.attacker = null;
+                this.gsm.emit('game:unselectAttacker', territory);
+                this.handleAttackClick(territory);
+            } else if (!this.attackTerritories.attacker.isNeighbor(territory)) {
+                this.gsm.emit('game:error', "Você só pode atacar territórios vizinhos!");
+            } else {
+                this.attackTerritories.defender = territory;
+                this.gsm.emit('game:defenderSelected', territory);
+            }
+        } else {
+            this.attackTerritories.attacker = null;
+            this.attackTerritories.defender = null;
+            this.gsm.emit('game:unselectAttacker', territory);
         }
     }
 
