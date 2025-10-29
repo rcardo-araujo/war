@@ -128,12 +128,17 @@ export default class GameController {
             this.attackTerritories.defender.removeTroops(casualties[1]);
             
             if (defender.getTroopCount() <= 0) {
-                // this.gsm.emit('game:territoryConquered', )
+                this.gsm.mapManager.changePlayerTerritoryOwnership(defender.id, attacker.owner);
+                this.gsm.emit('game:ownerChanged', defender.id);
+                const movingTroops = attackDice;
+                attacker.removeTroops(movingTroops);
+                defender.addTroops(movingTroops);
+                
             }
-    
-            this.gsm.emit('game:setMapInteractive', true);
+
             this.gsm.emit('game:troopCountChanged', attacker.id);
             this.gsm.emit('game:troopCountChanged', defender.id);
+            this.gsm.emit('game:setMapInteractive', true);
         }
 
         this.gsm.emit('game:unselectAttacker', attacker);
