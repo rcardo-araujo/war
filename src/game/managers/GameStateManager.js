@@ -26,4 +26,8 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     getCurrentPhase() {
         return this.turnManager.getCurrentPhase();
     }
+
+    getTerritory(territoryId) {
+        return this.mapManager.getTerritory(territoryId);
+    }
 }

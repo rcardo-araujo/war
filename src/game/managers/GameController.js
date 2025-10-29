@@ -2,8 +2,8 @@ import { TURN_PHASES } from './TurnManager';
 import { executeCombat } from '../utils/diceRoller';
 
 export default class GameController {
-    constructor(gameStateManager) {
-        this.gsm = gameStateManager;
+    constructor(gsm) {
+        this.gsm = gsm;
         this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
@@ -19,6 +19,7 @@ export default class GameController {
         this.gsm.on('ui:territoryClicked', this.handleTerritoryClick, this);
 
         this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
+        this.gsm.on('game:attackCommitted', this.onAttackCommit, this);
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
@@ -54,7 +55,7 @@ export default class GameController {
         }
         territory.addTroops(troops);
         currentPlayer.availableTroops -= troops;
-        this.gsm.emit('game:troopCountChanged', territory.id, territory.troops);
+        this.gsm.emit('game:troopCountChanged', territory.id);
         this.gsm.emit('game:setMapInteractive', true);
     }
 
@@ -111,13 +112,38 @@ export default class GameController {
                 this.gsm.emit('game:error', "Você só pode atacar territórios vizinhos!");
             } else {
                 this.attackTerritories.defender = territory;
-                this.gsm.emit('game:defenderSelected', territory);
+                this.gsm.emit('game:defenderSelected', territory, this.attackTerritories.attacker);
             }
         } else {
             this.attackTerritories.attacker = null;
             this.attackTerritories.defender = null;
             this.gsm.emit('game:unselectAttacker', territory);
         }
+    }
+
+    onAttackCommit({ attackDice, attacker, defender }) {
+        if (attackDice !== 0){
+            const casualties = executeCombat(attackDice, defender);
+            this.attackTerritories.attacker.removeTroops(casualties[0]);
+            this.attackTerritories.defender.removeTroops(casualties[1]);
+            
+            if (defender.getTroopCount() <= 0) {
+                this.gsm.mapManager.changePlayerTerritoryOwnership(defender.id, attacker.owner);
+                this.gsm.emit('game:ownerChanged', defender.id);
+                const movingTroops = attackDice;
+                attacker.removeTroops(movingTroops);
+                defender.addTroops(movingTroops);
+                
+            }
+
+            this.gsm.emit('game:troopCountChanged', attacker.id);
+            this.gsm.emit('game:troopCountChanged', defender.id);
+            this.gsm.emit('game:setMapInteractive', true);
+        }
+
+        this.gsm.emit('game:unselectAttacker', attacker);
+        this.attackTerritories.attacker = null;
+        this.attackTerritories.defender = null;
     }
 
     onPhaseChanged(newPhase) {
@@ -131,6 +157,7 @@ export default class GameController {
     }
 
     handleAttackConfirm(){
-        executeCombat(3,this.attackTerritories.defender);
+        console.log("Ataque confirmado");
+        this.gsm.emit('game:setMapInteractive', false);
     }
 }

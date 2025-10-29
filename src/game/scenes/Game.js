@@ -63,12 +63,12 @@ export class Game extends Scene {
     }
 
     setupGameEventListeners() {
-        this.gameState.on('game:troopCountChanged', (territoryId, newTroopCount) => {
-            this.updateTroops(territoryId, newTroopCount);
+        this.gameState.on('game:troopCountChanged', (territoryId) => {
+            this.updateTroops(territoryId);
         }, this);
 
-        this.gameState.on('game:ownerChanged', (territoryId, newColor) => {
-            this.updateTerritoryColor(territoryId, newColor);
+        this.gameState.on('game:ownerChanged', (territoryId) => {
+            this.updateTerritoryColor(territoryId);
         }, this);
         
         this.gameState.on('game:setMapInteractive', (isInteractive) => {
@@ -90,12 +90,13 @@ export class Game extends Scene {
         }, this);
     }
     
-    updateTroops(territoryId, newTroopCount) {
+    updateTroops(territoryId) {
         const troopText = this.territorySprites[territoryId].troops;
-        troopText.setText(newTroopCount);
+        troopText.setText(this.gameState.getTerritory(territoryId).getTroopCount());
     }
 
-    updateTerritoryColor(territoryId, newColor) {
+    updateTerritoryColor(territoryId) {
+        const newColor = this.gameState.getTerritory(territoryId).owner.getColor();
         this.territorySprites[territoryId].filled.setTint(newColor);
     }
 

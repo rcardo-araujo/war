@@ -93,7 +93,7 @@
             "id": "egito",
             "name": "Egito",
             "continent": "africa",
-            "neighbors": ["argelia", "sudao", "oriente_medio", "polonia", "peninsula_iberica"],
+            "neighbors": ["argelia", "sudao", "oriente-medio", "polonia", "peninsula_iberica"],
             "position": { "x": 596.21, "y": 358 }
         },
         {
@@ -198,14 +198,14 @@
             "id": "polonia",
             "name": "Polônia",
             "continent": "europe",
-            "neighbors": ["alemanha", "peninsula_iberica", "moscou", "oriente_medio", "egito"],
+            "neighbors": ["alemanha", "peninsula_iberica", "moscou", "oriente-medio", "egito"],
             "position": { "x": 602.81, "y": 243.5 }
         },
         {
             "id": "moscou",
             "name": "Moscou",
             "continent": "europe",
-            "neighbors": ["suecia", "polonia", "omsk", "aral", "oriente_medio"],
+            "neighbors": ["suecia", "polonia", "omsk", "aral", "oriente-medio"],
             "position": { "x": 643, "y": 166 }
         },
         {
@@ -219,7 +219,7 @@
             "id": "india",
             "name": "Índia",
             "continent": "asia",
-            "neighbors": ["oriente_medio", "aral", "china", "vietna", "sumatra"],
+            "neighbors": ["oriente-medio", "aral", "china", "vietna", "sumatra"],
             "position": { "x": 801.9, "y": 299.5 }
         },
         {
@@ -261,7 +261,7 @@
             "id": "aral",
             "name": "Aral",
             "continent": "asia",
-            "neighbors": ["moscou", "omsk", "china", "india", "oriente_medio"],
+            "neighbors": ["moscou", "omsk", "china", "india", "oriente-medio"],
             "position": { "x": 737.92, "y": 232.5 }
         },
         {

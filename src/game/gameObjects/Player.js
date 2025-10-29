@@ -9,6 +9,10 @@ export default class Player {
         this.availableTroops = 0;
     }
 
+    getColor() {
+        return this.color;
+    }
+
     setObjective(objective) {
         this.objective = objective;
     }

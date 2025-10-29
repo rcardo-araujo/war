@@ -1,7 +1,7 @@
 import Territory from "../gameObjects/Territory";
 
-export function executeCombat(attackingTroops, territory) {
-    const defense = Math.min(3,territory.getTroopCount());
+export function executeCombat(attackingTroops, defenseTerritory) {
+    const defense = Math.min(3,defenseTerritory.getTroopCount());
     // gera valores em ordem decrescente
     let attackDice = rollDice(attackingTroops);
     let defenseDice = rollDice(defense);
