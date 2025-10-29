@@ -47,6 +47,10 @@ export default class MapManager {
 
     changePlayerTerritoryOwnership(territoryId, newOwner) {
         const territory = this.getTerritory(territoryId);
+        const oldOwner = territory.owner;
+
+        oldOwner.removeTerritory(territory);
+        newOwner.addTerritory(territory);
         if (territory) {
             territory.setOwner(newOwner);
         }
