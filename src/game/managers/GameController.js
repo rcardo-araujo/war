@@ -2,8 +2,8 @@ import { TURN_PHASES } from './TurnManager';
 import { executeCombat } from '../utils/diceRoller';
 
 export default class GameController {
-    constructor(gameStateManager) {
-        this.gsm = gameStateManager;
+    constructor(gsm) {
+        this.gsm = gsm;
         this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
@@ -55,7 +55,7 @@ export default class GameController {
         }
         territory.addTroops(troops);
         currentPlayer.availableTroops -= troops;
-        this.gsm.emit('game:troopCountChanged', territory.id, territory.troops);
+        this.gsm.emit('game:troopCountChanged', territory.id);
         this.gsm.emit('game:setMapInteractive', true);
     }
 
@@ -122,21 +122,23 @@ export default class GameController {
     }
 
     onAttackCommit({ attackDice, attacker, defender }) {
-        if (attackDice === 0){
-            this.gameStateManager.emit('game:unselectAttacker', attacker);
-            this.attackTerritories.attacker = null;
-            this.attackTerritories.defender = null;
-            return;
+        if (attackDice !== 0){
+            const casualties = executeCombat(attackDice, defender);
+            this.attackTerritories.attacker.removeTroops(casualties[0]);
+            this.attackTerritories.defender.removeTroops(casualties[1]);
+            
+            if (defender.getTroopCount() <= 0) {
+                // this.gsm.emit('game:territoryConquered', )
+            }
+    
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.emit('game:troopCountChanged', attacker.id);
+            this.gsm.emit('game:troopCountChanged', defender.id);
         }
-        const casualties = executeCombat(attackDice, defender);
-        this.attackTerritories.attacker.removeTroops(casualties[0]);
-        this.attackTerritories.defender.removeTroops(casualties[1]);
-        
-        if (defender.getTroopCount() === 0) {
-            // this.gameStateManager.emit('game:territoryConquered', )
-        }
-        
-        this.gsm.emit('setMapInteractive', true);
+
+        this.gsm.emit('game:unselectAttacker', attacker);
+        this.attackTerritories.attacker = null;
+        this.attackTerritories.defender = null;
     }
 
     onPhaseChanged(newPhase) {
@@ -150,6 +152,7 @@ export default class GameController {
     }
 
     handleAttackConfirm(){
-        this.gsm.emit('setMapInteractive', false);
+        console.log("Ataque confirmado");
+        this.gsm.emit('game:setMapInteractive', false);
     }
 }

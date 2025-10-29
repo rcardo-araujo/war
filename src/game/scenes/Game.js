@@ -63,10 +63,11 @@ export class Game extends Scene {
     }
 
     setupGameEventListeners() {
-        this.gameState.on('game:troopCountChanged', (territoryId, newTroopCount) => {
-            this.updateTroops(territoryId, newTroopCount);
+        this.gameState.on('game:troopCountChanged', (territoryId) => {
+            this.updateTroops(territoryId);
         }, this);
 
+        // Update territory color when ownership changes! (ERRADO! REMOVER NEW COLOR)
         this.gameState.on('game:ownerChanged', (territoryId, newColor) => {
             this.updateTerritoryColor(territoryId, newColor);
         }, this);
@@ -90,9 +91,9 @@ export class Game extends Scene {
         }, this);
     }
     
-    updateTroops(territoryId, newTroopCount) {
+    updateTroops(territoryId) {
         const troopText = this.territorySprites[territoryId].troops;
-        troopText.setText(newTroopCount);
+        troopText.setText(this.gameState.getTerritory(territoryId).getTroopCount());
     }
 
     updateTerritoryColor(territoryId, newColor) {

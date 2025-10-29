@@ -66,7 +66,8 @@
                 this.hideConfirmAttack();
             }, this);
             this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
-                this.showAttackInput(defenderTerritory, attackerTerritory);
+                this.hideConfirmAttack();
+                this.showAttackInput(attackerTerritory, defenderTerritory);
             }, this);
         }
 
@@ -181,8 +182,8 @@
                             attacker: attackerTerritory, 
                             defender: defenderTerritory 
                         });
-                        
                         inputContainer.destroy();
+                        
                     } else {
                         this.gameStateManager.emit('game:error', `Número inválido. Deve ser entre 1 e ${maxAttackDice}.`, this);
                     }
@@ -193,8 +194,8 @@
                         attacker: attackerTerritory, 
                         defender: defenderTerritory 
                     });
-                    
                     inputContainer.destroy();
+                    
                 }
             });
         }
