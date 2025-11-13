@@ -110,7 +110,12 @@ export class Game extends Scene {
 
     updateTerritoryColor(territoryId) {
         const newColor = this.gameState.getTerritory(territoryId).owner.getColor();
-        this.territorySprites[territoryId].filled.setTint(newColor);
+
+        const sprites = this.territorySprites[territoryId];
+
+        sprites.filled.setTint(newColor);
+        sprites.counterBackground.setTint(newColor);
+        sprites.counterStroke.setTint(newColor);
     }
 
     highlightAttacker(territory){
