@@ -156,4 +156,17 @@ export default class PlayerManager {
         }
         return false;
     }
+
+    isObjectiveComplete(player, mapManager) {
+        if (this.checkAccumulateObjective(player)) {
+            return true;
+        }
+        if (this.checkContinentObjective(player, mapManager)) {
+            return true;
+        }
+        if (this.checkDestructionObjective(player)) {
+            return true;
+        }
+        return false;
+    }
 }

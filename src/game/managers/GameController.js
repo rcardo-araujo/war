@@ -23,6 +23,39 @@ export default class GameController {
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
+
+        // Objective checks after key game events
+        this.gsm.on('troopsAllocated', () => {
+            const current = this.gsm.getCurrentPlayer();
+            this.checkObjectiveForPlayer(current);
+        }, this);
+        this.gsm.on('game:attackCommitted', (payload) => {
+            const attacker = payload?.attacker;
+            if (attacker && attacker.owner) this.checkObjectiveForPlayer(attacker.owner);
+            this.gsm.playerManager.getPlayers().forEach(p => this.checkObjectiveForPlayer(p));
+        }, this);
+        this.gsm.on('game:ownerChanged', (territoryId) => {
+            const territory = this.gsm.getTerritory(territoryId);
+            if (territory && territory.owner) this.checkObjectiveForPlayer(territory.owner);
+            this.gsm.playerManager.getPlayers().forEach(p => this.checkObjectiveForPlayer(p));
+        }, this);
+        this.gsm.turnManager.on('phaseChanged', () => {
+            this.checkObjectiveForPlayer(this.gsm.getCurrentPlayer());
+        }, this);
+        this.gsm.turnManager.on('nextTurn', (tm) => {
+            this.checkObjectiveForPlayer(tm.getCurrentPlayer());
+        }, this);
+    }
+
+    checkObjectiveForPlayer(player) {
+        if (!player || !player.objective) return;
+        if (player.objective._completed) return;
+
+        const ok = this.gsm.playerManager.isObjectiveComplete(player, this.gsm.mapManager);
+        if (ok) {
+            player.objective._completed = true;
+            this.gsm.emit('game:objectiveAchieved', { player, objective: player.objective });
+        }
     }
 
     handleEndPhaseRequest() {
