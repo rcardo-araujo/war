@@ -106,4 +106,30 @@ export default class PlayerManager {
         }
         return false;
     }
+
+    checkContinentObjective(player, mapManager) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        const main = obj.main || {};
+
+        // continents (requires owning all territories in each listed continent)
+        if (Array.isArray(main.continents) && main.continents.length > 0) {
+            const territories = Object.values(mapManager.territories);
+            const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]/g, '');
+
+            for (let continentName of main.continents) {
+                if (continentName === 'X') {
+                    continue;
+                }
+                const neededTerritories = territories.filter(t => normalize(t.continent) === normalize(continentName));
+                if (neededTerritories.length === 0) {
+                    return false;
+                }
+
+                const ownsAll = neededTerritories.every(t => player.ownedTerritories.has(t));
+                if (!ownsAll) return false;
+            }
+            return true;
+        }
+    }
 }
