@@ -46,13 +46,15 @@ export class Game extends Scene {
             const territoryCenterX = position.x + (filledSprite.width / 2);
             const territoryCenterY = position.y + (filledSprite.height / 2);
 
-            const innerTroopCounterSprite = this.add.image(territoryCenterX, territoryCenterY, 'army-counter-inner').setOrigin(0.5).setDepth(91);
-            const strokeTroopCounterSprite = this.add.image(territoryCenterX, territoryCenterY + 1, 'army-counter-stroke').setOrigin(0.5).setDepth(90);
+            const counterBackground = this.add.image(territoryCenterX, territoryCenterY, 'army-counter-inner').setOrigin(0.5).setDepth(91);
+            const counterStroke = this.add.image(territoryCenterX, territoryCenterY + 1, 'army-counter-stroke').setOrigin(0.5).setDepth(90);
             const troopCount = this.add.text(position.x + filledSprite.width / 2, position.y + filledSprite.height / 2, territoryLogic.troops, {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold'
-            }).setOrigin(0.5);
+            })
+            .setOrigin(0.5)
+            .setDepth(92);
 
             filledSprite.setData('logic', territoryLogic);
             filledSprite.setInteractive({ pixelPerfect: true });
@@ -60,11 +62,16 @@ export class Game extends Scene {
             this.territorySprites[id] = {
                 filled: filledSprite,
                 stroke: strokeSprite,
+                counterBackground: counterBackground,
+                counterStroke: counterStroke,
                 troops: troopCount
             };
 
             filledSprite.setTint(territoryLogic.color);
             strokeSprite.setTint(0xffff00);
+
+            counterBackground.setTint(territoryLogic.color);
+            counterStroke.setTint(territoryLogic.color);
         });
     }
 
