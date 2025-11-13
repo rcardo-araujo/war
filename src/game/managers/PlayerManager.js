@@ -62,7 +62,7 @@ export default class PlayerManager {
             }
 
             const conquestObjective = conquestDeck.pop();
-            if (conquestObjective){
+            if (conquestObjective) {
                 player.setObjective(conquestObjective);
             }
         });
@@ -84,5 +84,26 @@ export default class PlayerManager {
 
     getCurrentPlayer(turnManager) {
         return turnManager.getCurrentPlayer();
+    }
+
+    checkAccumulateObjective(player) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        const main = obj.main || {};
+
+        if (typeof main.accumulate === 'number') {
+            const needed = main.accumulate;
+            if (typeof main.occupy === 'number') {
+                // count territories owned with at least `occupy` troops
+                let count = 0;
+                player.ownedTerritories.forEach(t => {
+                    if (t && t.getTroopCount() >= main.occupy) count++;
+                });
+                if (count >= needed) return true;
+            } else {
+                if (player.ownedTerritories.size >= needed) return true;
+            }
+        }
+        return false;
     }
 }
