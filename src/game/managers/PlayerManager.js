@@ -86,6 +86,13 @@ export default class PlayerManager {
         return turnManager.getCurrentPlayer();
     }
 
+    totalTroopsForPlayer(player) {
+        return player.ownedTerritories.reduce(
+            (sum, t) => sum + (t?.getTroopCount?.() ?? 0),
+            0
+        );
+    }
+
     checkAccumulateObjective(player) {
         if (!player || !player.objective) return false;
         const obj = player.objective;
@@ -131,5 +138,22 @@ export default class PlayerManager {
             }
             return true;
         }
+    }
+
+    checkDestructionObjective(player) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        // destruction objective
+        if (obj.type === 'destruction') {
+            const targetKey = obj.target; // expecting a colorKey or similar
+            if (!targetKey) return false;
+            // find opponent by colorKey
+            const opponent = this.players.find(p => p.colorKey === targetKey || p.color === targetKey);
+            if (!opponent) return false;
+            const opponentTroops = this._totalTroopsForPlayer(opponent);
+            // objective considered complete if opponent has zero total troops or zero territories
+            if (opponentTroops === 0 || opponent.ownedTerritories.size === 0) return true;
+        }
+        return false;
     }
 }
