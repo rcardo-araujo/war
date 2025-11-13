@@ -125,11 +125,15 @@ export class Game extends Scene {
         const sprites = this.territorySprites[territory.id];
         sprites.stroke.setTint(0xff0000);
         sprites.filled.setScale(1.1);
+        sprites.counterBackground.setScale(1.1);
+        sprites.counterStroke.setScale(1.1);
         sprites.stroke.setScale(1.1);
         sprites.troops.setScale(1.1);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
+        this.children.bringToTop(sprites.counterBackground);
+        this.children.bringToTop(sprites.counterStroke);
         this.children.bringToTop(sprites.troops);
     }
 
@@ -140,10 +144,14 @@ export class Game extends Scene {
         sprites.stroke.setTint(0x0000ff);
         sprites.filled.setScale(1.1);
         sprites.stroke.setScale(1.1);
+        sprites.counterBackground.setScale(1.1);
+        sprites.counterStroke.setScale(1.1);
         sprites.troops.setScale(1.1);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
+        this.children.bringToTop(sprites.counterBackground);
+        this.children.bringToTop(sprites.counterStroke);
         this.children.bringToTop(sprites.troops);
     }
 
@@ -153,6 +161,8 @@ export class Game extends Scene {
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
+            sprites.counterBackground.setScale(1);
+            sprites.counterStroke.setScale(1);
             sprites.troops.setScale(1);
         }
         if (this.highlightedDefender) {
@@ -160,6 +170,8 @@ export class Game extends Scene {
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
+            sprites.counterBackground.setScale(1);
+            sprites.counterStroke.setScale(1);
             sprites.troops.setScale(1);
         }
         
@@ -177,8 +189,17 @@ export class Game extends Scene {
             }
             const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
             troopCount.setScale(1.1);
+
+            const counterBackground = this.territorySprites[gameObject.getData('logic').id].counterBackground;
+            const counterStroke = this.territorySprites[gameObject.getData('logic').id].counterStroke;
+
+            counterStroke.setScale(1.1);
+            counterBackground.setScale(1.1);
+
             this.children.bringToTop(gameObject);
             this.children.bringToTop(stroke);
+            this.children.bringToTop(counterStroke);
+            this.children.bringToTop(counterBackground);
             this.children.bringToTop(troopCount); 
         });
 
@@ -189,6 +210,8 @@ export class Game extends Scene {
             if (territoryLogic !== this.highlightedAttacker && territoryLogic !== this.highlightedDefender) {
                 sprites.filled.setScale(1);
                 sprites.stroke.setScale(1);
+                sprites.counterStroke.setScale(1);
+                sprites.counterBackground.setScale(1);
                 sprites.troops.setScale(1);
                 sprites.stroke.setTint(0xffff00);
             } else if (territoryLogic === this.highlightedAttacker) {
@@ -204,7 +227,9 @@ export class Game extends Scene {
     }
 
     disableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, counterBackground, counterStroke, troops }) => {
+            counterBackground.setScale(1);
+            counterStroke.setScale(1);
             stroke.setScale(1);
             troops.setScale(1);
             filled.setScale(1);
@@ -213,7 +238,9 @@ export class Game extends Scene {
     }
 
     enableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, counterBackground, counterStroke, troops }) => {
+            counterBackground.setScale(1);
+            counterStroke.setScale(1);
             stroke.setScale(1);
             troops.setScale(1);
             filled.setScale(1);
