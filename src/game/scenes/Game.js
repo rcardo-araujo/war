@@ -42,6 +42,12 @@ export class Game extends Scene {
 
             const filledSprite = this.add.image(position.x, position.y, `${id}-filled`).setOrigin(0);
             const strokeSprite = this.add.image(position.x - 5 / 2, position.y - 5 / 2, `${id}-stroke`).setOrigin(0);
+
+            const territoryCenterX = position.x + (filledSprite.width / 2);
+            const territoryCenterY = position.y + (filledSprite.height / 2);
+
+            const innerTroopCounterSprite = this.add.image(territoryCenterX, territoryCenterY, 'army-counter-inner').setOrigin(0.5).setDepth(91);
+            const strokeTroopCounterSprite = this.add.image(territoryCenterX, territoryCenterY + 1, 'army-counter-stroke').setOrigin(0.5).setDepth(90);
             const troopCount = this.add.text(position.x + filledSprite.width / 2, position.y + filledSprite.height / 2, territoryLogic.troops, {
                 fontSize: '24px',
                 color: '#ffffff',
