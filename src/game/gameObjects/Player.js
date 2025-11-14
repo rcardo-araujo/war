@@ -37,60 +37,59 @@ export default class Player {
 
     calculateReinforcements() {
         const territoryBonus = Math.floor(this.ownedTerritories.size / 2);
-        const continentBonus = this.calculateContinentBonus();
 
-        return Math.max(3, territoryBonus) + continentBonus;
+        return Math.max(3, territoryBonus);
     }
 
     setAvailableTroops() {
         this.availableTroops = this.calculateReinforcements();
-
+        this.setContinentBonus();
     }
     
     calculateContinentBonus(value, index, array){
-        let SA = 0;
-        let NA = 0;
-        let EU = 0;
-        let AF = 0;
-        let AS = 0;
-        let OC = 0
+        let sa = 0;
+        let na = 0;
+        let eu = 0;
+        let af = 0;
+        let as = 0;
+        let oc = 0;
 
-        switch(value.continent) {
+        switch(value.getContinent()) {
             case "south_america":
-                SA += 1
+                sa += 1
                 break;
             case "north_america":
-                NA += 1
+                na += 1
                 break;
             case "europe":
-                EU += 1
+                eu += 1
                 break;
             case "africa":
-                AF += 1
+                af += 1
                 break;
             case "asia":
-                AS += 1
+                as += 1
                 break;
             case "oceania":
-                OC += 1
+                oc += 1
                 break;
         }
-        if (SA == 4){
+        if (sa == 4){
             this.availableTroopsSouthAmerica = 2
         }
-        if (NA == 9){
+        if (na == 9){
             this.availableTroopsSouthAmerica = 5
         }
-        if (EU == 7){
+        if (eu == 7){
             this.availableTroopsSouthAmerica = 5
         }
-        if (AF == 6){
+        if (af == 6){
             this.availableTroopsSouthAmerica = 3
         }
-        if (AS == 12){
+        if (as == 12){
             this.availableTroopsSouthAmerica = 7
         }
-        if (OC == 4){
+        if (oc == 4){
             this.availableTroopsSouthAmerica = 2
         }
     }
