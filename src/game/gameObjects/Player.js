@@ -54,8 +54,9 @@ export default class Player {
         let as = 0;
         let oc = 0;
 
-        for (let x in this.ownedTerritories) {
-            switch(value.getContinent()) {
+        for (let x of this.ownedTerritories) {
+            console.log(x.id);
+            switch(x.getContinent()) {
                 case "south_america":
                     sa += 1;
                     break;
@@ -80,19 +81,19 @@ export default class Player {
             this.availableTroopsSouthAmerica = 2;
         }
         if (na == 9){
-            this.availableTroopsSouthAmerica = 5;
+            this.availableTroopsNorthAmerica = 5;
         }
         if (eu == 7){
-            this.availableTroopsSouthAmerica = 5;
+            this.availableTroopsEurope = 5;
         }
         if (af == 6){
-            this.availableTroopsSouthAmerica = 3;
+            this.availableTroopsAfrica = 3;
         }
         if (as == 12){
-            this.availableTroopsSouthAmerica = 7;
+            this.availableTroopsAsia = 7;
         }
         if (oc == 4){
-            this.availableTroopsSouthAmerica = 2;
+            this.availableTroopsOceania = 2;
         }
     }
 
@@ -100,22 +101,16 @@ export default class Player {
         switch(territory.getContinent()) {
             case "south_america":
                 return this.availableTroopsSouthAmerica;
-                break;
             case "north_america":
                 return this.availableTroopsNorthAmerica;
-                break;
             case "europe":
                 return this. availableTroopsEurope;
-                break;
             case "africa":
                 return this.availableTroopsAfrica;
-                break;
             case "asia":
                 return this.availableTroopsAsia;
-                break;
             case "oceania":
                 return this.availableTroopsOceania;
-                break;
         }
     }
 
