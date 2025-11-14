@@ -11,7 +11,7 @@ export default class MapManager {
         this.continents = mapData.continents;
 
         mapData.territories.forEach(data => {
-            this.territories[data.id] = new Territory(data.id, data.name, data.continent);
+            this.territories[data.id] = new Territory(data.id, data.name, data.continent, data.type);
         });
 
         mapData.territories.forEach(data => {
