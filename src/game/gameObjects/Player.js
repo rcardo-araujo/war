@@ -46,7 +46,7 @@ export default class Player {
         this.setContinentBonus();
     }
     
-    calculateContinentBonus(value, index, array){
+    setContinentBonus() {
         let sa = 0;
         let na = 0;
         let eu = 0;
@@ -54,69 +54,67 @@ export default class Player {
         let as = 0;
         let oc = 0;
 
-        switch(value.getContinent()) {
-            case "south_america":
-                sa += 1
-                break;
-            case "north_america":
-                na += 1
-                break;
-            case "europe":
-                eu += 1
-                break;
-            case "africa":
-                af += 1
-                break;
-            case "asia":
-                as += 1
-                break;
-            case "oceania":
-                oc += 1
-                break;
+        for (let x in this.ownedTerritories) {
+            switch(value.getContinent()) {
+                case "south_america":
+                    sa += 1;
+                    break;
+                case "north_america":
+                    na += 1;
+                    break;
+                case "europe":
+                    eu += 1;
+                    break;
+                case "africa":
+                    af += 1;
+                    break;
+                case "asia":
+                    as += 1;
+                    break;
+                case "oceania":
+                    oc += 1;
+                    break;
+            }
         }
         if (sa == 4){
-            this.availableTroopsSouthAmerica = 2
+            this.availableTroopsSouthAmerica = 2;
         }
         if (na == 9){
-            this.availableTroopsSouthAmerica = 5
+            this.availableTroopsSouthAmerica = 5;
         }
         if (eu == 7){
-            this.availableTroopsSouthAmerica = 5
+            this.availableTroopsSouthAmerica = 5;
         }
         if (af == 6){
-            this.availableTroopsSouthAmerica = 3
+            this.availableTroopsSouthAmerica = 3;
         }
         if (as == 12){
-            this.availableTroopsSouthAmerica = 7
+            this.availableTroopsSouthAmerica = 7;
         }
         if (oc == 4){
-            this.availableTroopsSouthAmerica = 2
+            this.availableTroopsSouthAmerica = 2;
         }
-    }
-
-    setContinentBonus() {
-        this.ownedTerritories.forEach(this.calculateContinentBonus)
     }
 
     getContinentBonus(territory){
         switch(territory.getContinent()) {
             case "south_america":
-                return this.availableTroopsSouthAmerica
+                return this.availableTroopsSouthAmerica;
                 break;
             case "north_america":
-                return this.availableTroopsNorthAmerica
+                return this.availableTroopsNorthAmerica;
                 break;
             case "europe":
-                return this. availableTroopsEurope
+                return this. availableTroopsEurope;
                 break;
             case "africa":
-                return this.availableTroopsAfrica
+                return this.availableTroopsAfrica;
                 break;
             case "asia":
-                return this.availableTroopsAsia
+                return this.availableTroopsAsia;
                 break;
             case "oceania":
-                return this.availableTroopsOceania
+                return this.availableTroopsOceania;
                 break;
         }
     }
