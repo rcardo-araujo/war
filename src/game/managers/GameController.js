@@ -47,7 +47,7 @@ export default class GameController {
         }
 
         const currentPlayer = this.gsm.getCurrentPlayer();
-        const continentBonus = currentPlayer.getContinentBonus();
+        const continentBonus = currentPlayer.getContinentBonus(territory);
 
         if (troops > currentPlayer.availableTroops + continentBonus) {
             this.gsm.emit('game:error', "Você não tem tropas suficientes para alocar.");
@@ -55,7 +55,7 @@ export default class GameController {
             return;
         }
         territory.addTroops(troops);
-        currentPlayer.availableTroops -= troops;
+        currentPlayer.allocateTroops(territory, troops);
         this.gsm.emit('game:troopCountChanged', territory.id);
         this.gsm.emit('game:setMapInteractive', true);
     }
