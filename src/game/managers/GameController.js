@@ -29,11 +29,11 @@ export default class GameController {
         const player = this.gsm.getCurrentPlayer();
         const phase = this.gsm.getCurrentPhase();
 
-        if (player.availableTroops > 0 &&
+        if ((player.availableTroops > 0 || player.availableTroopsSouthAmerica >0 || player.availableTroopsNorthAmerica > 0 || player.availableTroopsEurope > 0 || player.availableTroopsAfrica > 0 || player.availableTroopsAsia > 0 || player.availableTroopsOceania > 0) &&
             (phase === TURN_PHASES.REINFORCEMENT ||
              phase === TURN_PHASES.FIRST_REINFORCEMENT)
         ) {
-            this.gsm.emit('game:error', `Você ainda tem ${player.availableTroops} tropas para alocar!`);
+            this.gsm.emit('game:error', `Você ainda tem ${player.availableTroops+player.availableTroopsSouthAmerica+player.availableTroopsNorthAmerica+player.availableTroopsEurope+player.availableTroopsAfrica+player.availableTroopsAsia+player.availableTroopsOceania} tropas para alocar!`);
             return;
         }
 
