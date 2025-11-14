@@ -10,7 +10,7 @@
         },
         "africa": {
             "name": "África",
-            "bonus": 5
+            "bonus": 3
         },
         "europe": {
             "name": "Europa",
@@ -21,8 +21,8 @@
             "bonus": 7
         },
         "oceania": {
-            "name": "Ásia",
-            "bonus": 7
+            "name": "Oceania",
+            "bonus": 2
         }
     },
     "territories": [
