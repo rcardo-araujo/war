@@ -55,7 +55,6 @@ export default class Player {
         let oc = 0;
 
         for (let x of this.ownedTerritories) {
-            console.log(x.id);
             switch(x.getContinent()) {
                 case "south_america":
                     sa += 1;

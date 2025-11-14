@@ -120,7 +120,7 @@
                 if (event.target.id === 'confirmButton') {
                     const value = parseInt(inputContainer.getChildByID('troops').value, 10);
 
-                    if (!isNaN(value) && value <= currentPlayer.availableTroops) {
+                    if (!isNaN(value) && value <= (currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory))) {
                         this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
                         inputContainer.destroy();
                     } else {
