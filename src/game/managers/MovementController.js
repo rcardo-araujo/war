@@ -13,9 +13,6 @@ export default class MovementController {
             this.availableTroops.set(destination, destination.troops - 1);
         }
 
-        console.log(troopsAllocated);
-        console.log(this.availableTroops.get(origin));
-
         if (origin.troops - troopsAllocated > 0) {
             origin.removeTroops(troopsAllocated);
             this.availableTroops.set(origin, this.availableTroops.get(origin) - troopsAllocated);

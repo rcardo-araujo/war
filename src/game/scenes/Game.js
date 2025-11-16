@@ -26,8 +26,8 @@ export class Game extends Scene {
 
         this.territorySprites = {};
         this.highlightedTerritories = [];
-        this.highlightedAttacker = null;
-        this.highlightedDefender = null;
+        this.highlightedFirst = null;
+        this.highlightedSecond = null;
 
         this.drawMap();
         this.setupInteractivity();
@@ -86,25 +86,35 @@ export class Game extends Scene {
         }, this);
 
         this.gameState.on('game:attackerSelected', (territory) => {
-            this.highlightTerritory(territory, 0xff0000,  highlightTerritoryNumber.FIRST);
+            this.highlightTerritorySelection(territory, 0xff0000, highlightTerritoryNumber.FIRST);
         }, this);
         this.gameState.on('game:defenderSelected', (territory) => {
-            this.highlightTerritory(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
+            this.highlightTerritorySelection(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
         }, this);
         this.gameState.on('game:unselectAttacker', (territory) => {
             this.clearHighlights();
         }, this);
 
-        
+
         this.gameState.on('game:originSelected', (territory) => {
-            this.highlightTerritory(territory, 0xff0000,  highlightTerritoryNumber.FIRST);
+            this.highlightTerritorySelection(territory, 0xff0000, highlightTerritoryNumber.FIRST);
+            for (const terr of territory.getNeighborIds()) {
+                let t = this.gameState.getTerritory(terr);
+                if (t.owner === this.gameState.getCurrentPlayer()) {
+                    this.highlightTerritory(t, 0x00ff00);
+                }
+            }
         }, this);
         this.gameState.on('game:destinationSelected', (territory) => {
-            this.highlightTerritory(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
+            this.highlightTerritorySelection(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
         }, this);
         this.gameState.on('game:unselectOrigin', (territory) => {
             this.clearHighlights();
         }, this);
+
+        this.gameState.on('game:phaseChanged', (newPhase) => {
+            this.clearHighlights();
+        });
     }
 
     updateTroops(territoryId) {
@@ -117,45 +127,56 @@ export class Game extends Scene {
         this.territorySprites[territoryId].filled.setTint(newColor);
     }
 
+    highlightTerritorySelection(territory, color, territoryNumber) {
+        const sprites = this.territorySprites[territory.id];
 
-    highlightTerritory(territory, color, territoryNumber) {
+        this.highlightTerritory(territory, color);
+        if (territoryNumber === highlightTerritoryNumber.FIRST) {
+            this.highlightedFirst = territory;
+        }
+        else if (territoryNumber === highlightTerritoryNumber.SECOND) {
+            this.highlightedSecond = territory;
+        }
+    }
+
+    highlightTerritory(territory, color) {
         this.highlightedTerritories.push(territory);
         const sprites = this.territorySprites[territory.id];
         sprites.stroke.setTint(color);
-        sprites.filled.setScale(1.1);
-        sprites.stroke.setScale(1.1);
-        sprites.troops.setScale(1.1);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
         this.children.bringToTop(sprites.troops);
-        
-        if(territoryNumber === highlightTerritoryNumber.FIRST){
-            this.highlightedAttacker = territory;
-        }
-        else if(territoryNumber === highlightTerritoryNumber.SECOND){
-            this.highlightedDefender = territory;
-        }
     }
 
     clearHighlights() {
-        if (this.highlightedAttacker) {
-            const sprites = this.territorySprites[this.highlightedAttacker.id];
+        if (this.highlightedFirst) {
+            const sprites = this.territorySprites[this.highlightedFirst.id];
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
             sprites.troops.setScale(1);
         }
-        if (this.highlightedDefender) {
-            const sprites = this.territorySprites[this.highlightedDefender.id];
+        if (this.highlightedSecond) {
+            const sprites = this.territorySprites[this.highlightedSecond.id];
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
             sprites.troops.setScale(1);
         }
 
-        this.highlightedAttacker = null;
-        this.highlightedDefender = null;
+        this.highlightedFirst = null;
+        this.highlightedSecond = null;
+
+        for (const territory of this.highlightedTerritories) {
+            const sprites = this.territorySprites[territory.id];
+            sprites.stroke.setTint(0xffff00);
+            sprites.filled.setScale(1);
+            sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
+        }
+
+        this.highlightedTerritories.length = 0
     }
 
     setupInteractivity() {
@@ -176,6 +197,13 @@ export class Game extends Scene {
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
             sprites.troops.setScale(1);
+
+            if ((this.highlightedFirst != null && territoryLogic.id === this.highlightedFirst.id) || (this.highlightedSecond != null &&
+                territoryLogic.id === this.highlightedSecond.id)) {
+                sprites.filled.setScale(1.1);
+                sprites.stroke.setScale(1.1);
+                sprites.troops.setScale(1.1);
+            }
         });
 
         this.input.on('gameobjectdown', (pointer, gameObject) => {
@@ -184,7 +212,6 @@ export class Game extends Scene {
     }
 
     disableInteractivity() {
-        console.log("DESATIVANDO INTERATIVIDADE");
         Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
             stroke.setScale(1);
             troops.setScale(1);
@@ -194,7 +221,6 @@ export class Game extends Scene {
     }
 
     enableInteractivity() {
-        console.log("ATIVANDO INTERATIVIDADE");
         Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
             stroke.setScale(1);
             troops.setScale(1);

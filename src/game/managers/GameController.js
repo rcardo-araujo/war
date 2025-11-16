@@ -216,6 +216,10 @@ export default class GameController {
 
     onPhaseChanged(newPhase) {
         this.gsm.emit('game:phaseChanged', newPhase);
+        this.strategyTerritories.origin = null;
+        this.strategyTerritories.destination = null;
+        this.attackTerritories.attacker = null;
+        this.attackTerritories.defender = null;
     }
 
     onNextTurn(turnManager) {
