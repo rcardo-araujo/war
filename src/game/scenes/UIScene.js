@@ -59,6 +59,8 @@ export class UIScene extends Phaser.Scene {
         this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
             this.showTroopInput(territory, currentPlayer);
         });
+
+
         this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
             this.showConfirmButton("Confirm Attack", () => {
                 this.gameStateManager.emit('game:attackConfirmed', defenderTerritory, attackerTerritory, this);
@@ -70,6 +72,20 @@ export class UIScene extends Phaser.Scene {
         this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
             this.hideConfirmButton();
             this.showAttackInput(attackerTerritory, defenderTerritory);
+        }, this);
+
+
+        this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
+            this.showConfirmButton("Confirm Strategy", () => {
+                this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
+            })
+        }, this);
+        this.gameStateManager.on('game:unselectOrigin', (territory) => {
+            this.hideConfirmButton();
+        }, this);
+        this.gameStateManager.on('game:strategyConfirmed', (destinationTerritory, originTerritory) => {
+            this.hideConfirmButton();
+            this.showStrategyInput(originTerritory, destinationTerritory);
         }, this);
     }
 
@@ -198,6 +214,59 @@ export class UIScene extends Phaser.Scene {
                 });
                 inputContainer.destroy();
 
+            }
+        });
+    }
+
+    showStrategyInput(originTerritory, destinationTerritory) {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        let availableTroops = originTerritory.troops - 1;
+
+        const html = `
+                <div style="
+                    background: rgba(0,0,0,0.8);
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: center;
+                    color: white;
+                    font-family: Arial;
+                ">
+                    <p>Território: <strong>${originTerritory.name}</strong></p>
+                    <p>Tropas disponíveis: <strong>${availableTroops}</strong></p>
+                    <p>Quantas tropas colocar?</p>
+                    <input id="troops" type="number" min="1" max="${availableTroops}" value="1" style="width: 60px; text-align: center;">
+                    <br><br>
+                    <button id="confirmButton">Confirmar</button>
+                    <button id="cancelButton">Cancelar</button>
+                </div>
+                `;
+
+        const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
+
+        inputContainer.addListener('click');
+        inputContainer.on('click', (event) => {
+            if (event.target.id === 'confirmButton') {
+                const value = parseInt(inputContainer.getChildByID('troops').value, 10);
+
+                if (!isNaN(value) && value <= availableTroops) {
+                    this.gameStateManager.emit('game:strategyCommitted', {
+                        troopsAllocated: value,
+                        origin: originTerritory,
+                        destination: destinationTerritory
+                    });
+                    inputContainer.destroy();
+                } else {
+                    this.gameStateManager.emit('game:error', `Digite um número válido entre 1 e ${availableTroops}!`, this);
+                }
+            } else if (event.target.id === 'cancelButton') {
+                this.gameStateManager.emit('game:strategyCommitted', {
+                    troopsAllocated: 0,
+                    origin: originTerritory,
+                    destination: destinationTerritory
+                });
+                inputContainer.destroy();
             }
         });
     }

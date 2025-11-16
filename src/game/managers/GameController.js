@@ -11,6 +11,11 @@ export default class GameController {
             attacker: null,
             defender: null
         }
+
+        this.strategyTerritories = {
+            origin: null,
+            destination: null
+        }
     }
 
     setupEventListeners() {
@@ -20,6 +25,10 @@ export default class GameController {
 
         this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
         this.gsm.on('game:attackCommitted', this.onAttackCommit, this);
+
+        this.gsm.on('game:strategyConfirmed', this.handleStrategyConfirm, this);
+        this.gsm.on('game:strategyCommitted', this.onStrategyCommit, this);
+
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
@@ -69,7 +78,7 @@ export default class GameController {
                 this.handleAttackClick(territory);
                 break;
             case TURN_PHASES.STRATEGIC:
-                // this.handleStrategicClick(territory);
+                this.handleStrategicClick(territory);
                 break;
             default:
                 break;
@@ -138,13 +147,73 @@ export default class GameController {
 
             this.gsm.emit('game:troopCountChanged', attacker.id);
             this.gsm.emit('game:troopCountChanged', defender.id);
-            this.gsm.emit('game:setMapInteractive', true);
         }
 
+        this.gsm.emit('game:setMapInteractive', true);
         this.gsm.emit('game:unselectAttacker', attacker);
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
     }
+
+    handleAttackConfirm(){
+        console.log("Ataque confirmado");
+        this.gsm.emit('game:setMapInteractive', false);
+    }
+
+
+    handleStrategicClick(territory) {
+        const currentPlayer = this.gsm.getCurrentPlayer();
+        console.log(this.strategyTerritories);
+        if (this.strategyTerritories.origin === null) {
+            if (territory.owner !== currentPlayer) {
+                this.gsm.emit('game:error', "Você só pode deslocar tropas de seus próprios territórios!");
+            } else if (territory.getTroopCount() < 2) {
+                this.gsm.emit('game:error', "Você não pode retirar todas as tropas de um território!");
+            } else {
+                this.strategyTerritories.origin = territory;
+                this.gsm.emit('game:originSelected', territory);
+            }
+        } else if (this.strategyTerritories.destination === null) {
+            if (territory === this.strategyTerritories.origin) {
+                this.strategyTerritories.origin = null;
+                this.gsm.emit('game:unselectOrigin', territory);
+            } else if (territory.owner !== currentPlayer) {
+                this.strategyTerritories.origin = null;
+                this.gsm.emit('game:unselectOrigin', territory);
+                this.handleStrategicClick(territory);
+            } else if (!this.strategyTerritories.origin.isNeighbor(territory)) {
+                this.gsm.emit('game:error', "Você só pode deslocar tropas para territórios vizinhos!");
+            } else {
+                this.strategyTerritories.destination = territory;
+                this.gsm.emit('game:destinationSelected', territory, this.strategyTerritories.origin);
+            }
+        } else {
+            this.strategyTerritories.origin = null;
+            this.strategyTerritories.destination = null;
+            this.gsm.emit('game:unselectOrigin', territory);
+        }
+    }
+
+    onStrategyCommit({ troopsAllocated, origin, destination }) {
+        if (troopsAllocated !== 0){
+            this.strategyTerritories.origin.removeTroops(troopsAllocated);
+            this.strategyTerritories.destination.addTroops(troopsAllocated);
+
+            this.gsm.emit('game:troopCountChanged', origin.id);
+            this.gsm.emit('game:troopCountChanged', destination.id);
+        }
+
+        this.gsm.emit('game:unselectOrigin', origin);
+        this.gsm.emit('game:setMapInteractive', true);
+        this.strategyTerritories.origin = null;
+        this.strategyTerritories.destination = null;
+    }
+
+    handleStrategyConfirm(){
+        console.log("Estratégia confirmada");
+        this.gsm.emit('game:setMapInteractive', false);
+    }
+
 
     onPhaseChanged(newPhase) {
         this.gsm.emit('game:phaseChanged', newPhase);
@@ -154,10 +223,5 @@ export default class GameController {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
-    }
-
-    handleAttackConfirm(){
-        console.log("Ataque confirmado");
-        this.gsm.emit('game:setMapInteractive', false);
     }
 }

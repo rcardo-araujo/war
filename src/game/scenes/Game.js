@@ -96,6 +96,15 @@ export class Game extends Scene {
         }, this);
 
         
+        this.gameState.on('game:originSelected', (territory) => {
+            this.highlightTerritory(territory, 0xff0000,  highlightTerritoryNumber.FIRST);
+        }, this);
+        this.gameState.on('game:destinationSelected', (territory) => {
+            this.highlightTerritory(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
+        }, this);
+        this.gameState.on('game:unselectOrigin', (territory) => {
+            this.clearHighlights();
+        }, this);
     }
 
     updateTroops(territoryId) {
