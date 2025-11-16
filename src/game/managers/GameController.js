@@ -4,6 +4,8 @@ import { executeCombat } from '../utils/diceRoller';
 export default class GameController {
     constructor(gsm) {
         this.gsm = gsm;
+        this.movementController = this.gsm.movementController;
+
         this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
@@ -40,7 +42,7 @@ export default class GameController {
 
         if (player.availableTroops > 0 &&
             (phase === TURN_PHASES.REINFORCEMENT ||
-             phase === TURN_PHASES.FIRST_REINFORCEMENT)
+                phase === TURN_PHASES.FIRST_REINFORCEMENT)
         ) {
             this.gsm.emit('game:error', `Você ainda tem ${player.availableTroops} tropas para alocar!`);
             return;
@@ -56,7 +58,7 @@ export default class GameController {
         }
 
         const currentPlayer = this.gsm.getCurrentPlayer();
-        
+
         if (troops > currentPlayer.availableTroops) {
             this.gsm.emit('game:error', "Você não tem tropas suficientes para alocar.");
             this.gsm.emit('game:setMapInteractive', true);
@@ -87,7 +89,7 @@ export default class GameController {
 
     handleReinforcementClick(territory) {
         const currentPlayer = this.gsm.getCurrentPlayer();
-        
+
         if (territory.owner === currentPlayer) {
             this.gsm.emit('game:setMapInteractive', false);
             this.gsm.emit('territorySelected', territory, currentPlayer);
@@ -131,18 +133,18 @@ export default class GameController {
     }
 
     onAttackCommit({ attackDice, attacker, defender }) {
-        if (attackDice !== 0){
+        if (attackDice !== 0) {
             const casualties = executeCombat(attackDice, defender);
             this.attackTerritories.attacker.removeTroops(casualties[0]);
             this.attackTerritories.defender.removeTroops(casualties[1]);
-            
+
             if (defender.getTroopCount() <= 0) {
                 this.gsm.mapManager.changePlayerTerritoryOwnership(defender.id, attacker.owner);
                 this.gsm.emit('game:ownerChanged', defender.id);
                 const movingTroops = attackDice;
                 attacker.removeTroops(movingTroops);
                 defender.addTroops(movingTroops);
-                
+
             }
 
             this.gsm.emit('game:troopCountChanged', attacker.id);
@@ -155,7 +157,7 @@ export default class GameController {
         this.attackTerritories.defender = null;
     }
 
-    handleAttackConfirm(){
+    handleAttackConfirm() {
         console.log("Ataque confirmado");
         this.gsm.emit('game:setMapInteractive', false);
     }
@@ -195,13 +197,10 @@ export default class GameController {
     }
 
     onStrategyCommit({ troopsAllocated, origin, destination }) {
-        if (troopsAllocated !== 0){
-            this.strategyTerritories.origin.removeTroops(troopsAllocated);
-            this.strategyTerritories.destination.addTroops(troopsAllocated);
+        this.movementController.moveTroops(origin, destination, troopsAllocated);
 
-            this.gsm.emit('game:troopCountChanged', origin.id);
-            this.gsm.emit('game:troopCountChanged', destination.id);
-        }
+        this.gsm.emit('game:troopCountChanged', origin.id);
+        this.gsm.emit('game:troopCountChanged', destination.id);
 
         this.gsm.emit('game:unselectOrigin', origin);
         this.gsm.emit('game:setMapInteractive', true);
@@ -209,7 +208,7 @@ export default class GameController {
         this.strategyTerritories.destination = null;
     }
 
-    handleStrategyConfirm(){
+    handleStrategyConfirm() {
         console.log("Estratégia confirmada");
         this.gsm.emit('game:setMapInteractive', false);
     }
@@ -222,6 +221,7 @@ export default class GameController {
     onNextTurn(turnManager) {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
+        this.movementController.reset();
         this.gsm.emit('game:nextTurn', newPlayer);
     }
 }

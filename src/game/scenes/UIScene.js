@@ -222,7 +222,7 @@ export class UIScene extends Phaser.Scene {
         const centerX = this.cameras.main.centerX;
         const centerY = this.cameras.main.centerY;
 
-        let availableTroops = originTerritory.troops - 1;
+        let availableTroops = this.gameStateManager.movementController.getAvailableTroops(originTerritory);
 
         const html = `
                 <div style="
