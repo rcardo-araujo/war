@@ -104,7 +104,7 @@ export default class PlayerManager {
             if (typeof main.occupy === 'number') {
                 let count = 0;
                 player.ownedTerritories.forEach(t => {
-                    if (t && t.getTroopCount() >= main.occupy) count++;
+                    if ((t && t.getTroopCount() >= main.occupy) || (!main.occupy)) count++;
                 });
                 if (count >= needed) return true;
             } else {
