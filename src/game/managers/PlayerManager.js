@@ -98,10 +98,10 @@ export default class PlayerManager {
         const obj = player.objective;
         const main = obj.main || {};
 
+
         if (typeof main.accumulate === 'number') {
             const needed = main.accumulate;
             if (typeof main.occupy === 'number') {
-                // count territories owned with at least `occupy` troops
                 let count = 0;
                 player.ownedTerritories.forEach(t => {
                     if (t && t.getTroopCount() >= main.occupy) count++;
@@ -119,7 +119,6 @@ export default class PlayerManager {
         const obj = player.objective;
         const main = obj.main || {};
 
-        // continents (requires owning all territories in each listed continent)
         if (Array.isArray(main.continents) && main.continents.length > 0) {
             const territories = Object.values(mapManager.territories);
             const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]/g, '');
@@ -140,28 +139,30 @@ export default class PlayerManager {
         }
     }
 
-    checkDestructionObjective(player) {
+    checkDestructionObjective(player, defender) {
         if (!player || !player.objective) return false;
         const obj = player.objective;
-        if (obj.type === 'destruction') {
-            const targetKey = obj.target;
-            if (!targetKey) return false;
-            const opponent = this.players.find(p => p.colorKey === targetKey || p.color === targetKey);
-            if (!opponent) return false;
-            const opponentTroops = this._totalTroopsForPlayer(opponent);
-            if (opponentTroops === 0 || opponent.ownedTerritories.size === 0) return true;
+        const main = obj.main || {};
+
+        if (obj.type === 'destruction' && defender) {
+            if (player.objective.target === defender) {
+                const totalTroops = this.totalTroopsForPlayer(defender);
+                if (totalTroops === 0) {
+                    return true;
+                }
+            }
         }
         return false;
     }
 
-    isObjectiveComplete(player, mapManager) {
+    isObjectiveComplete(player, mapManager, defender) {
         if (this.checkAccumulateObjective(player)) {
             return true;
         }
         if (this.checkContinentObjective(player, mapManager)) {
             return true;
         }
-        if (this.checkDestructionObjective(player)) {
+        if (this.checkDestructionObjective(player, defender)) {
             return true;
         }
         return false;
