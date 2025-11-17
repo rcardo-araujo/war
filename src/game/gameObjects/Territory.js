@@ -1,0 +1,41 @@
+export default class Territory {
+    constructor(id, name, continent) {
+        this.id = id;
+        this.name = name;
+        this.continent = continent;
+        this.neighbors = new Set();
+
+        this.owner = null;
+        this.color = null;
+        this.troops = 0;
+    }
+
+    setOwner(player) {
+        this.owner = player;
+        this.color = player.color;
+    }
+
+    addTroops(amount) {
+        this.troops += amount;
+    }
+
+    removeTroops(amount) {
+        this.troops = Math.max(0, this.troops - amount);
+    }
+
+    addNeighbor(territory) {
+        this.neighbors.add(territory.id);
+    }
+
+    isNeighbor(territory) {
+        return this.neighbors.has(territory.id);
+    }
+
+    getNeighborIds() {
+        return Array.from(this.neighbors);
+    }
+
+    getTroopCount(){
+        return this.troops;
+    }
+}
