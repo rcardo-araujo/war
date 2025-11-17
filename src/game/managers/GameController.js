@@ -23,28 +23,6 @@ export default class GameController {
 
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
-
-        // Objective checks after key game events
-        this.gsm.on('troopsAllocated', () => {
-            const current = this.gsm.getCurrentPlayer();
-            this.checkObjectiveForPlayer(current);
-        }, this);
-        this.gsm.on('game:attackCommitted', (payload) => {
-            const attacker = payload?.attacker;
-            if (attacker && attacker.owner) this.checkObjectiveForPlayer(attacker.owner);
-            this.gsm.playerManager.getPlayers().forEach(p => this.checkObjectiveForPlayer(p));
-        }, this);
-        this.gsm.on('game:ownerChanged', (territoryId) => {
-            const territory = this.gsm.getTerritory(territoryId);
-            if (territory && territory.owner) this.checkObjectiveForPlayer(territory.owner);
-            this.gsm.playerManager.getPlayers().forEach(p => this.checkObjectiveForPlayer(p));
-        }, this);
-        this.gsm.turnManager.on('phaseChanged', () => {
-            this.checkObjectiveForPlayer(this.gsm.getCurrentPlayer());
-        }, this);
-        this.gsm.turnManager.on('nextTurn', (tm) => {
-            this.checkObjectiveForPlayer(tm.getCurrentPlayer());
-        }, this);
     }
 
     checkObjectiveForPlayer(player) {
@@ -90,6 +68,8 @@ export default class GameController {
         currentPlayer.availableTroops -= troops;
         this.gsm.emit('game:troopCountChanged', territory.id);
         this.gsm.emit('game:setMapInteractive', true);
+        this.checkObjectiveForPlayer(currentPlayer);
+        console.log(`Alocadas ${troops} tropas para o território ${territory.name}`);
     }
 
     handleTerritoryClick(territory) {
@@ -177,6 +157,8 @@ export default class GameController {
         this.gsm.emit('game:unselectAttacker', attacker);
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
+        console.log('Ataque concluído');
+        this.checkObjectiveForPlayer(attacker.owner);
     }
 
     onPhaseChanged(newPhase) {
@@ -190,7 +172,8 @@ export default class GameController {
     }
 
     handleAttackConfirm(){
-        console.log("Ataque confirmado");
+        this.checkObjectiveForPlayer(this.gsm.getCurrentPlayer());
+        console.log("handleAttackConfirm");
         this.gsm.emit('game:setMapInteractive', false);
     }
 }
