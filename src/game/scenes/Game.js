@@ -161,8 +161,6 @@ export class Game extends Scene {
     }
 
     highlightTerritorySelection(territory, color, territoryNumber) {
-        const sprites = this.territorySprites[territory.id];
-
         this.highlightTerritory(territory, color);
         if (territoryNumber === highlightTerritoryNumber.FIRST) {
             this.highlightedFirst = territory;
@@ -180,6 +178,7 @@ export class Game extends Scene {
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
         this.children.bringToTop(sprites.troops);
+        this.children.bringToTop(sprites.counter);
     }
 
     clearHighlights() {
@@ -254,7 +253,7 @@ export class Game extends Scene {
     }
 
     disableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, troops, counter }) => {
             counter.setScale(1);
             stroke.setScale(1);
             troops.setScale(1);
@@ -264,7 +263,7 @@ export class Game extends Scene {
     }
 
     enableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, troops, counter }) => {
             counter.setScale(1);
             stroke.setScale(1);
             troops.setScale(1);
