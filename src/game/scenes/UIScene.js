@@ -104,9 +104,9 @@
                     font-family: Arial;
                 ">
                     <p>Território: <strong>${territory.name}</strong></p>
-                    <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops}</strong></p>
+                    <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory)}</strong></p>
                     <p>Quantas tropas colocar?</p>
-                    <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops}" value="1" style="width: 60px; text-align: center;">
+                    <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory)}" value="1" style="width: 60px; text-align: center;">
                     <br><br>
                     <button id="confirmButton">Confirmar</button>
                     <button id="cancelButton">Cancelar</button>
@@ -120,7 +120,7 @@
                 if (event.target.id === 'confirmButton') {
                     const value = parseInt(inputContainer.getChildByID('troops').value, 10);
 
-                    if (!isNaN(value) && value <= currentPlayer.availableTroops) {
+                    if (!isNaN(value) && value <= (currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory))) {
                         this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
                         inputContainer.destroy();
                     } else {
