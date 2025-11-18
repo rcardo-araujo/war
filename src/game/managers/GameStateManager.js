@@ -9,6 +9,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
         super();
         this.mapManager = new MapManager(scene.cache.json.get('mapData'));
+        this.territoryCardManager = new TerritoryCardManager(scene.cache.json.get('mapData'));
         this.playerManager = new PlayerManager(
             playerSetup,
             scene.cache.json.get('objectivesData')
