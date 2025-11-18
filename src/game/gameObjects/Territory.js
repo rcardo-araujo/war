@@ -1,8 +1,9 @@
 export default class Territory {
-    constructor(id, name, continent) {
+    constructor(id, name, continent, type) {
         this.id = id;
         this.name = name;
         this.continent = continent;
+        this.type = type;
         this.neighbors = new Set();
 
         this.owner = null;
