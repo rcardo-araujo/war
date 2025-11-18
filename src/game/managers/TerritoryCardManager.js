@@ -19,12 +19,13 @@ export default class TerritoryCardManager {
         const territoryCard = this.getTerritoryCard(territoryCardId);
         territoryCard.setOwner(newOwner);
         this.usedTerritoryCards.add(territoryCardId);
+        newOwner.territoryCards.push(territoryCardId);
     }
 
     checkTradeEligibility(player) {
         const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
         if (playerOwnedCards.length > 2) {
-            if (2 < playerOwnedCards.length < 5) {
+            if (playerOwnedCards.length > 2 && playerOwnedCards.length < 5) {
                 circle_count = 0;
                 square_count = 0;
                 triangle_count = 0;
@@ -78,5 +79,4 @@ export default class TerritoryCardManager {
                 return baseBonus + 11 + (this.currentTrade - 6) * 5;
         }
     }
-
 }

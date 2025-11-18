@@ -4,7 +4,7 @@ export default class Player {
         this.color = color;
         this.colorKey = colorKey;
         this.ownedTerritories = new Set();
-        this.cards = [];
+        this.territoryCards = [];
         this.objective = null;
         this.availableTroops = 0;
     }
