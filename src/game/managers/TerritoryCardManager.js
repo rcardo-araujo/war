@@ -55,6 +55,8 @@ export default class TerritoryCardManager {
 
     calculateTradeBonus(player, tradedCardIds) {
         const baseBonus = 4;
+
+        baseBonus += this.calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds);
         
         switch (this.currentTrade) {
             case 1:
@@ -78,5 +80,23 @@ export default class TerritoryCardManager {
             default:
                 return baseBonus + 11 + (this.currentTrade - 6) * 5;
         }
+    }
+
+    calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds) {
+        const bonusTroops = 0;
+
+        tradedCardIds.forEach(cardId => {
+            const card = this.getTerritoryCard(cardId);
+
+            if (card.owner === player) {
+
+                const territory = card.id;
+                if (player.ownedTerritories.has(territory)) {
+                    bonusTroops += 2;
+                }
+
+            }
+        });
+        return bonusTroops;
     }
 }
