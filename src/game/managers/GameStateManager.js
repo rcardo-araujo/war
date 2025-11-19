@@ -4,6 +4,7 @@ import PlayerManager from './PlayerManager';
 import TurnManager from './TurnManager';
 import MovementController from './MovementController';
 import GameController from './GameController';
+import TerritoryCardManager from './TerritoryCardManager'
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
