@@ -70,4 +70,8 @@ export default class MapManager {
     getTerritory(id) {
         return this.territories[id];
     }
+
+    getTerritoryNeighbors(id) {
+        
+    }
 }

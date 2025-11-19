@@ -22,6 +22,7 @@ export default class GameController {
         this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
         this.gsm.on('game:attackCommitted', this.onAttackCommit, this);
 
+        this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
     }
 
@@ -174,10 +175,21 @@ export default class GameController {
         this.checkObjectiveForPlayer(attacker.owner, defendingPlayer);
     }
 
+    onPhaseChanged(newPhase) {
+        this.gsm.emit('game:phaseChanged', newPhase);
+        // this.strategyTerritories.origin = null;
+        // this.strategyTerritories.destination = null;
+        // this.attackTerritories.attacker = null;
+        // this.attackTerritories.defender = null;
+    }
+
     onNextTurn(turnManager) {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
+        if (newPlayer.getType() == PLAYER_TYPES.BOT){
+            this.gsm.handleBotTurn();
+        }
     }
 
     handleAttackConfirm(){

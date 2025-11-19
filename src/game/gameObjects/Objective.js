@@ -8,7 +8,11 @@ export default class Objective {
     }
 
     constructDescription(){
-        this.description
+        this.description;
+    }
+
+    getDescription(){
+        return this.description;
     }
 
 }

@@ -45,7 +45,7 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         //     this.hasPerformedStrategicMove = false;
         // }
 
-        this.emit("game:phaseChanged", this.currentPhase);
+        this.emit("phaseChanged", this.currentPhase);
     }
 
     markStrategicMovePerformed(){

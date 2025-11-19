@@ -16,6 +16,10 @@ export default class Player {
         this.availableTroopsOceania = 0;
     }
 
+    getName() {
+        return this.name;
+    }
+
     getColor() {
         return this.color;
     }
@@ -24,8 +28,16 @@ export default class Player {
         return this.type;
     }
 
+    getOwnedTerritories() {
+        return this.ownedTerritories;
+    }
+
     setObjective(objective) {
         this.objective = objective;
+    }
+
+    getObjective() {
+        return this.objective;
     }
 
     addTerritory(territory) {

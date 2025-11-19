@@ -72,6 +72,7 @@
         }
 
         updateTurnLabel(newPlayer) {
+            console.log("Atualizando o botão...")
             this.label.setText("Turno do jogador # " + newPlayer.name);
             this.label.setStyle({
                 backgroundColor: `#${newPlayer.color.toString(16).padStart(6, '0')}`

@@ -4,6 +4,7 @@ import PlayerManager from './PlayerManager';
 import TurnManager from './TurnManager';
 import MovementController from './MovementController';
 import GameController from './GameController';
+import { BotService } from '../gameObjects/BotService';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -17,6 +18,7 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
         this.movementController = new MovementController(this);
         this.mapManager.distributeTerritories(this.playerManager.getPlayers());
         this.gameController = new GameController(this);
+        this.botService = new BotService();
     }
     
     getCurrentPlayer() {
@@ -29,5 +31,41 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
 
     getTerritory(territoryId) {
         return this.mapManager.getTerritory(territoryId);
+    }
+
+    getStateForLLM(){
+        const player = this.getCurrentPlayer();
+        const territories = [...player.getOwnedTerritories()];
+        
+        const formattedList = territories.map(territory => {
+            return {
+                territory: territory.id,
+                troops: territory.getTroopCount(),
+                neighbors: territory.getNeighborIds().map(neighborId => {
+                    const neighborObj = this.getTerritory(neighborId); 
+                    return {
+                        id: neighborId,
+                        troops: neighborObj.getTroopCount(),
+                        owner: neighborObj.getOwnerColor ? neighborObj.getOwnerColor() : "unknown" 
+                    };
+                })
+            };
+        });
+
+        const info = {
+            "player": player.getName(),
+            "phase": this.getCurrentPhase(),
+            "objective": player.getObjective().getDescription(),
+            "ownedTerritories": formattedList
+        }
+
+        return info;
+    }
+
+    handleBotTurn(){
+        const state = this.getStateForLLM();
+        console.log(state)
+        response = this.botService.getBotMove(state);
+        console.log(response);
     }
 }
