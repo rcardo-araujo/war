@@ -301,6 +301,37 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
+    createTargetButton() {
+        const padding = 60;
+        const x = this.cameras.main.width - padding;
+        const y = this.cameras.main.height - padding;
+
+        this.targetContainer = this.add.container(x, y);
+
+        const elipse = this.add.image(0, 0, 'target-elipse').setOrigin(0.5);
+        const aim = this.add.image(0, 0, 'target-aim').setOrigin(0.5);
+
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
+        if (currentPlayer && currentPlayer.color) {
+            elipse.setTint(currentPlayer.color);
+        }
+        this.targetElipse = elipse;
+
+        this.targetContainer.add([elipse, aim]);
+        this.targetContainer.setDepth(10000);
+
+        try {
+            elipse.setInteractive({ pixelPerfect: true });
+        } catch (e) {
+            elipse.setInteractive();
+        }
+        aim.setInteractive({ pixelPerfect: true });
+
+        const onClick = () => this.showObjectiveModal();
+        elipse.on('pointerdown', onClick);
+        aim.on('pointerdown', onClick);
+    }
+
     update(time, delta) {
     }
 }
