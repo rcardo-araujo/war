@@ -332,6 +332,42 @@ export class UIScene extends Phaser.Scene {
         aim.on('pointerdown', onClick);
     }
 
+    showObjectiveModal() {
+        const w = this.cameras.main.width;
+        const h = this.cameras.main.height;
+
+        this.gameStateManager.emit('game:setMapInteractive', false);
+
+        this.modalOverlay = this.add.rectangle(0, 0, w, h, 0x000000, 0.65).setOrigin(0).setDepth(10001).setInteractive();
+
+        const card = this.add.image(w / 2, h / 2, 'objective-card').setDepth(10002);
+
+        const player = this.gameStateManager.getCurrentPlayer();
+        let objectiveText = 'Objetivo não disponível';
+        if (player && player.objective) {
+            objectiveText = player.objective.description || player.objective.main || player.objective.main?.text || objectiveText;
+        }
+
+        const displayW = card.displayWidth || card.width;
+        const textStyle = {
+            font: '18px Arial',
+            color: '#ffffff',
+            align: 'center',
+            wordWrap: { width: Math.max(100, displayW - 40) }
+        };
+
+        this.objectiveText = this.add.text(w / 2, h / 2, objectiveText, textStyle).setOrigin(0.5).setDepth(10003);
+
+        const maxW = w - 80;
+        const maxH = h - 80;
+        if (card.width > maxW || card.height > maxH) {
+            const scale = Math.min(maxW / card.width, maxH / card.height);
+            card.setScale(scale);
+        }
+
+        this.modalOverlay.on('pointerdown', () => this.hideObjectiveModal());
+    }
+
     update(time, delta) {
     }
 }
