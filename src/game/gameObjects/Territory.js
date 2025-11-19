@@ -38,4 +38,8 @@ export default class Territory {
     getTroopCount(){
         return this.troops;
     }
+
+    getContinent(){
+        return this.continent;
+    }
 }
