@@ -44,6 +44,7 @@ export class UIScene extends Phaser.Scene {
         });
         this.confirmButton = null;
 
+        this.createTargetButton();        
         this.setupEvents();
         this.updateButtonText(this.gameStateManager.getCurrentPhase());
         this.updatePhaseText(this.gameStateManager.getCurrentPhase());
