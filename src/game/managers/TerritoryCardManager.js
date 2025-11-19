@@ -109,4 +109,9 @@ export default class TerritoryCardManager {
           this.territoryCards[j] = k;
         }
     }
+
+    drawCard(player){
+        let card = this.territoryCards[this.territoryCards.length - 1];
+        this.changePlayerTerritoryCardOwnership(card.id, player);
+    }
 }
