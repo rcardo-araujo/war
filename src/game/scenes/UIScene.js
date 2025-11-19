@@ -88,6 +88,11 @@ export class UIScene extends Phaser.Scene {
             this.hideConfirmButton();
             this.showStrategyInput(originTerritory, destinationTerritory);
         }, this);
+        this.gameStateManager.on('game:nextTurn', (newPlayer) => {
+            if (this.targetElipse && newPlayer && newPlayer.color) {
+                this.targetElipse.setTint(newPlayer.color);
+            }
+        }, this);
     }
 
     updateTurnLabel(newPlayer) {
