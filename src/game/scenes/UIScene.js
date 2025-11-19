@@ -122,9 +122,9 @@ export class UIScene extends Phaser.Scene {
                     font-family: Arial;
                 ">
                     <p>Território: <strong>${territory.name}</strong></p>
-                    <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops}</strong></p>
+                    <p>Tropas disponíveis: <strong>${currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory)}</strong></p>
                     <p>Quantas tropas colocar?</p>
-                    <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops}" value="1" style="width: 60px; text-align: center;">
+                    <input id="troops" type="number" min="1" max="${currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory)}" value="1" style="width: 60px; text-align: center;">
                     <br><br>
                     <button id="confirmButton">Confirmar</button>
                     <button id="cancelButton">Cancelar</button>
@@ -138,18 +138,18 @@ export class UIScene extends Phaser.Scene {
             if (event.target.id === 'confirmButton') {
                 const value = parseInt(inputContainer.getChildByID('troops').value, 10);
 
-                if (!isNaN(value) && value <= currentPlayer.availableTroops) {
-                    this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
+                    if (!isNaN(value) && value <= (currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory))) {
+                        this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
+                        inputContainer.destroy();
+                    } else {
+                        this.gameStateManager.emit('game:error', `Digite um número válido entre 1 e ${currentPlayer.availableTroops}!`, this);
+                    }
+                } else if (event.target.id === 'cancelButton') {
+                    this.gameStateManager.emit('troopsAllocated', { troops: 0, territory: territory });
                     inputContainer.destroy();
-                } else {
-                    this.gameStateManager.emit('game:error', `Digite um número válido entre 1 e ${currentPlayer.availableTroops}!`, this);
                 }
-            } else if (event.target.id === 'cancelButton') {
-                this.gameStateManager.emit('troopsAllocated', { troops: 0, territory: territory });
-                inputContainer.destroy();
-            }
-        });
-    }
+            });
+        }
 
     showAttackInput(attackerTerritory, defenderTerritory) {
         const centerX = this.cameras.main.centerX;
