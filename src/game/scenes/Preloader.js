@@ -50,6 +50,18 @@ export class Preloader extends Scene
         this.load.image('target-pink', 'assets/images/ui/target-pink.png');
         this.load.image('objective-card', 'assets/images/ui/objective-card.png');
 
+        this.load.image('button-next-turn', 'assets/images/ui/hud/button-next-turn.png');
+        this.load.image('center-bar-stroke', 'assets/images/ui/hud/center-bar-stroke.png');
+        this.load.image('center-bar', 'assets/images/ui/hud/center-bar.png');
+        this.load.image('side-panel', 'assets/images/ui/hud/side-panel.png');
+        this.load.image('icon-attack-phase', 'assets/images/ui/hud/icon-attack-phase.png');
+        this.load.image('icon-fortify-phase', 'assets/images/ui/hud/icon-fortify-phase.png');
+        this.load.image('icon-relocation-phase', 'assets/images/ui/hud/icon-relocation-phase.png');
+        this.load.image('phase-bar-active', 'assets/images/ui/hud/phase-bar-active.png');
+        this.load.image('phase-bar-inactive', 'assets/images/ui/hud/phase-bar-inactive.png');
+        this.load.image('phase-label-background', 'assets/images/ui/hud/phase-label-background.png');
+        this.load.image('territory-cards', 'assets/images/ui/hud/territory-cards.png');
+
         this.load.audio('background-music', 'assets/audio/background.mp3');
         this.load.audio('hover-sound', 'assets/audio/hover.mp3');
         this.load.audio('click-sound', 'assets/audio/click.wav');
