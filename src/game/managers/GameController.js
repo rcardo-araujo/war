@@ -162,6 +162,7 @@ export default class GameController {
                 const movingTroops = attackDice;
                 attacker.removeTroops(movingTroops);
                 defender.addTroops(movingTroops);
+                this.gsm.turnManager.setCapture(true);
 
             }
 
