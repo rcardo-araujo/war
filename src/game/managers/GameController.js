@@ -168,7 +168,6 @@ export default class GameController {
             this.gsm.emit('game:troopCountChanged', attacker.id);
             this.gsm.emit('game:troopCountChanged', defender.id);
         }
-
         this.gsm.emit('game:setMapInteractive', true);
         this.gsm.emit('game:unselectAttacker', attacker);
         this.attackTerritories.attacker = null;
@@ -178,7 +177,6 @@ export default class GameController {
     }
 
     handleAttackConfirm() {
-        this.checkObjectiveForPlayer(this.gsm.getCurrentPlayer());
         console.log("Ataque confirmado");
         this.gsm.emit('game:setMapInteractive', false);
     }
