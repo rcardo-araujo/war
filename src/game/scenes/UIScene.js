@@ -350,7 +350,7 @@ export class UIScene extends Phaser.Scene {
 
         const displayW = card.displayWidth || card.width;
         const textStyle = {
-            font: '18px Arial',
+            font: '18px JetBrainsMono',
             color: '#ffffff',
             align: 'center',
             wordWrap: { width: Math.max(100, displayW - 40) }
