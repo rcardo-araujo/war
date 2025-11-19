@@ -10,7 +10,7 @@
         },
         "africa": {
             "name": "África",
-            "bonus": 5
+            "bonus": 3
         },
         "europe": {
             "name": "Europa",
@@ -21,8 +21,8 @@
             "bonus": 7
         },
         "oceania": {
-            "name": "Ásia",
-            "bonus": 7
+            "name": "Oceania",
+            "bonus": 2
         }
     },
     "territories": [
@@ -71,7 +71,7 @@
             "name": "Congo",
             "continent": "africa",
             "type": "triangle",
-            "neighbors": ["africa_do_sul", "argelia", "sudao"],
+            "neighbors": ["africa-do-sul", "argelia", "sudao"],
             "position": { "x": 587.22, "y": 464 }
         },
         {
@@ -87,7 +87,7 @@
             "name": "Madagascar",
             "continent": "africa",
             "type": "square",
-            "neighbors": ["africa_do_sul", "sudao"],
+            "neighbors": ["africa-do-sul", "sudao"],
             "position": { "x": 723.64, "y": 515.5 }
         },
         {
@@ -95,7 +95,7 @@
             "name": "Sudão",
             "continent": "africa",
             "type": "triangle",
-            "neighbors": ["argelia", "egito", "congo", "africa_do_sul", "madagascar"],
+            "neighbors": ["argelia", "egito", "congo", "africa-do-sul", "madagascar"],
             "position": { "x": 606.78, "y": 396 }
         },
         {
@@ -103,7 +103,7 @@
             "name": "Egito",
             "continent": "africa",
             "type": "circle",
-            "neighbors": ["argelia", "sudao", "oriente-medio", "polonia", "peninsula_iberica"],
+            "neighbors": ["argelia", "sudao", "oriente-medio", "polonia", "peninsula-iberica"],
             "position": { "x": 596.21, "y": 358 }
         },
         {
@@ -111,7 +111,7 @@
             "name": "México",
             "continent": "north_america",
             "type": "square",
-            "neighbors": ["venezuela", "california", "nova_york"],
+            "neighbors": ["venezuela", "california", "nova-york"],
             "position": { "x": 144.5, "y": 297.5 }
         },
         {
@@ -119,7 +119,7 @@
             "name": "Califórnia",
             "continent": "north_america",
             "type": "triangle",
-            "neighbors": ["mexico", "nova_york", "vancouver", "ottawa"],
+            "neighbors": ["mexico", "nova-york", "vancouver", "ottawa"],
             "position": { "x": 138.5, "y": 215 }
         },
         {
@@ -143,7 +143,7 @@
             "name": "Ottawa",
             "continent": "north_america",
             "type": "triangle",
-            "neighbors": ["nova_york", "california", "vancouver", "mackenzie", "labrador"],
+            "neighbors": ["nova-york", "california", "vancouver", "mackenzie", "labrador"],
             "position": { "x": 258, "y": 182.5 }
         },
         {
@@ -151,7 +151,7 @@
             "name": "Labrador",
             "continent": "north_america",
             "type": "circle",
-            "neighbors": ["nova_york", "ottawa", "groenlandia"],
+            "neighbors": ["nova-york", "ottawa", "groenlandia"],
             "position": { "x": 327.5, "y": 179.5 }
         },
         {
@@ -183,7 +183,7 @@
             "name": "Península Ibérica",
             "continent": "europe",
             "type": "square",
-            "neighbors": ["reino_unido", "alemanha", "polonia", "egito"],
+            "neighbors": ["reino-unido", "alemanha", "polonia", "egito"],
             "position": { "x": 521.4, "y": 252.25 }
         },
         {
@@ -191,7 +191,7 @@
             "name": "Reino Unido",
             "continent": "europe",
             "type": "triangle",
-            "neighbors": ["islandia", "suecia", "alemanha", "peninsula_iberica"],
+            "neighbors": ["islandia", "suecia", "alemanha", "peninsula-iberica"],
             "position": { "x": 499.7, "y": 191.5 }
         },
         {
@@ -199,7 +199,7 @@
             "name": "Islândia",
             "continent": "europe",
             "type": "circle",
-            "neighbors": ["groenlandia", "reino_unido"],
+            "neighbors": ["groenlandia", "reino-unido"],
             "position": { "x": 496, "y": 126.5 }
         },
         {
@@ -207,7 +207,7 @@
             "name": "Suécia",
             "continent": "europe",
             "type": "square",
-            "neighbors": ["reino_unido", "moscou"],
+            "neighbors": ["reino-unido", "moscou"],
             "position": { "x": 588.54, "y": 158 }
         },
         {
@@ -215,7 +215,7 @@
             "name": "Alemanha",
             "continent": "europe",
             "type": "triangle",
-            "neighbors": ["reino_unido", "peninsula_iberica", "polonia"],
+            "neighbors": ["reino-unido", "peninsula-iberica", "polonia"],
             "position": { "x": 574.26, "y": 219.5 }
         },
         {
@@ -223,7 +223,7 @@
             "name": "Polônia",
             "continent": "europe",
             "type": "circle",
-            "neighbors": ["alemanha", "peninsula_iberica", "moscou", "oriente-medio", "egito"],
+            "neighbors": ["alemanha", "peninsula-iberica", "moscou", "oriente-medio", "egito"],
             "position": { "x": 602.81, "y": 243.5 }
         },
         {
@@ -335,7 +335,7 @@
             "name": "Austrália",
             "continent": "oceania",
             "type": "triangle",
-            "neighbors": ["borneo", "nova_guine", "sumatra"],
+            "neighbors": ["borneo", "nova-guine", "sumatra"],
             "position": { "x": 998.08, "y": 556 }
         },
         {
@@ -351,7 +351,7 @@
             "name": "Bornéu",
             "continent": "oceania",
             "type": "square",
-            "neighbors": ["vietna", "nova_guine", "australia"],
+            "neighbors": ["vietna", "nova-guine", "australia"],
             "position": { "x": 1017.65, "y": 469.5 }
         },
         {

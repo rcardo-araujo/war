@@ -62,7 +62,7 @@ export default class PlayerManager {
             }
 
             const conquestObjective = conquestDeck.pop();
-            if (conquestObjective){
+            if (conquestObjective) {
                 player.setObjective(conquestObjective);
             }
         });
@@ -84,5 +84,88 @@ export default class PlayerManager {
 
     getCurrentPlayer(turnManager) {
         return turnManager.getCurrentPlayer();
+    }
+
+    totalTroopsForPlayer(player) {
+        let totalTroops = 0;
+        player.ownedTerritories.forEach(territory => {
+            totalTroops += territory.getTroopCount();
+        });
+        return totalTroops;
+    }
+
+    checkAccumulateObjective(player) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        const main = obj.main || {};
+
+
+        if (typeof main.accumulate === 'number') {
+            const needed = main.accumulate;
+            if (typeof main.occupy === 'number') {
+                let count = 0;
+                player.ownedTerritories.forEach(t => {
+                    if ((t && t.getTroopCount() >= main.occupy) || (!main.occupy)) count++;
+                });
+                if (count >= needed) return true;
+            } else {
+                if (player.ownedTerritories.size >= needed) return true;
+            }
+        }
+        return false;
+    }
+
+    checkContinentObjective(player, mapManager) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        const main = obj.main || {};
+
+        if (Array.isArray(main.continents) && main.continents.length > 0) {
+            const territories = Object.values(mapManager.territories);
+            const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]/g, '');
+
+            for (let continentName of main.continents) {
+                if (continentName === 'X') {
+                    continue;
+                }
+                const neededTerritories = territories.filter(t => normalize(t.continent) === normalize(continentName));
+                if (neededTerritories.length === 0) {
+                    return false;
+                }
+
+                const ownsAll = neededTerritories.every(t => player.ownedTerritories.has(t));
+                if (!ownsAll) return false;
+            }
+            return true;
+        }
+    }
+
+    checkDestructionObjective(player, defender) {
+        if (!player || !player.objective) return false;
+        const obj = player.objective;
+        const main = obj.main || {};
+
+        if (obj.type === 'destruction' && defender) {
+            if (player.objective.target === defender) {
+                const totalTroops = this.totalTroopsForPlayer(defender);
+                if (totalTroops === 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    isObjectiveComplete(player, mapManager, defender) {
+        if (this.checkAccumulateObjective(player)) {
+            return true;
+        }
+        if (this.checkContinentObjective(player, mapManager)) {
+            return true;
+        }
+        if (this.checkDestructionObjective(player, defender)) {
+            return true;
+        }
+        return false;
     }
 }
