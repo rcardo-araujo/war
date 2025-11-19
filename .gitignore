@@ -23,4 +23,5 @@ dist-ssr
 *.sw?
 
 venv/
+__pycache__/
 rename_assets.py

@@ -14,7 +14,7 @@ export default class PlayerManager {
     initializePlayers(playerConfigs = []) {
         this.players = playerConfigs
             .filter(cfg => cfg.type !== PLAYER_TYPES.NONE)
-            .map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color)));
+            .map(cfg => new Player(cfg.name, cfg.type, cfg.color, this.getPlayerColorName(cfg.color)));
     }
 
     initializeObjectives(objectivesData){

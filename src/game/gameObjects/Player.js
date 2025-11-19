@@ -1,6 +1,7 @@
 export default class Player {
-    constructor(name, color, colorKey = null) {
+    constructor(name, type, color, colorKey = null) {
         this.name = name;
+        this.type = type;
         this.color = color;
         this.colorKey = colorKey;
         this.ownedTerritories = new Set();
@@ -17,6 +18,10 @@ export default class Player {
 
     getColor() {
         return this.color;
+    }
+    
+    getType() {
+        return this.type;
     }
 
     setObjective(objective) {

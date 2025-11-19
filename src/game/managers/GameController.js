@@ -1,4 +1,5 @@
 import { TURN_PHASES } from './TurnManager';
+import { PLAYER_TYPES } from '../config/playerTypes';
 import { executeCombat } from '../utils/diceRoller';
 
 export default class GameController {
@@ -21,9 +22,7 @@ export default class GameController {
         this.gsm.on('game:attackConfirmed', this.handleAttackConfirm, this);
         this.gsm.on('game:attackCommitted', this.onAttackCommit, this);
 
-        this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
-
     }
 
     checkObjectiveForPlayer(player, defender) {
@@ -39,6 +38,11 @@ export default class GameController {
     }
 
     handleEndPhaseRequest() {
+        console.log(this.gsm.getCurrentPlayer().getType())
+        if (this.gsm.getCurrentPlayer().getType() == PLAYER_TYPES.BOT) {
+            return;
+        } 
+
         const player = this.gsm.getCurrentPlayer();
         const phase = this.gsm.getCurrentPhase();
 
@@ -77,6 +81,10 @@ export default class GameController {
     }
 
     handleTerritoryClick(territory) {
+        if (this.gsm.getCurrentPlayer().getType() === PLAYER_TYPES.BOT) {
+            return;
+        }
+
         switch (this.gsm.getCurrentPhase()) {
             case TURN_PHASES.FIRST_REINFORCEMENT:
             case TURN_PHASES.REINFORCEMENT:
@@ -164,10 +172,6 @@ export default class GameController {
         this.attackTerritories.defender = null;
         console.log('Ataque concluído');
         this.checkObjectiveForPlayer(attacker.owner, defendingPlayer);
-    }
-
-    onPhaseChanged(newPhase) {
-        this.gsm.emit('game:phaseChanged', newPhase);
     }
 
     onNextTurn(turnManager) {
