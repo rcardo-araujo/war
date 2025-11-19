@@ -12,6 +12,7 @@ export default class TerritoryCardManager {
     initializeTerritoryCards (mapData) {
         mapData.territories.forEach(data => {
             this.territoryCards[data.id] = new TerritoryCard(data.id, data.name, data.type);
+            this.shuffleDeck();
         });
     }
 
@@ -98,5 +99,14 @@ export default class TerritoryCardManager {
             }
         });
         return bonusTroops;
+    }
+
+    shuffleDeck() {
+        for (let i = this.territoryCards.length -1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i+1));
+          let k = this.territoryCards[i];
+          this.territoryCards[i] = this.territoryCards[j];
+          this.territoryCards[j] = k;
+        }
     }
 }
