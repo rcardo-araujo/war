@@ -87,10 +87,11 @@ export default class PlayerManager {
     }
 
     totalTroopsForPlayer(player) {
-        return player.ownedTerritories.reduce(
-            (sum, t) => sum + (t?.getTroopCount?.() ?? 0),
-            0
-        );
+        let totalTroops = 0;
+        player.ownedTerritories.forEach(territory => {
+            totalTroops += territory.getTroopCount();
+        });
+        return totalTroops;
     }
 
     checkAccumulateObjective(player) {

@@ -139,25 +139,24 @@ export default class GameController {
 
     onAttackCommit({ attackDice, attacker, defender }) {
         const defendingPlayer = defender.owner;
-        if (attackDice !== 0){
+        if (attackDice !== 0) {
             const casualties = executeCombat(attackDice, defender);
             this.attackTerritories.attacker.removeTroops(casualties[0]);
             this.attackTerritories.defender.removeTroops(casualties[1]);
-            
+
             if (defender.getTroopCount() <= 0) {
                 this.gsm.mapManager.changePlayerTerritoryOwnership(defender.id, attacker.owner);
                 this.gsm.emit('game:ownerChanged', defender.id);
                 const movingTroops = attackDice;
                 attacker.removeTroops(movingTroops);
                 defender.addTroops(movingTroops);
-                
+
             }
 
             this.gsm.emit('game:troopCountChanged', attacker.id);
             this.gsm.emit('game:troopCountChanged', defender.id);
-            this.gsm.emit('game:setMapInteractive', true);
         }
-
+        this.gsm.emit('game:setMapInteractive', true);
         this.gsm.emit('game:unselectAttacker', attacker);
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
@@ -175,8 +174,7 @@ export default class GameController {
         this.gsm.emit('game:nextTurn', newPlayer);
     }
 
-    handleAttackConfirm(){
-        this.checkObjectiveForPlayer(this.gsm.getCurrentPlayer());
+    handleAttackConfirm() {
         console.log("Ataque confirmado");
         this.gsm.emit('game:setMapInteractive', false);
     }
