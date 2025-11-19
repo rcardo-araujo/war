@@ -368,6 +368,24 @@ export class UIScene extends Phaser.Scene {
         this.modalOverlay.on('pointerdown', () => this.hideObjectiveModal());
     }
 
+    hideObjectiveModal() {
+        if (this.modalOverlay) {
+            this.modalOverlay.destroy();
+            this.modalOverlay = null;
+        }
+        const card = this.children.getByName && this.children.getByName('objective-card');
+        this.children.list.slice().forEach(child => {
+            if (child.texture && child.texture.key === 'objective-card') child.destroy();
+        });
+
+        if (this.objectiveText) {
+            this.objectiveText.destroy();
+            this.objectiveText = null;
+        }
+
+        this.gameStateManager.emit('game:setMapInteractive', true);
+    }
+
     update(time, delta) {
     }
 }
