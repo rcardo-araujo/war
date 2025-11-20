@@ -3,6 +3,11 @@ import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { COLORS } from '../config/colors';
 
+const highlightTerritoryNumber = Object.freeze({
+    FIRST: "FIRST",
+    SECOND: "SECOND"
+});
+
 export class Game extends Scene {
     constructor() {
         super('Game');
@@ -20,8 +25,9 @@ export class Game extends Scene {
             .setDisplaySize(GameConfig.width, GameConfig.height);
 
         this.territorySprites = {};
-        this.highlightedAttacker = null;
-        this.highlightedDefender = null;
+        this.highlightedTerritories = [];
+        this.highlightedFirst = null;
+        this.highlightedSecond = null;
 
         this.drawMap();
         this.setupInteractivity();
@@ -61,7 +67,7 @@ export class Game extends Scene {
                 color: '#ffffff',
                 fontStyle: 'bold'
             })
-            .setOrigin(0.5)
+                .setOrigin(0.5)
 
             const counterContainer = this.add.container(counterX, counterY, [counterStroke, counterBackground, troopCount]);
             counterContainer.setDepth(90);
@@ -93,7 +99,7 @@ export class Game extends Scene {
         this.gameState.on('game:ownerChanged', (territoryId) => {
             this.updateTerritoryColor(territoryId);
         }, this);
-        
+
         this.gameState.on('game:setMapInteractive', (isInteractive) => {
             if (isInteractive) {
                 this.enableInteractivity();
@@ -103,16 +109,37 @@ export class Game extends Scene {
         }, this);
 
         this.gameState.on('game:attackerSelected', (territory) => {
-            this.highlightAttacker(territory);
+            this.highlightTerritorySelection(territory, 0xff0000, highlightTerritoryNumber.FIRST);
         }, this);
         this.gameState.on('game:defenderSelected', (territory) => {
-            this.highlightDefender(territory);
+            this.highlightTerritorySelection(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
         }, this);
         this.gameState.on('game:unselectAttacker', (territory) => {
             this.clearHighlights();
         }, this);
+
+
+        this.gameState.on('game:originSelected', (territory) => {
+            this.highlightTerritorySelection(territory, 0xff0000, highlightTerritoryNumber.FIRST);
+            for (const terr of territory.getNeighborIds()) {
+                let t = this.gameState.getTerritory(terr);
+                if (t.owner === this.gameState.getCurrentPlayer()) {
+                    this.highlightTerritory(t, 0x00ff00);
+                }
+            }
+        }, this);
+        this.gameState.on('game:destinationSelected', (territory) => {
+            this.highlightTerritorySelection(territory, 0x0000ff, highlightTerritoryNumber.SECOND);
+        }, this);
+        this.gameState.on('game:unselectOrigin', (territory) => {
+            this.clearHighlights();
+        }, this);
+
+        this.gameState.on('game:phaseChanged', (newPhase) => {
+            this.clearHighlights();
+        });
     }
-    
+
     updateTroops(territoryId) {
         const troopText = this.territorySprites[territoryId].troops;
         troopText.setText(this.gameState.getTerritory(territoryId).getTroopCount());
@@ -133,86 +160,90 @@ export class Game extends Scene {
         counterStroke.setTint(newColor);
     }
 
-    highlightAttacker(territory){
-        this.clearHighlights();
-
-        this.highlightedAttacker = territory;
-        const sprites = this.territorySprites[territory.id];
-
-        sprites.stroke.setTint(0xff0000);
-        sprites.filled.setScale(1.1);
-        sprites.counter.setScale(1.1);
-
-        this.children.bringToTop(sprites.filled);
-        this.children.bringToTop(sprites.stroke);
-        this.children.bringToTop(sprites.counter);
+    highlightTerritorySelection(territory, color, territoryNumber) {
+        this.highlightTerritory(territory, color);
+        if (territoryNumber === highlightTerritoryNumber.FIRST) {
+            this.highlightedFirst = territory;
+        }
+        else if (territoryNumber === highlightTerritoryNumber.SECOND) {
+            this.highlightedSecond = territory;
+        }
     }
 
-    highlightDefender(territory) {
-        this.highlightedDefender = territory;
+    highlightTerritory(territory, color) {
+        this.highlightedTerritories.push(territory);
         const sprites = this.territorySprites[territory.id];
-
-        sprites.stroke.setTint(0x0000ff);
-        sprites.filled.setScale(1.1);
-        sprites.stroke.setScale(1.1);
-        sprites.counter.setScale(1.1);
+        sprites.stroke.setTint(color);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
+        this.children.bringToTop(sprites.troops);
         this.children.bringToTop(sprites.counter);
     }
 
     clearHighlights() {
-        if (this.highlightedAttacker) {
-            const sprites = this.territorySprites[this.highlightedAttacker.id];
+        if (this.highlightedFirst) {
+            const sprites = this.territorySprites[this.highlightedFirst.id];
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
             sprites.counter.setScale(1);
         }
-        if (this.highlightedDefender) {
-            const sprites = this.territorySprites[this.highlightedDefender.id];
+        if (this.highlightedSecond) {
+            const sprites = this.territorySprites[this.highlightedSecond.id];
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
             sprites.counter.setScale(1);
         }
-        
-        this.highlightedAttacker = null;
-        this.highlightedDefender = null;
+
+        this.highlightedFirst = null;
+        this.highlightedSecond = null;
+
+        for (const territory of this.highlightedTerritories) {
+            const sprites = this.territorySprites[territory.id];
+            sprites.stroke.setTint(0xffff00);
+            sprites.filled.setScale(1);
+            sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
+            sprites.counter.setScale(1);
+        }
+
+        this.highlightedTerritories.length = 0
     }
 
     setupInteractivity() {
         this.input.on('gameobjectover', (pointer, gameObject) => {
             const sprites = this.territorySprites[gameObject.getData('logic').id];
-            
             gameObject.setScale(1.1);
-            sprites.stroke.setScale(1.1);
-            
-            if (this.highlightedAttacker && gameObject.getData('logic').id !== this.highlightedAttacker.id){
-                sprites.stroke.setTint(0xffffff);
-            }
-            
-            sprites.counter.setScale(1.1)
+            const stroke = sprites.stroke;
+            stroke.setScale(1.1);
+            const troopCount = sprites.troops;
+            troopCount.setScale(1.1);
+            sprites.counter.setScale(1.1);
 
             this.children.bringToTop(gameObject);
-            this.children.bringToTop(sprites.stroke);
+            this.children.bringToTop(stroke);
+            this.children.bringToTop(troopCount);
             this.children.bringToTop(sprites.counter);
         });
 
         this.input.on('gameobjectout', (pointer, gameObject) => {
             const territoryLogic = gameObject.getData('logic');
             const sprites = this.territorySprites[territoryLogic.id];
+            sprites.filled.setScale(1);
+            sprites.stroke.setScale(1);
+            sprites.troops.setScale(1);
+            sprites.counter.setScale(1);
 
-            if (territoryLogic !== this.highlightedAttacker && territoryLogic !== this.highlightedDefender) {
-                sprites.filled.setScale(1);
-                sprites.stroke.setScale(1);
-                sprites.counter.setScale(1);
-                sprites.stroke.setTint(0xffff00);
-            } else if (territoryLogic === this.highlightedAttacker) {
-                sprites.stroke.setTint(0xff0000);
-            } else if (territoryLogic === this.highlightedDefender) {
-                sprites.stroke.setTint(0x0000ff);
+            if ((this.highlightedFirst != null && territoryLogic.id === this.highlightedFirst.id) || (this.highlightedSecond != null &&
+                territoryLogic.id === this.highlightedSecond.id)) {
+                sprites.filled.setScale(1.1);
+                sprites.stroke.setScale(1.1);
+                sprites.troops.setScale(1.1);
+                sprites.counter.setScale(1.1);
             }
         });
 
@@ -222,20 +253,22 @@ export class Game extends Scene {
     }
 
     disableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, counter, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, troops, counter }) => {
             counter.setScale(1);
             stroke.setScale(1);
+            troops.setScale(1);
             filled.setScale(1);
             filled.disableInteractive();
-        }); 
+        });
     }
 
     enableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, counter, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, troops, counter }) => {
             counter.setScale(1);
             stroke.setScale(1);
+            troops.setScale(1);
             filled.setScale(1);
             filled.setInteractive({ pixelPerfect: true });
-        }); 
+        });
     }
 }
