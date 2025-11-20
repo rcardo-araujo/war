@@ -36,17 +36,36 @@ export class Game extends Scene {
     drawMap() {
         const mapData = this.cache.json.get('mapData');
 
+        const counterTexture = this.textures.get('army-counter-stroke');
+        const counterWidth = counterTexture.getSourceImage().width;
+        const counterHeight = counterTexture.getSourceImage().height;
+
         mapData.territories.forEach(territoryData => {
             const { id, name, position } = territoryData;
             const territoryLogic = this.gameState.mapManager.getTerritory(id);
 
             const filledSprite = this.add.image(position.x, position.y, `${id}-filled`).setOrigin(0);
             const strokeSprite = this.add.image(position.x - 5 / 2, position.y - 5 / 2, `${id}-stroke`).setOrigin(0);
-            const troopCount = this.add.text(position.x + filledSprite.width / 2, position.y + filledSprite.height / 2, territoryLogic.troops, {
+
+            const territoryCenterX = position.x + (filledSprite.width / 2);
+            const territoryCenterY = position.y + (filledSprite.height / 2);
+
+            const counterX = territoryCenterX - (counterWidth / 2);
+            const counterY = territoryCenterY - (counterHeight / 2);
+
+            const counterStroke = this.add.image(0, 0, 'army-counter-stroke').setOrigin(0);
+            const counterBackground = this.add.image(2, 2, 'army-counter-inner').setOrigin(0);
+
+            const troopCount = this.add.text(counterWidth / 2, counterHeight / 2, territoryLogic.troops, {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold'
-            }).setOrigin(0.5);
+            })
+            .setOrigin(0.5)
+
+            const counterContainer = this.add.container(counterX, counterY, [counterStroke, counterBackground, troopCount]);
+            counterContainer.setDepth(90);
+            troopCount.setDepth(1);
 
             filledSprite.setData('logic', territoryLogic);
             filledSprite.setInteractive({ pixelPerfect: true });
@@ -54,11 +73,15 @@ export class Game extends Scene {
             this.territorySprites[id] = {
                 filled: filledSprite,
                 stroke: strokeSprite,
+                counter: counterContainer,
                 troops: troopCount
             };
 
             filledSprite.setTint(territoryLogic.color);
             strokeSprite.setTint(0xffff00);
+
+            counterBackground.setTint(territoryLogic.color);
+            counterStroke.setTint(territoryLogic.color);
         });
     }
 
@@ -97,7 +120,17 @@ export class Game extends Scene {
 
     updateTerritoryColor(territoryId) {
         const newColor = this.gameState.getTerritory(territoryId).owner.getColor();
-        this.territorySprites[territoryId].filled.setTint(newColor);
+
+        const sprites = this.territorySprites[territoryId];
+
+        sprites.filled.setTint(newColor);
+
+        const counterStroke = sprites.counter.list[0];
+        const counterBackground = sprites.counter.list[1];
+
+        counterBackground.setTint(newColor);
+        counterStroke.clearTint()
+        counterStroke.setTint(newColor);
     }
 
     highlightAttacker(territory){
@@ -105,14 +138,14 @@ export class Game extends Scene {
 
         this.highlightedAttacker = territory;
         const sprites = this.territorySprites[territory.id];
+
         sprites.stroke.setTint(0xff0000);
         sprites.filled.setScale(1.1);
-        sprites.stroke.setScale(1.1);
-        sprites.troops.setScale(1.1);
+        sprites.counter.setScale(1.1);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
-        this.children.bringToTop(sprites.troops);
+        this.children.bringToTop(sprites.counter);
     }
 
     highlightDefender(territory) {
@@ -122,11 +155,11 @@ export class Game extends Scene {
         sprites.stroke.setTint(0x0000ff);
         sprites.filled.setScale(1.1);
         sprites.stroke.setScale(1.1);
-        sprites.troops.setScale(1.1);
+        sprites.counter.setScale(1.1);
 
         this.children.bringToTop(sprites.filled);
         this.children.bringToTop(sprites.stroke);
-        this.children.bringToTop(sprites.troops);
+        this.children.bringToTop(sprites.counter);
     }
 
     clearHighlights() {
@@ -135,14 +168,14 @@ export class Game extends Scene {
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
-            sprites.troops.setScale(1);
+            sprites.counter.setScale(1);
         }
         if (this.highlightedDefender) {
             const sprites = this.territorySprites[this.highlightedDefender.id];
             sprites.stroke.setTint(0xffff00);
             sprites.filled.setScale(1);
             sprites.stroke.setScale(1);
-            sprites.troops.setScale(1);
+            sprites.counter.setScale(1);
         }
         
         this.highlightedAttacker = null;
@@ -151,17 +184,20 @@ export class Game extends Scene {
 
     setupInteractivity() {
         this.input.on('gameobjectover', (pointer, gameObject) => {
+            const sprites = this.territorySprites[gameObject.getData('logic').id];
+            
             gameObject.setScale(1.1);
-            const stroke = this.territorySprites[gameObject.getData('logic').id].stroke;
-            stroke.setScale(1.1);
+            sprites.stroke.setScale(1.1);
+            
             if (this.highlightedAttacker && gameObject.getData('logic').id !== this.highlightedAttacker.id){
-                stroke.setTint(0xffffff);
+                sprites.stroke.setTint(0xffffff);
             }
-            const troopCount = this.territorySprites[gameObject.getData('logic').id].troops;
-            troopCount.setScale(1.1);
+            
+            sprites.counter.setScale(1.1)
+
             this.children.bringToTop(gameObject);
-            this.children.bringToTop(stroke);
-            this.children.bringToTop(troopCount); 
+            this.children.bringToTop(sprites.stroke);
+            this.children.bringToTop(sprites.counter);
         });
 
         this.input.on('gameobjectout', (pointer, gameObject) => {
@@ -171,7 +207,7 @@ export class Game extends Scene {
             if (territoryLogic !== this.highlightedAttacker && territoryLogic !== this.highlightedDefender) {
                 sprites.filled.setScale(1);
                 sprites.stroke.setScale(1);
-                sprites.troops.setScale(1);
+                sprites.counter.setScale(1);
                 sprites.stroke.setTint(0xffff00);
             } else if (territoryLogic === this.highlightedAttacker) {
                 sprites.stroke.setTint(0xff0000);
@@ -186,18 +222,18 @@ export class Game extends Scene {
     }
 
     disableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, counter, troops }) => {
+            counter.setScale(1);
             stroke.setScale(1);
-            troops.setScale(1);
             filled.setScale(1);
             filled.disableInteractive();
         }); 
     }
 
     enableInteractivity() {
-        Object.values(this.territorySprites).forEach(({ filled, stroke, troops }) => {
+        Object.values(this.territorySprites).forEach(({ filled, stroke, counter, troops }) => {
+            counter.setScale(1);
             stroke.setScale(1);
-            troops.setScale(1);
             filled.setScale(1);
             filled.setInteractive({ pixelPerfect: true });
         }); 
