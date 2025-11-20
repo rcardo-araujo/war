@@ -1,5 +1,5 @@
 export default class Player {
-    constructor(name, color, colorKey = null) {
+    constructor(name, color, colorKey = null, type = 'human') {
         this.name = name;
         this.color = color;
         this.colorKey = colorKey;
@@ -13,6 +13,7 @@ export default class Player {
         this.availableTroopsAsia = 0;
         this.availableTroopsAfrica = 0;
         this.availableTroopsOceania = 0;
+        this.type = type
     }
 
     getColor() {
