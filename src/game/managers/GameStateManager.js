@@ -5,6 +5,7 @@ import TurnManager from './TurnManager';
 import MovementController from './MovementController';
 import GameController from './GameController';
 import { BotService } from '../gameObjects/BotService';
+import { COLOR_NAMES } from '../config/colors';
 
 export default class GameStateManager extends Phaser.Events.EventEmitter {
     constructor(scene, playerSetup = []) {
@@ -46,16 +47,17 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
                     return {
                         id: neighborId,
                         troops: neighborObj.getTroopCount(),
-                        owner: neighborObj.getOwnerColor ? neighborObj.getOwnerColor() : "unknown" 
+                        owner: COLOR_NAMES[neighborObj.color] ? COLOR_NAMES[neighborObj.color] : "unknown" 
                     };
                 })
             };
         });
 
         const info = {
-            "player": player.getName(),
+            "player": COLOR_NAMES[player.color],
             "phase": this.getCurrentPhase(),
             "objective": player.getObjective().getDescription(),
+            "troopsToPlace": player.getAvailableTroops(),
             "ownedTerritories": formattedList
         }
 
@@ -65,7 +67,16 @@ export default class GameStateManager extends Phaser.Events.EventEmitter {
     handleBotTurn(){
         const state = this.getStateForLLM();
         console.log(state)
-        response = this.botService.getBotMove(state);
-        console.log(response);
+        const response = this.botService.getReinforcementMove(state);
+        response.then((jogada) => {
+            this.allocateBotTroops(jogada.alocacoes);
+        });
+        this.emit('ui:endPhaseClicked');
+    }
+
+    allocateBotTroops(allocations){
+        allocations.forEach(allocation => {
+            this.emit('troopsAllocated', { troops: allocation.tropas, territory: this.mapManager.getTerritory(allocation.territorio) })
+        });
     }
 }

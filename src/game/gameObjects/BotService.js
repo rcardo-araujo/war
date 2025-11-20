@@ -1,9 +1,9 @@
 export class BotService {
     constructor(apiUrl = 'http://localhost:8000') {
-        self.apiUrl = apiUrl;
+        this.apiUrl = apiUrl;
     }
 
-    async getBotMove(gameState) {
+    async getReinforcementMove(gameState) {
         try {
             const payload = {
                 dados_jogo: gameState
@@ -11,7 +11,7 @@ export class BotService {
 
             console.log("Enviando estado para o General Python...", payload);
 
-            const response = await fetch(`${self.apiUrl}/pedir-jogada`, {
+            const response = await fetch(`${this.apiUrl}/reinforcement-move`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

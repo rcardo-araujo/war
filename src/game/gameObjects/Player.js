@@ -63,6 +63,10 @@ export default class Player {
         this.setContinentBonus();
     }
     
+    getAvailableTroops() {
+        return this.availableTroops;
+    }
+    
     setContinentBonus() {
         let sa = 0;
         let na = 0;

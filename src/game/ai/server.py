@@ -19,14 +19,14 @@ bot_manager = WarBotManager()
 class GameState(BaseModel):
     dados_jogo: dict
 
-@app.post("/pedir-jogada")
+@app.post("/reinforcement-move")
 async def ask_bot_move(state: GameState):
     """
     Recebe o estado do Phaser, manda pro LM Studio e devolve a jogada.
     """
     try:
         print("Recebendo pedido do Phaser...")
-        jogada = bot_manager.get_strategic_move(state.dados_jogo)
+        jogada = bot_manager.get_reinforcement_move(state.dados_jogo)
         
         if not jogada:
             raise HTTPException(status_code=500, detail="O Bot não conseguiu gerar uma jogada válida.")

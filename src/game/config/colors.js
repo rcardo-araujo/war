@@ -9,3 +9,15 @@ export const COLORS = {
     black: 0x000000,
     white: 0xffffff
 }
+
+export const COLOR_NAMES = {
+    [COLORS.brand]: 'amarelo',
+    [COLORS.primary]: 'primary',
+    [COLORS.secondary]: 'secondary',
+    [COLORS.pink]: 'rosa',
+    [COLORS.blue]: 'azul',
+    [COLORS.orange]: 'laranja',
+    [COLORS.purple]: 'roxo',
+    [COLORS.black]: 'preto',
+    [COLORS.white]: 'branco'
+}

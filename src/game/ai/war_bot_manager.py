@@ -13,39 +13,79 @@ class WarBotManager:
         self.client = OpenAI(base_url=base_url, api_key="lm-studio")
         self.model_name = model_name
         self.temperature = temperature
-        
-        self.system_prompt = """
-        Você é um general especialista no jogo de tabuleiro War.
-        Seu objetivo é conquistar territórios estrategicamente e eliminar oponentes.
-        
-        Você receberá o estado atual do jogo em JSON.
-        Você DEVE responder APENAS com um JSON válido contendo sua próxima jogada.
-        Não inclua explicações ou texto fora do JSON.
-        
-        O formato de resposta deve ser:
-        {
-            "razao_estrategica": "Explique detalhadamente a lógica por trás da sua jogada."
-            "fase": "ataque",
-            "origem": "Nome do Território",
-            "destino": "Nome do Território",
-            "qtd_exercitos": int,
-        }
-        """
 
-    def get_strategic_move(self, game_state):
+    def format_game_state_for_llm(self, game_state):
         """
-        Envia o estado do jogo para o LLM e retorna a jogada estruturada.
+        Transforma o estado do jogo JSON em um prompt narrativo e estruturado para LLMs.
+        """
+        player = game_state.get('player', 'Desconhecido').upper()
+        objective = game_state.get('objective', 'Nenhum').replace('\n', ' ')
+        troops = game_state.get('troopsToPlace', 0)
+        phase = game_state.get('phase', '')
+
+        prompt_text = (
+            f"=== SITUAÇÃO ESTRATÉGICA DE WAR ===\n"
+            f"VOCÊ É O JOGADOR: {player}\n"
+            f"FASE ATUAL: {phase}\n"
+            f"TROPAS DISPONÍVEIS PARA ALOCAR: {troops}\n"
+            f"SEU OBJETIVO: {objective}\n\n"
+            f"=== MAPA E FRONTEIRAS ===\n"
+            f"Analise seus territórios atuais e a situação das fronteiras para decidir onde alocar as tropas:\n\n"
+        )
+
+        for t in game_state.get('ownedTerritories', []):
+            name = t.get('territory').upper()
+            current_troops = t.get('troops')
+            
+            prompt_text += f"- TERRITÓRIO: {name} (Suas tropas: {current_troops})\n"
+            prompt_text += f"  Vizinhos/Fronteiras:\n"
+            
+            neighbors = t.get('neighbors', [])
+            if not neighbors:
+                prompt_text += "    (Nenhum vizinho listado)\n"
+            
+            for n in neighbors:
+                n_id = n.get('id')
+                n_owner = n.get('owner').upper()
+                n_troops = n.get('troops')
+                
+                relation = "ALIADO" if n_owner == player else "INIMIGO"
+                
+                prompt_text += (
+                    f"    -> {n_id}: Pertence a {n_owner} ({relation}) | "
+                    f"Tropas: {n_troops}\n"
+                )
+            
+            prompt_text += "\n"
+
+        return prompt_text
+
+    def get_reinforcement_move(self, game_state):
+        reinforcement_prompt = '''
+        Você é o WarAI, uma IA especialista em Teoria dos Jogos e estratégia militar no jogo War. 
         
-        :param game_state: Dicionário ou String JSON com o estado atual (mapa, exércitos, cartas).
-        """
-        if isinstance(game_state, dict):
-            game_state_str = json.dumps(game_state, ensure_ascii=False)
-        else:
-            game_state_str = game_state
+        SUAS DIRETRIZES TÁTICAS (DOUTRINA):
+        1. PROTEÇÃO DE FRONTEIRA: Se um território for importante para seu objetivo e estiver ameaçado, você DEVE reforçar para evitar perdê-lo.
+        2. CONCENTRAÇÃO DE FORÇA: Aloque suas forças em NO MÁXIMO de dois territórios para criar pontos fortes, ao invés de espalhar suas tropas.
+        3. FOCO NO OBJETIVO: Se houver vizinhos da cor ALVO do seu objetivo, priorize alocar tropas lá para preparar um ataque.
+
+        Sua resposta deve ser ESTRITAMENTE um JSON válido seguindo este formato:
+        {
+            "analise_situacao": "Resumo curto das maiores ameaças e oportunidades identificadas no tabuleiro.",
+            "estrategia_adotada": "Explique: 'Vou focar em defender X porque é um território valioso e está sob ameaças' ou 'Vou acumular em Y para atacar Z, seguindo em direção ao meu objetivo'.",
+            "alocacoes": [
+                {"territorio": "nome-territorio", "tropas": 1},
+                {"territorio": "nome-territorio", "tropas": 1}
+            ]
+        }
+        '''
+
+        prompt_text = self.format_game_state_for_llm(game_state)
+        print(prompt_text)
 
         messages = [
-            {"role": "system", "content": self.system_prompt},
-            {"role": "user", "content": f"Estado atual do jogo: {game_state_str}. Qual é a sua próxima jogada?"}
+            {"role": "system", "content": reinforcement_prompt},
+            {"role": "user", "content": f"{prompt_text}. Com base na situação, decida como alocar as suas tropas."}
         ]
 
         try:
@@ -53,7 +93,7 @@ class WarBotManager:
                 model=self.model_name,
                 messages=messages,
                 temperature=self.temperature,
-                max_tokens=1000,
+                max_tokens=2000,
             )
             
             raw_content = response.choices[0].message.content
@@ -85,10 +125,8 @@ class WarBotManager:
                 return None
 
 if __name__ == "__main__":
-    # 1. Instancie o bot (certifique-se que o LM Studio está rodando o servidor)
     bot = WarBotManager()
 
-    # 2. Simule um estado do jogo (vinda do seu backend)
     estado_jogo_exemplo = {
         "meus_territorios": {
             "Brasil": 5,
