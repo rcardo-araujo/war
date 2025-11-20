@@ -247,4 +247,18 @@ export default class GameController {
         this.movementController.reset();
         this.gsm.emit('game:nextTurn', newPlayer);
     }
+
+    handleTradeClick() {
+        const currentPlayer = this.gsm.getCurrentPlayer();
+        if (this.gsm.territoryCardManager.checkTradeEligibility(currentPlayer)) {
+            this.gsm.emit('game:tradeCards', currentPlayer);
+        } else {
+            this.gsm.emit('game:error', "Você não possui cartas suficientes para trocar!");
+        }
+    }
+
+    onTradeCommit({ player, cards }) {
+        this.gsm.territoryCardManager.tradeCardsForTroops(player, cards);
+        this.gsm.emit('game:cardsTraded', player);
+    }
 }
