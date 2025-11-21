@@ -176,12 +176,15 @@ export default class GameController {
 
     onPhaseChanged(newPhase) {
         this.gsm.emit('game:phaseChanged', newPhase);
-        if (newPhase == TURN_PHASES.FIRST_REINFORCEMENT){
-            const currentPlayer = this.gsm.getCurrentPlayer();
-            if (currentPlayer.type === PLAYER_TYPES.BOT){
+        const currentPlayer = this.gsm.getCurrentPlayer();
+        if (currentPlayer.type === PLAYER_TYPES.BOT){
+            if (newPhase === TURN_PHASES.FIRST_REINFORCEMENT){
                 this.executeBotFirstReinforcement(currentPlayer);
+            } else if (newPhase === TURN_PHASES.REINFORCEMENT){
+                this.executeBotReinforcement(currentPlayer);
             }
         }
+        
     }
 
     onNextTurn(turnManager) {
