@@ -22,36 +22,20 @@ export default class BotService{
         }
 
     }
-    async getFirstReinforcementDecision(gameStateManager){
-        
-        const currentPlayer = gameStateManager.getCurrentPlayer();
-        const objectiveType = currentPlayer.objective.type;
-        const objectiveDescription = currentPlayer.objective.description
-        const availableTroops = currentPlayer.availableTroops;
-        const ownedTerritories = Array.from(currentPlayer.ownedTerritories).map(t => ({
-            id: t.id,
-            territoryName: t.name,
-            continet: t.continent,
-            troops: t.troops,
-        }))
-        
-        const requestData = {
-            data: {
-                objectiveType: objectiveType,
-                objectiveDescription: objectiveDescription,
-                totalAvailableTroops: availableTroops,
-                ownedTerritories: ownedTerritories,
-            }
-        };
 
-        return await this.getBotResponse(requestData, "first-reinforcement")
-    }
-
-    async getReinforcementDecision(gameStateManager){
+    async getReinforcementDecision(gameStateManager, phase){
         const currentPlayer = gameStateManager.getCurrentPlayer();
-        const allTerritories = Object.values(gameStateManager.mapManager.territories);
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description;
+        const freeTroops = currentPlayer.availableTroops();
+        const continentBonusTroops = {
+            south_america: currentPlayer.availableTroopsSouthAmerica,
+            north_america: currentPlayer.availableTroopsNorthAmerica,
+            europe: currentPlayer.availableTroopsEurope,
+            asia: currentPlayer.availableTroopsAsia,
+            africa: currentPlayer.availableTroopsAfrica,
+            oecania: currentPlayer.availableTroopsOceania,
+        };
         const totalAvailableTroops = currentPlayer.getTotalAvailableTroops();
         const ownedTerritories = Array.from(currentPlayer.ownedTerritories).map(t => {
             const neighborsList = Array.from(t.neighbors)
@@ -79,12 +63,14 @@ export default class BotService{
             data: {
                 objectiveType: objectiveType,
                 objectiveDescription: objectiveDescription,
+                freeTroops: freeTroops,
+                continentBonusTroops: continentBonusTroops,
                 totalAvailableTroops: totalAvailableTroops,
                 ownedTerritories: ownedTerritories,
             }
         };
         
-        return await this.getBotResponse(requestData, "reinforcement")
+        return await this.getBotResponse(requestData, phase)
 
     }
 

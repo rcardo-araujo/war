@@ -208,7 +208,7 @@ export default class GameController {
         console.log(`Bot ${currentPlayer.name} pensando`)
         try {
             this.gsm.emit('game:setMapInteractive', false);
-            const decision = await this.botService.getFirstReinforcementDecision(this.gsm);
+            const decision = await this.botService.getReinforcementDecision(this.gsm, "first-reinforcement");
             console.log('Decisão do bot: ', decision);
             if (decision && decision.placements){
                 for (const placement of decision.placements){
@@ -244,7 +244,7 @@ export default class GameController {
         console.log(`Bot ${currentPlayer.name} pensando (reinforcement)...`)
         try {
             this.gsm.emit('game:setMapInteractive', false);
-            const decision = await this.botService.getReinforcementDecision(this.gsm);
+            const decision = await this.botService.getReinforcementDecision(this.gsm, "reinforcement");
             console.log('Decisão do bot (reinforcement): ',decision);
             if (decision && decision.placements){
                 for (const placement of decision.placements){
