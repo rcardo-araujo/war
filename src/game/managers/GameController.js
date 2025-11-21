@@ -14,6 +14,11 @@ export default class GameController {
             attacker: null,
             defender: null
         }
+        if (firstPlayer.type == PLAYER_TYPES.BOT){
+            setTimeout(() => {
+                this.executeBotFirstReinforcement(firstPlayer);
+            }, 1000);
+        }
     }
 
     setupEventListeners() {
@@ -196,7 +201,7 @@ export default class GameController {
     }
 
     /// BOT METHODS
-    async executeBotFirstReinforcement(currentBot){
+    async executeBotFirstReinforcement(currentPlayer){
         console.log(`Bot ${currentPlayer.name} pensando`)
         try {
             this.gsm.emit('game:setMapInteractive', false);
