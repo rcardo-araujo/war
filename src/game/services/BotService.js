@@ -82,7 +82,8 @@ export default class BotService{
                 ownedTerritories: groupedTerritories,
                 totalAvailableTroops: currentPlayer.getTotalAvailableTroops(),
                 phase: phase,
-                botStats: this.getBotStats(),
+                botStats: this.getBotStats(), 
+                botName: currentPlayer.name,
             }
         };
         
@@ -129,6 +130,7 @@ export default class BotService{
                 objectiveDescription: objectiveDescription,
                 territoriesCanAttackFrom: territoriesCanAttackFrom,
                 botStats: this.getBotStats(),
+                botName: currentPlayer.name,
             }
         };
         return await this.getBotResponse(requestData, "attack");
