@@ -9,8 +9,8 @@ export default class BotService{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    body: JSON.stringify(requestData)
-                }
+                },
+                body: JSON.stringify(requestData)
             });
             if (!response.ok){
                 throw new Error(`API error: ${response.status}`)
@@ -22,50 +22,60 @@ export default class BotService{
         }
 
     }
-    getFirstReinforcementDecision(gameStateManager){
+    async getFirstReinforcementDecision(gameStateManager){
         
         const currentPlayer = gameStateManager.getCurrentPlayer();
-        const allPlayers = gameStateManager.playerManager.getPlayers();
-        const allTerritories = Object.values(gameStateManager.mapManager.territories);
-        const currentPlayerData = {
-            objective: currentPlayer.objective ? {
-                type: currentPlayer.objective.type,
-                description: currentPlayer.objective.description
-            } : null,
-            availabeTroops: currentPlayer.availabeTroops,
-            availableTroopsSouthAmerica: currentPlayer.availableTroopsSouthAmerica,
-            availabeTroopsNorthAmerica: currentPlayer.availabeTroopsNorthAmerica,
-            availableTroopsEurope: currentPlayer.availableTroopsEurope,
-            availabeTroopsAsia: currentPlayer.availabeTroopsAsia,
-            availabeTroopsAfrica: currentPlayer.availabeTroopsAfrica,
-            availabeTroopsOceania: currentPlayer.availabeTroopsOceania,
-            ownedTerritories: Array.from(currentPlayer.ownedTerritories).map(t => ({
-                id: t.id,
-                territoryName: t.name,
-                continent: t.continent,
-                troops: t.troops
-            })),
-        };
-        const allPlayersData = allPlayers.map(player => ({
-            name: player.name,
-            color: player.color,
-            colorKey: player.colorKey,
-            territoryCount: player.ownedTerritories.size,
-            ownedTerritories: Array.from(player.ownedTerritories).map(t => ({
-                id: t.id,
-                territoryName: t.name,
-                continent: t.continent,
-                troops: t.troops,
-            }))
-        }));
+        //const allPlayers = gameStateManager.playerManager.getPlayers();
+        //const allTerritories = Object.values(gameStateManager.mapManager.territories);
+        const objectiveType = currentPlayer.objective.type;
+        const objectiveDescription = currentPlayer.objective.description
+        const availableTroops = currentPlayer.availableTroops;
+        const ownedTerritories = Array.from(currentPlayer.ownedTerritories).map(t => ({
+            id: t.id,
+            territoryName: t.name,
+            continet: t.continent,
+            troops: t.troops,
+        }))
+        // const currentPlayerData = {
+        //     objective: currentPlayer.objective ? {
+        //         type: currentPlayer.objective.type,
+        //         description: currentPlayer.objective.description
+        //     } : null,
+        //     availabeTroops: currentPlayer.availableTroops,
+        //     availableTroopsSouthAmerica: currentPlayer.availableTroopsSouthAmerica,
+        //     availabeTroopsNorthAmerica: currentPlayer.availableTroopsNorthAmerica,
+        //     availableTroopsEurope: currentPlayer.availableTroopsEurope,
+        //     availabeTroopsAsia: currentPlayer.availableTroopsAsia,
+        //     availabeTroopsAfrica: currentPlayer.availableTroopsAfrica,
+        //     availabeTroopsOceania: currentPlayer.availableTroopsOceania,
+        //     ownedTerritories: Array.from(currentPlayer.ownedTerritories).map(t => ({
+        //         id: t.id,
+        //         territoryName: t.name,
+        //         continent: t.continent,
+        //         troops: t.troops
+        //     })),
+        // };
+        // const allPlayersData = allPlayers.map(player => ({
+        //     name: player.name,
+        //     color: player.color,
+        //     colorKey: player.colorKey,
+        //     territoryCount: player.ownedTerritories.size,
+        //     ownedTerritories: Array.from(player.ownedTerritories).map(t => ({
+        //         id: t.id,
+        //         territoryName: t.name,
+        //         continent: t.continent,
+        //         troops: t.troops,
+        //     }))
+        // }));
         const requestData = {
             data: {
-                currentPlayer: currentPlayerData,
-                allPlayers: allPlayersData,
-                phase: "first_reinforcement"
+                objectiveType: objectiveType,
+                objectiveDescription: objectiveDescription,
+                totalAvailableTroops: availableTroops,
+                ownedTerritories: ownedTerritories,
             }
         };
 
-        this.getBotResponse(requestData, "first_reinforcement")
+        return await this.getBotResponse(requestData, "first-reinforcement")
     }
 }
