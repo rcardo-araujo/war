@@ -36,37 +36,7 @@ export default class BotService{
             continet: t.continent,
             troops: t.troops,
         }))
-        // const currentPlayerData = {
-        //     objective: currentPlayer.objective ? {
-        //         type: currentPlayer.objective.type,
-        //         description: currentPlayer.objective.description
-        //     } : null,
-        //     availabeTroops: currentPlayer.availableTroops,
-        //     availableTroopsSouthAmerica: currentPlayer.availableTroopsSouthAmerica,
-        //     availabeTroopsNorthAmerica: currentPlayer.availableTroopsNorthAmerica,
-        //     availableTroopsEurope: currentPlayer.availableTroopsEurope,
-        //     availabeTroopsAsia: currentPlayer.availableTroopsAsia,
-        //     availabeTroopsAfrica: currentPlayer.availableTroopsAfrica,
-        //     availabeTroopsOceania: currentPlayer.availableTroopsOceania,
-        //     ownedTerritories: Array.from(currentPlayer.ownedTerritories).map(t => ({
-        //         id: t.id,
-        //         territoryName: t.name,
-        //         continent: t.continent,
-        //         troops: t.troops
-        //     })),
-        // };
-        // const allPlayersData = allPlayers.map(player => ({
-        //     name: player.name,
-        //     color: player.color,
-        //     colorKey: player.colorKey,
-        //     territoryCount: player.ownedTerritories.size,
-        //     ownedTerritories: Array.from(player.ownedTerritories).map(t => ({
-        //         id: t.id,
-        //         territoryName: t.name,
-        //         continent: t.continent,
-        //         troops: t.troops,
-        //     }))
-        // }));
+        
         const requestData = {
             data: {
                 objectiveType: objectiveType,
