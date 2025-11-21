@@ -217,7 +217,6 @@ export default class GameController {
         console.log(`Bot ${currentPlayer.name} pensando (${phase})...`)
         this.gsm.emit('game:setMapInteractive', false);
         let decision = null
-        let apiError = false;
         try {
             decision = await this.botService.getReinforcementDecision(this.gsm, phase);
             console.log(`Decisão do bot (${phase}): `,decision);
@@ -226,30 +225,28 @@ export default class GameController {
             }
         } catch (error){
             console.log(`Erro: ${error}. Ativando fallback"`);
-        }
-        decision = null
-        if (!decision || !decision.placements){
-            apiError = true;
             decision = this.botService.getFallbackReinforcement(this.gsm, currentPlayer);
         }
+        let isDecisionValid = true;
         if (decision && decision.placements){
             for (const placement of decision.placements){
                 const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
-                if (!territory){
-                    console.log(`Território não encontrado: ${placement.territoryId}`);
-                    continue;
-                }
-                if (territory.owner !== currentPlayer){
-                    console.log(`Bot tentou alocar tropas em território que não possui: ${territory.name}`)
-                    continue;
-                }
-                territory.addTroops(placement.troops);
-                currentPlayer.allocateTroops(territory, placement.troops);
-                this.gsm.emit('game:troopCountChanged', territory.id);
-                if (apiError){
-                    await new Promise(resolve => setTimeout(resolve, 2000))
+                if (!territory || territory.owner !== currentPlayer){
+                    console.log(`Decisão inválida: ${placement.territoryId}. Ativando fallback`);
+                    isDecisionValid = false;
+                    break;
                 }
             }
+        }
+        if (!isDecisionValid){
+            decision = this.botService.getFallbackReinforcement(this.gsm, currentPlayer);
+        }
+        for (const placement of decision.placements){
+            const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
+            territory.addTroops(placement.troops);
+            currentPlayer.allocateTroops(territory, placement.troops);
+            this.gsm.emit('game:troopCountChanged', territory.id);
+            
         }
         this.gsm.emit('game:setMapInteractive', true);
         this.gsm.turnManager.endPhase();
