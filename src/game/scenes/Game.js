@@ -169,10 +169,8 @@ export class Game extends Scene {
     flashAttackResult(winnerId, loserId){
         const winnerSprites = this.territorySprites[winnerId];
         const loserSprites = this.territorySprites[loserId];
-        const winnerOriginalColor = this.gameState.getTerritory(winnerId).owner.getColor();
-        const loserOriginalColor = this.gameState.getTerritory(loserId).owner.getColor();
 
-        
+
         winnerSprites.stroke.setTint(COLORS.green);
         winnerSprites.filled.setTint(COLORS.green);
         this.tweens.add({
@@ -183,7 +181,7 @@ export class Game extends Scene {
             repeat: 2
         });
 
-        
+
         loserSprites.stroke.setTint(COLORS.red);
         loserSprites.filled.setTint(COLORS.red);
         this.tweens.add({
@@ -194,12 +192,15 @@ export class Game extends Scene {
             repeat: 2
         })
 
-        
+
         this.time.delayedCall(600, () => {
+            const winnerCurrentColor = this.gameState.getTerritory(winnerId).owner.getColor();
+            const loserCurrentColor = this.gameState.getTerritory(loserId).owner.getColor();
+
             winnerSprites.stroke.setTint(COLORS.yellow);
-            winnerSprites.filled.setTint(winnerOriginalColor);
+            winnerSprites.filled.setTint(winnerCurrentColor);
             loserSprites.stroke.setTint(COLORS.yellow);
-            loserSprites.filled.setTint(loserOriginalColor);
+            loserSprites.filled.setTint(loserCurrentColor);
         })
     }
 

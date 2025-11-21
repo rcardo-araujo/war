@@ -1,5 +1,6 @@
     import { Scene } from 'phaser';
     import { TURN_PHASES } from '../managers/TurnManager';
+    import { PLAYER_TYPES } from '../config/playerTypes';
 
     export class UIScene extends Phaser.Scene {
         constructor() {
@@ -47,6 +48,10 @@
             this.setupEvents();
             this.updateButtonText(this.gameStateManager.getCurrentPhase());
             this.updatePhaseText(this.gameStateManager.getCurrentPhase());
+
+            // Inicializa o estado do botão baseado no tipo do jogador atual
+            const isBot = currentPlayer.type === PLAYER_TYPES.BOT;
+            this.setButtonInteractive(!isBot);
         }
 
         setupEvents() {
@@ -69,6 +74,19 @@
                 this.hideConfirmAttack();
                 this.showAttackInput(attackerTerritory, defenderTerritory);
             }, this);
+            this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
+                this.setButtonInteractive(!isActive);
+            }, this);
+        }
+
+        setButtonInteractive(isInteractive) {
+            if (isInteractive) {
+                this.button.setInteractive();
+                this.button.setAlpha(1);
+            } else {
+                this.button.disableInteractive();
+                this.button.setAlpha(0.5);
+            }
         }
 
         updateTurnLabel(newPlayer) {

@@ -179,11 +179,14 @@ export default class GameController {
         this.gsm.emit('game:phaseChanged', newPhase);
         const currentPlayer = this.gsm.getCurrentPlayer();
         if (currentPlayer.type === PLAYER_TYPES.BOT){
+            this.gsm.emit('game:setBotTurnActive', true);
             if (newPhase === TURN_PHASES.FIRST_REINFORCEMENT || newPhase === TURN_PHASES.REINFORCEMENT){
                 this.executeBotReinforcement(currentPlayer, newPhase);
             } else if (newPhase === TURN_PHASES.ATTACK){
                 this.executeBotAttack(currentPlayer);
             }
+        } else {
+            this.gsm.emit('game:setBotTurnActive', false);
         }
     }
 
@@ -193,8 +196,13 @@ export default class GameController {
         this.gsm.emit('game:nextTurn', newPlayer);
 
         const currentPhase = this.gsm.getCurrentPhase();
-        if (currentPhase === TURN_PHASES.FIRST_REINFORCEMENT && newPlayer.type === PLAYER_TYPES.BOT) {
-            this.executeBotReinforcement(newPlayer, currentPhase);
+        if (newPlayer.type === PLAYER_TYPES.BOT) {
+            this.gsm.emit('game:setBotTurnActive', true);
+            if (currentPhase === TURN_PHASES.FIRST_REINFORCEMENT) {
+                this.executeBotReinforcement(newPlayer, currentPhase);
+            }
+        } else {
+            this.gsm.emit('game:setBotTurnActive', false);
         }
     }
 
@@ -207,8 +215,11 @@ export default class GameController {
     onSceneReady(){
         const firstPlayer = this.gsm.getCurrentPlayer();
         if (firstPlayer.type === PLAYER_TYPES.BOT){
+            this.gsm.emit('game:setBotTurnActive', true);
             this.gsm.emit('game:setMapInteractive', false);
             this.executeBotReinforcement(firstPlayer, this.gsm.getCurrentPhase());
+        } else {
+            this.gsm.emit('game:setBotTurnActive', false);
         }
     }
 

@@ -1,6 +1,21 @@
 export default class BotService{
     constructor(apiUrl = 'http://localhost:8080'){
         this.apiUrl = apiUrl;
+        this.totalReinforcementCalls = 0;
+        this.totalAttackCalls = 0;
+        this.reinforcementFallbackCount = 0;
+        this.attackFallbackCount = 0;
+        this.apiErros = 0;
+    }
+
+    getBotStats(){
+        const data = {
+            "totalAttackCalls": this.totalAttackCalls,
+            "attackFallbackCount": this.attackFallbackCount,
+            "totalReinforcementCalls": this.totalReinforcementCalls,
+            "reinforcementFallbackCount": this.reinforcementFallbackCount,
+        }
+        return data;
     }
 
     async getBotResponse(requestData, phase){
@@ -9,7 +24,7 @@ export default class BotService{
             endpoint = "reinforcement"
         }
         
-        console.log(endpoint)
+        requestData["botStats"] = this.getBotStats();
 
         try{
             const response = await fetch(`${this.apiUrl}/${endpoint}`, {
@@ -26,11 +41,13 @@ export default class BotService{
             return data.generated_json;
         } catch (error){
             console.log('Erro ao chamar API do bot: ',error);
+            this.apiErros += 1;
         }
 
     }
 
     async getReinforcementDecision(gameStateManager, phase){
+        this.totalReinforcementCalls += 1
         const currentPlayer = gameStateManager.getCurrentPlayer();
         const mapManager = gameStateManager.mapManager;
         const continentBonusTroops = {
@@ -64,6 +81,8 @@ export default class BotService{
                 restrictedTroops: continentBonusTroops,
                 ownedTerritories: groupedTerritories,
                 totalAvailableTroops: currentPlayer.getTotalAvailableTroops(),
+                phase: phase,
+                botStats: this.getBotStats(),
             }
         };
         
@@ -72,6 +91,7 @@ export default class BotService{
     }
 
     async getAttackDecision(gameStateManager){
+        this.totalAttackCalls += 1
         const currentPlayer = gameStateManager.getCurrentPlayer();
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description;
@@ -108,12 +128,14 @@ export default class BotService{
                 objectiveType: objectiveType,
                 objectiveDescription: objectiveDescription,
                 territoriesCanAttackFrom: territoriesCanAttackFrom,
+                botStats: this.getBotStats(),
             }
         };
         return await this.getBotResponse(requestData, "attack");
     }
 
     getFallbackReinforcement(gsm, currentPlayer){
+        this.reinforcementFallbackCount += 1
         const available = currentPlayer.availableTroops;
         const placements = [];
         const borderTerritories = Array.from(currentPlayer.ownedTerritories).filter(t => {
@@ -136,6 +158,7 @@ export default class BotService{
     // inutilizado, pode só usar um return onde a chamada der errado
     // como se o bot tivesse decidido não atacar ngm
     getFallbackAttack(){
+        this.attackFallbackCount += 1;
         return {action: "attack", skipAttack: true};
     }
 
