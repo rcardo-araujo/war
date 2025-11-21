@@ -201,7 +201,7 @@ export default class GameController {
     }
 
     /// BOT METHODS
-    async executeBotFirstReinforcement(currentPlayer){
+    async executeBotReinforcement(currentPlayer){
         console.log(`Bot ${currentPlayer.name} pensando`)
         try {
             this.gsm.emit('game:setMapInteractive', false);
@@ -230,10 +230,41 @@ export default class GameController {
             }
         }
             this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
         } catch(error){
             console.log('Erro ao executar ação do bot: ', error);
         }
         
+    }
+
+    async executeBotReinforcement(currentPlayer){
+        console.log(`Bot ${currentPlayer.name} pensando (reinforcement)...`)
+        try {
+            this.gsm.emit('game:setMapInteractive', false);
+            const decision = await this.botService.getReinforcementDecision(this.gsm);
+            console.log('Decisão do bot (reinforcement): ',decision);
+            if (decision && decision.placements){
+                for (const placement of decision.placements){
+                    const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
+                    if (!territory){
+                        console.log(`Território não encontrado: ${placement.territoryId}`);
+                        continue;
+                    }
+                    if (territory.owner !== currentPlayer){
+                        console.log(`Bot tentou alocar tropas em território que não possui: ${territory.name}`)
+                        continue;
+                    }
+                    territory.addTroops(placement.troops);
+                    currentPlayer.allocateTroops(territory, placement.troops);
+                    this.gsm.emit('game:troopCountChanged', territory.id);
+                }
+            }
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+        } catch (error){
+            console.log('Erro ao executar reinforcement do bot: ', error);
+            this.gsm.emit('game:setMapInteractive', true);
+        }
     }
 
 
