@@ -27,7 +27,7 @@ export default class BotService{
         const currentPlayer = gameStateManager.getCurrentPlayer();
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description;
-        const freeTroops = currentPlayer.availableTroops();
+        const freeTroops = currentPlayer.availableTroops;
         const continentBonusTroops = {
             south_america: currentPlayer.availableTroopsSouthAmerica,
             north_america: currentPlayer.availableTroopsNorthAmerica,

@@ -116,6 +116,7 @@ export class Game extends Scene {
     updateTroops(territoryId) {
         const troopText = this.territorySprites[territoryId].troops;
         troopText.setText(this.gameState.getTerritory(territoryId).getTroopCount());
+        this.flashTerritory(territoryId);
     }
 
     updateTerritoryColor(territoryId) {
@@ -131,6 +132,32 @@ export class Game extends Scene {
         counterBackground.setTint(newColor);
         counterStroke.clearTint()
         counterStroke.setTint(newColor);
+    }
+
+    flashTerritory(territoryId){
+        const sprites = this.territorySprites[territoryId];
+        const originalColor = this.gameState.getTerritory(territoryId).owner.getColor();
+        this.tweens.add({
+            targets: sprites.filled,
+            alpha: {from: 1, to: 0.3},
+            duration: 150,
+            yoyo: true,
+            repeat: 2,
+            ease: 'Sine.easeInOut'
+        });
+        this.tweens.add({
+            targets: sprites.counter,
+            scale: {from: 1, to: 1.3},
+            duration: 150,
+            yoyo: true,
+            repeat: 2,
+            ease: 'Sine.easeInOut'
+        })
+
+        sprites.stroke.setTint(0x00ff00);
+        this.time.delayedCall(900, () => {
+            sprites.stroke.setTint(0xffff00);
+        })
     }
 
     highlightAttacker(territory){
