@@ -186,7 +186,7 @@ export default class GameController {
         }
         
     }
-
+''
     onNextTurn(turnManager) {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
@@ -204,7 +204,7 @@ export default class GameController {
     }
 
     /// BOT METHODS
-    async executeBotReinforcement(currentPlayer){
+    async executeBotFirstReinforcement(currentPlayer){
         console.log(`Bot ${currentPlayer.name} pensando`)
         try {
             this.gsm.emit('game:setMapInteractive', false);

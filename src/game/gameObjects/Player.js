@@ -167,4 +167,14 @@ export default class Player {
         }
     }
 
+    getTotalAvailableTroops(){
+        return this.availableTroops + 
+        this.availableTroopsSouthAmerica +
+        this.availableTroopsNorthAmerica +
+        this.availableTroopsEurope +
+        this.availableTroopsAsia +
+        this.availableTroopsAfrica +
+        this.availableTroopsOceania;
+    }
+
 }
