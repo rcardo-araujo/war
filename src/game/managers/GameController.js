@@ -1,9 +1,12 @@
 import { TURN_PHASES } from './TurnManager';
 import { executeCombat } from '../utils/diceRoller';
+import BotService from '../services/BotService';
+import { PLAYER_TYPES } from '../config/playerTypes';
 
 export default class GameController {
     constructor(gsm) {
         this.gsm = gsm;
+        this.botService = new BotService()
         this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
@@ -168,12 +171,22 @@ export default class GameController {
 
     onPhaseChanged(newPhase) {
         this.gsm.emit('game:phaseChanged', newPhase);
+        if (newPhase == TURN_PHASES.FIRST_REINFORCEMENT){
+            const currentPlayer = this.gsm.getCurrentPlayer();
+            if (currentPlayer.type === PLAYER_TYPES.BOT){
+                this.executeBotFirstReinforcement(currentPlayer);
+            }
+        }
     }
 
     onNextTurn(turnManager) {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
+        const currentPhase = this.gsm.getCurrentPhase();
+        if (currentPhase === TURN_PHASES.FIRST_REINFORCEMENT && newPlayer.type === PLAYER_TYPES.BOT){
+            this.executeBotFirstReinforcement(newPlayer)
+        }
     }
 
     handleAttackConfirm(){
@@ -181,4 +194,42 @@ export default class GameController {
         console.log("Ataque confirmado");
         this.gsm.emit('game:setMapInteractive', false);
     }
+
+    /// BOT METHODS
+    async executeBotFirstReinforcement(currentBot){
+        console.log(`Bot ${currentPlayer.name} pensando`)
+        try {
+            this.gsm.emit('game:setMapInteractive', false);
+            const decision = await this.botService.getFirstReinforcementDecision(this.gsm);
+            console.log('Decisão do bot: ', decision);
+            if (decision && decision.placements){
+                for (const placement of decision.placements){
+                    const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
+                    if (!territory){
+                        console.log(`Território não encontrado: ${placement.territoryId}`);
+                        continue;
+                    }
+                    if (territory.owner !== currentPlayer){
+                        console.log(`Bot tentou alocar tropas em território que não possui: ${territory.name}`);
+                        continue;
+                    }
+                const continentBonus = currentPlayer.getContinentBonus(territory);
+                const maxTroops = currentPlayer.availableTroops + continentBonus;
+                if (placement.troops > maxTroops){
+                    console.log(`Bot tentou alocar mais tropas do que tem disponível`);
+                    continue;
+                }
+                territory.addTroops(placement.troops);
+                currentPlayer.allocateTroops(territory, placement.troops);
+                this.gsm.emit('game:troopCountChanged', territory.id);
+            }
+        }
+            this.gsm.emit('game:setMapInteractive', true);
+        } catch(error){
+            console.log('Erro ao executar ação do bot: ', error);
+        }
+        
+    }
+
+
 }
