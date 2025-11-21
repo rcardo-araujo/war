@@ -74,4 +74,46 @@ export default class BotService{
 
     }
 
+    async getAttackDecision(gameStateManager){
+        const currentPlayer = gameStateManager.getCurrentPlayer();
+        const objectiveType = currentPlayer.objective.type;
+        const objectiveDescription = currentPlayer.objective.description;
+        const attackableTerritories = Array.from(currentPlayer.ownedTerritories).reduce((acc, t) => {
+            const neighborIds = Array.from(t.neighbor);
+            const enemyNeighbors = neighborIds.reduce((enemies, neighborId) => {
+                const neighbor = gameStateManager.mapManager.getTerritory(neighborId);
+                if (neighbor && neighbor.owner !== currentPlayer){
+                    enemies.push({
+                        id: neighbor.id,
+                        name: neighbor.name,
+                        troops: neighbor.troops,
+                        owner: neighbor.owner.name,
+                        continent: neighbor.continent
+                    });
+                }
+                return enemies;
+            }, []);
+            if (enemyNeighbors.length > 0){
+                acc.push({
+                    id: t.id,
+                    territoryName: t.name,
+                    continent: t.continent,
+                    troops: t.troops,
+                    maxDice: Math.min(3, t.troops - 1),
+                    enemyNeighbors: enemyNeighbors
+                });
+            }
+            return acc;
+        }, []);
+
+        const requestData = {
+            data: {
+                objectiveType: objectiveType,
+                objectiveDescription: objectiveDescription,
+                attackableTerritories: attackableTerritories,
+            }
+        };
+        return await this.getBotResponse(requestData, "attack");
+    }
+
 }
