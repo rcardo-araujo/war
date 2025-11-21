@@ -7,17 +7,13 @@ export default class GameController {
     constructor(gsm) {
         this.gsm = gsm;
         this.botService = new BotService()
-        this.setupEventListeners();
         const firstPlayer = this.gsm.playerManager.getPlayers()[0];
         this.gsm.playerManager.calculateReinforcements(firstPlayer);
         this.attackTerritories = {
             attacker: null,
             defender: null
         }
-        if (firstPlayer.type == PLAYER_TYPES.BOT){
-            this.gsm.emit('game:setMapInteractive', false);
-            this.executeBotReinforcement(firstPlayer, this.gsm.getCurrentPhase());
-        }
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
@@ -31,6 +27,7 @@ export default class GameController {
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
 
+        this.gsm.on('scene:ready', this.onSceneReady, this);
     }
 
     checkObjectiveForPlayer(player, defender) {
@@ -207,24 +204,35 @@ export default class GameController {
         this.gsm.emit('game:setMapInteractive', false);
     }
 
+    onSceneReady(){
+        const firstPlayer = this.gsm.getCurrentPlayer();
+        if (firstPlayer.type === PLAYER_TYPES.BOT){
+            this.gsm.emit('game:setMapInteractive', false);
+            this.executeBotReinforcement(firstPlayer, this.gsm.getCurrentPhase());
+        }
+    }
+
     /// BOT METHODS
     async executeBotReinforcement(currentPlayer, phase){
         console.log(`Bot ${currentPlayer.name} pensando (${phase})...`)
         this.gsm.emit('game:setMapInteractive', false);
+        let decision = null
+        let apiError = false;
         try {
-            const decision = await this.botService.getReinforcementDecision(this.gsm, phase);
+            decision = await this.botService.getReinforcementDecision(this.gsm, phase);
             console.log(`Decisão do bot (${phase}): `,decision);
             if (decision === "jsonParseFaile"){
-                throw new Error(SyntaxError)
+                throw new Error("erro no parse do JSON da API")
             }
         } catch (error){
-            decision = null;
+            console.log(`Erro: ${error}. Ativando fallback"`);
         }
+        decision = null
         if (!decision || !decision.placements){
-            console.log("Pegando fallback")
+            apiError = true;
             decision = this.botService.getFallbackReinforcement(this.gsm, currentPlayer);
         }
-        else if (decision && decision.placements){
+        if (decision && decision.placements){
             for (const placement of decision.placements){
                 const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
                 if (!territory){
@@ -238,6 +246,9 @@ export default class GameController {
                 territory.addTroops(placement.troops);
                 currentPlayer.allocateTroops(territory, placement.troops);
                 this.gsm.emit('game:troopCountChanged', territory.id);
+                if (apiError){
+                    await new Promise(resolve => setTimeout(resolve, 2000))
+                }
             }
         }
         this.gsm.emit('game:setMapInteractive', true);
@@ -247,81 +258,89 @@ export default class GameController {
 
     async executeBotAttack(currentPlayer){
         console.log(`Bot ${currentPlayer.name} pensando (attack)...`);
+        this.gsm.emit('game:setMapInteractive', false);
+        let decision = null;
         try {
-            this.gsm.emit('game:setMapInteractive', false);
-            const decision = await this.botService.getAttackDecision(this.gsm);
+            decision = await this.botService.getAttackDecision(this.gsm);
             console.log('Decisão do bot (attack): ', decision);
-            if (!decision || decision.skipAttack === true){
-                console.log(`Bot ${currentPlayer.name} decidiu não atacar.`);
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            const attacker = this.gsm.mapManager.getTerritory(decision.attackerTerritoryId);
-            const defender = this.gsm.mapManager.getTerritory(decision.defenderTerritoryId);
-            if (!attacker || !defender){
-                console.log('Território inválido - pulando ataque do bot');
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            if (attacker.owner !== currentPlayer){
-                console.log("Bot tentou atacar de território que não possui - pulando ataque");
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            if (!attacker.neighbors.has(defender.id)){
-                console.log("Bot tentou atacar território que não é vizinho - pulando ataque");
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            if (defender.owner === currentPlayer){
-                console.log("Bot tentou atacar seu próprio território - pulando ataque");
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            const maxDice = Math.min(3, attacker.troops - 1);
-            const attackDice = Math.min(decision.attackDice, maxDice);
-            if (attackDice < 1){
-                console.log('Dados de ataque inválidos - pulando ataque');
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-                return;
-            }
-            console.log(`Bot atacando: ${attacker.name} -> ${defender.name} com ${attackDice} dados`);
-            this.attackTerritories.attacker = attacker;
-            this.attackTerritories.defender = defender;
-            this.gsm.emit('game:attackerSelected', attacker);
-            await new Promise(resolve => setTimeout(resolve, 500));
-            this.gsm.emit('game:defenderSelected', defender, attacker);
-            await new Promise(resolve => setTimeout(resolve, 500));
-            this.gsm.emit('game:attackCommitted', {
-                attackDice: attackDice,
-                attacker: attacker,
-                defender: defender
-            })
-            const canStillAttack = Array.from(currentPlayer.ownedTerritories).some(t => {
-                if (t.troops < 2) return false;
-                return Array.from(t.neighbors).some(neighborId => {
-                    const neighbor = this.gsm.mapManager.getTerritory(neighborId);
-                    return neighbor && neighbor.owner !== currentPlayer;
-                });
-            });
-            if (canStillAttack) {
-                this.executeBotAttack(currentPlayer);
-            }
-            else {
-                console.log(`Bot ${currentPlayer.name} não tem mais ataques possíveis`);
-                this.gsm.emit('game:setMapInteractive', true);
-                this.gsm.turnManager.endPhase();
-            }
-            
         } catch (error){
-            console.log('Erro ao executar attack do bot: ', error);
+            console.log(`Erro ao executar attack do bot: ${error}. Pulando ataque`);
+
+        }
+        if (!decision){
+            console.log(`Bot ${currentPlayer.name} retornou uma resposta inválida. Pulando ataque`);
             this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        if (decision.skipAttack === true){
+            console.log(`Bot ${currentPlayer.name} decidiu não atacar.`);
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        const attacker = this.gsm.mapManager.getTerritory(decision.attackerTerritoryId);
+        const defender = this.gsm.mapManager.getTerritory(decision.defenderTerritoryId);
+        if (!attacker || !defender){
+            console.log('Território inválido - pulando ataque do bot');
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        if (attacker.owner !== currentPlayer){
+            console.log("Bot tentou atacar de território que não possui - pulando ataque");
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        if (!attacker.neighbors.has(defender.id)){
+            console.log("Bot tentou atacar território que não é vizinho - pulando ataque");
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        if (defender.owner === currentPlayer){
+            console.log("Bot tentou atacar seu próprio território - pulando ataque");
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+        const maxDice = Math.min(3, attacker.troops - 1);
+        const attackDice = Math.min(decision.attackDice, maxDice);
+        if (attackDice < 1){
+            console.log('Dados de ataque inválidos - pulando ataque');
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
+            return;
+        }
+
+        console.log(`Bot atacando: ${attacker.name} -> ${defender.name} com ${attackDice} dados`);
+        this.attackTerritories.attacker = attacker;
+        this.attackTerritories.defender = defender;
+        this.gsm.emit('game:attackerSelected', attacker);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.gsm.emit('game:defenderSelected', defender, attacker);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.gsm.emit('game:attackCommitted', {
+            attackDice: attackDice,
+            attacker: attacker,
+            defender: defender
+        })
+
+        const canStillAttack = Array.from(currentPlayer.ownedTerritories).some(t => {
+            if (t.troops < 2) return false;
+            return Array.from(t.neighbors).some(neighborId => {
+                const neighbor = this.gsm.mapManager.getTerritory(neighborId);
+                return neighbor && neighbor.owner !== currentPlayer;
+            });
+        });
+        if (canStillAttack) {
+            this.executeBotAttack(currentPlayer);
+        }
+        else {
+            console.log(`Bot ${currentPlayer.name} não tem mais ataques possíveis`);
+            this.gsm.emit('game:setMapInteractive', true);
+            this.gsm.turnManager.endPhase();
         }
     }
 

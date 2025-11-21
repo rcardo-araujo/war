@@ -4,8 +4,15 @@ export default class BotService{
     }
 
     async getBotResponse(requestData, phase){
+        let endpoint = phase
+        if (phase === "reinforcement" || phase === "first_reinforcement"){
+            endpoint = "reinforcement"
+        }
+        
+        console.log(endpoint)
+
         try{
-            const response = await fetch(`${this.apiUrl}/${phase}`, {
+            const response = await fetch(`${this.apiUrl}/${endpoint}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -24,7 +31,7 @@ export default class BotService{
     }
 
     async getReinforcementDecision(gameStateManager, phase){
-        const currentPlayer = gameStateManager.getCurrentPlayer();
+        const currentPlayer = gameStateManager.getCturrentPlayer();
         const mapManager = gameStateManager.mapManager;
         const continentBonusTroops = {
             "South America": currentPlayer.availableTroopsSouthAmerica,
@@ -53,9 +60,10 @@ export default class BotService{
         const requestData = {
             data: {
                 objective: currentPlayer.objective.description,
-                freeTroops: currentPlayer.availableTroops,
-                continentBonusTroops: continentBonusTroops,
-                groupeddTerritories: groupedTerritories
+                anywhereTroops: currentPlayer.availableTroops,
+                restrictedTroops: continentBonusTroops,
+                ownedTerritories: groupedTerritories,
+                totalAvailableTroops: currentPlayer.getTotalAvailableTroops(),
             }
         };
         
@@ -106,7 +114,7 @@ export default class BotService{
     }
 
     getFallbackReinforcement(gsm, currentPlayer){
-        const avaialble = currentPlayer.availableTroops;
+        const available = currentPlayer.availableTroops;
         const placements = [];
         const borderTerritories = Array.from(currentPlayer.ownedTerritories).filter(t => {
             return Array.from(t.neighbors).some(nid => {
@@ -125,6 +133,8 @@ export default class BotService{
         return {action: "reinforcement_fallback", placements: placements};
     }
 
+    // inutilizado, pode só usar um return onde a chamada der errado
+    // como se o bot tivesse decidido não atacar ngm
     getFallbackAttack(){
         return {action: "attack", skipAttack: true};
     }

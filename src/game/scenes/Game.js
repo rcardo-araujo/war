@@ -28,6 +28,7 @@ export class Game extends Scene {
         this.setupGameEventListeners();
 
         this.scene.launch('UIScene', { gameStateManager: this.gameState });
+        this.gameState.emit('scene:ready');
     }
 
     update() {
