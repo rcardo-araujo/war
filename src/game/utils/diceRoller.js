@@ -16,8 +16,8 @@ export function executeCombat(attackingTroops, defenseTerritory) {
             casualties[0]++;
         }
     }
-    // remover alerta ao adicionar atualizar território após combate
-    window.alert(casualties)
+    // TODO: adicionar visual de dados depois
+    console.log(`Resultado do combate - Atacante perdeu: ${casualties[0]}, Defensor perdeu: ${casualties[1]}`);
     return casualties;
 }
 

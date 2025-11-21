@@ -78,8 +78,8 @@ export default class BotService{
         const currentPlayer = gameStateManager.getCurrentPlayer();
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description;
-        const attackableTerritories = Array.from(currentPlayer.ownedTerritories).reduce((acc, t) => {
-            const neighborIds = Array.from(t.neighbor);
+        const territoriesCanAttackFrom = Array.from(currentPlayer.ownedTerritories).reduce((acc, t) => {
+            const neighborIds = Array.from(t.neighbors || []);
             const enemyNeighbors = neighborIds.reduce((enemies, neighborId) => {
                 const neighbor = gameStateManager.mapManager.getTerritory(neighborId);
                 if (neighbor && neighbor.owner !== currentPlayer){
@@ -110,7 +110,7 @@ export default class BotService{
             data: {
                 objectiveType: objectiveType,
                 objectiveDescription: objectiveDescription,
-                attackableTerritories: attackableTerritories,
+                territoriesCanAttackFrom: territoriesCanAttackFrom,
             }
         };
         return await this.getBotResponse(requestData, "attack");

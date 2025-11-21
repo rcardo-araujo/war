@@ -101,6 +101,9 @@ export class Game extends Scene {
                 this.disableInteractivity();
             }
         }, this);
+        this.gameState.on('game:attackResult', ({winnerId, loserId}) => {
+            this.flashAttackResult(winnerId, loserId);
+        })
 
         this.gameState.on('game:attackerSelected', (territory) => {
             this.highlightAttacker(territory);
@@ -154,9 +157,48 @@ export class Game extends Scene {
             ease: 'Sine.easeInOut'
         })
 
-        sprites.stroke.setTint(0x00ff00);
+        sprites.stroke.setTint(COLORS.green);
         this.time.delayedCall(900, () => {
-            sprites.stroke.setTint(0xffff00);
+            sprites.stroke.setTint(COLORS.yellow);
+        })
+
+
+    }
+
+    flashAttackResult(winnerId, loserId){
+        const winnerSprites = this.territorySprites[winnerId];
+        const loserSprites = this.territorySprites[loserId];
+        const winnerOriginalColor = this.gameState.getTerritory(winnerId).owner.getColor();
+        const loserOriginalColor = this.gameState.getTerritory(loserId).owner.getColor();
+
+        
+        winnerSprites.stroke.setTint(COLORS.green);
+        winnerSprites.filled.setTint(COLORS.green);
+        this.tweens.add({
+            targets: winnerSprites.filled,
+            alpha: {from: 1, to: 0.6},
+            duration: 100,
+            yoyo: true,
+            repeat: 2
+        });
+
+        
+        loserSprites.stroke.setTint(COLORS.red);
+        loserSprites.filled.setTint(COLORS.red);
+        this.tweens.add({
+            targets: loserSprites.filled,
+            alpha: {from: 1, to: 0.6},
+            duration: 100,
+            yoyo: true,
+            repeat: 2
+        })
+
+        
+        this.time.delayedCall(600, () => {
+            winnerSprites.stroke.setTint(COLORS.yellow);
+            winnerSprites.filled.setTint(winnerOriginalColor);
+            loserSprites.stroke.setTint(COLORS.yellow);
+            loserSprites.filled.setTint(loserOriginalColor);
         })
     }
 

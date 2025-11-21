@@ -87,7 +87,7 @@ export default class PlayerManager {
     }
 
     totalTroopsForPlayer(player) {
-        return player.ownedTerritories.reduce(
+        return Array.from(player.ownedTerritories).reduce(
             (sum, t) => sum + (t?.getTroopCount?.() ?? 0),
             0
         );
