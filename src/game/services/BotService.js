@@ -25,52 +25,41 @@ export default class BotService{
 
     async getReinforcementDecision(gameStateManager, phase){
         const currentPlayer = gameStateManager.getCurrentPlayer();
-        const objectiveType = currentPlayer.objective.type;
-        const objectiveDescription = currentPlayer.objective.description;
-        const freeTroops = currentPlayer.availableTroops;
+        const mapManager = gameStateManager.mapManager;
         const continentBonusTroops = {
-            south_america: currentPlayer.availableTroopsSouthAmerica,
-            north_america: currentPlayer.availableTroopsNorthAmerica,
-            europe: currentPlayer.availableTroopsEurope,
-            asia: currentPlayer.availableTroopsAsia,
-            africa: currentPlayer.availableTroopsAfrica,
-            oecania: currentPlayer.availableTroopsOceania,
+            "South America": currentPlayer.availableTroopsSouthAmerica,
+            "North America": currentPlayer.availableTroopsNorthAmerica,
+            "Europe": currentPlayer.availableTroopsEurope,
+            "Asia": currentPlayer.availableTroopsAsia,
+            "Africa": currentPlayer.availableTroopsAfrica,
+            "Oceania": currentPlayer.availableTroopsOceania
         };
-        const totalAvailableTroops = currentPlayer.getTotalAvailableTroops();
-        const ownedTerritories = Array.from(currentPlayer.ownedTerritories).map(t => {
-            const neighborsList = Array.from(t.neighbors)
-            const enemyNeighbors = neighborsList.reduce((acc, neighborId) => {
-                const neighbor = gameStateManager.mapManager.getTerritory(neighborId);
-                if (neighbor && neighbor.owner !== currentPlayer) {
-                    acc.push({
-                        id: neighbor.id,
-                        name: neighbor.name,
-                        troops: neighbor.troops
-                    });
-                }
-                return acc;
-            }, []); 
-            return {
+        const groupedTerritories = {}
+        Array.from(currentPlayer.ownedTerritories).forEach(t => {
+            const isBorder = Array.from(t.neighbors).some(neighborId => {
+                const neighbor = mapManager.getTerritory(neighborId);
+                return neighbor && neighbor.owner !== currentPlayer;
+            });
+            if (!groupedTerritories[t.continent]){
+                groupedTerritories[t.continent] = []
+            }
+            groupedTerritories[t.continent].push({
                 id: t.id,
-                territoryName: t.name,
-                continent: t.continent,
+                name: t.name,
                 troops: t.troops,
-                enemyNeighbors: enemyNeighbors
-            };
+                is_border: isBorder
+            });
         });
-
-        const requestData = {   
+        const requestData = {
             data: {
-                objectiveType: objectiveType,
-                objectiveDescription: objectiveDescription,
-                freeTroops: freeTroops,
+                objective: currentPlayer.objective.description,
+                freeTroops: currentPlayer.availableTroops,
                 continentBonusTroops: continentBonusTroops,
-                totalAvailableTroops: totalAvailableTroops,
-                ownedTerritories: ownedTerritories,
+                groupeddTerritories: groupedTerritories
             }
         };
         
-        return await this.getBotResponse(requestData, phase)
+        return await this.getBotResponse(requestData, phase);
 
     }
 
@@ -114,6 +103,30 @@ export default class BotService{
             }
         };
         return await this.getBotResponse(requestData, "attack");
+    }
+
+    getFallbackReinforcement(gsm, currentPlayer){
+        const avaialble = currentPlayer.availableTroops;
+        const placements = [];
+        const borderTerritories = Array.from(currentPlayer.ownedTerritories).filter(t => {
+            return Array.from(t.neighbors).some(nid => {
+                const neighbor = gsm.mapManager.getTerritory(nid);
+                return neighbor && neighbor.owner !== currentPlayer;
+            });
+        });
+        const targets = borderTerritories.length > 0 ? borderTerritories : Array.from(currentPlayer.ownedTerritories);
+        if (targets.length > 0 && available > 0){
+            const randomTarget = targets[Math.floor(Math.random() * targets.length)];
+            placements.push({
+                territoryId: randomTarget.id,
+                troops: available
+            });
+        }
+        return {action: "reinforcement_fallback", placements: placements};
+    }
+
+    getFallbackAttack(){
+        return {action: "attack", skipAttack: true};
     }
 
 }

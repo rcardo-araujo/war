@@ -210,32 +210,39 @@ export default class GameController {
     /// BOT METHODS
     async executeBotReinforcement(currentPlayer, phase){
         console.log(`Bot ${currentPlayer.name} pensando (${phase})...`)
+        this.gsm.emit('game:setMapInteractive', false);
         try {
-            this.gsm.emit('game:setMapInteractive', false);
             const decision = await this.botService.getReinforcementDecision(this.gsm, phase);
             console.log(`Decisão do bot (${phase}): `,decision);
-            if (decision && decision.placements){
-                for (const placement of decision.placements){
-                    const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
-                    if (!territory){
-                        console.log(`Território não encontrado: ${placement.territoryId}`);
-                        continue;
-                    }
-                    if (territory.owner !== currentPlayer){
-                        console.log(`Bot tentou alocar tropas em território que não possui: ${territory.name}`)
-                        continue;
-                    }
-                    territory.addTroops(placement.troops);
-                    currentPlayer.allocateTroops(territory, placement.troops);
-                    this.gsm.emit('game:troopCountChanged', territory.id);
-                }
+            if (decision === "jsonParseFaile"){
+                throw new Error(SyntaxError)
             }
-            this.gsm.emit('game:setMapInteractive', true);
-            this.gsm.turnManager.endPhase();
         } catch (error){
-            console.log('Erro ao executar reinforcement do bot: ', error);
-            this.gsm.emit('game:setMapInteractive', true);
+            decision = null;
         }
+        if (!decision || !decision.placements){
+            console.log("Pegando fallback")
+            decision = this.botService.getFallbackReinforcement(this.gsm, currentPlayer);
+        }
+        else if (decision && decision.placements){
+            for (const placement of decision.placements){
+                const territory = this.gsm.mapManager.getTerritory(placement.territoryId);
+                if (!territory){
+                    console.log(`Território não encontrado: ${placement.territoryId}`);
+                    continue;
+                }
+                if (territory.owner !== currentPlayer){
+                    console.log(`Bot tentou alocar tropas em território que não possui: ${territory.name}`)
+                    continue;
+                }
+                territory.addTroops(placement.troops);
+                currentPlayer.allocateTroops(territory, placement.troops);
+                this.gsm.emit('game:troopCountChanged', territory.id);
+            }
+        }
+        this.gsm.emit('game:setMapInteractive', true);
+        this.gsm.turnManager.endPhase();
+        
     }
 
     async executeBotAttack(currentPlayer){
