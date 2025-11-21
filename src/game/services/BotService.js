@@ -25,8 +25,6 @@ export default class BotService{
     async getFirstReinforcementDecision(gameStateManager){
         
         const currentPlayer = gameStateManager.getCurrentPlayer();
-        //const allPlayers = gameStateManager.playerManager.getPlayers();
-        //const allTerritories = Object.values(gameStateManager.mapManager.territories);
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description
         const availableTroops = currentPlayer.availableTroops;
