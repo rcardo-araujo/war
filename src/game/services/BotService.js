@@ -31,7 +31,7 @@ export default class BotService{
     }
 
     async getReinforcementDecision(gameStateManager, phase){
-        const currentPlayer = gameStateManager.getCturrentPlayer();
+        const currentPlayer = gameStateManager.getCurrentPlayer();
         const mapManager = gameStateManager.mapManager;
         const continentBonusTroops = {
             "South America": currentPlayer.availableTroopsSouthAmerica,
