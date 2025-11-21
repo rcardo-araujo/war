@@ -46,4 +46,46 @@ export default class BotService{
 
         return await this.getBotResponse(requestData, "first-reinforcement")
     }
+
+    async getReinforcementDecision(gameStateManager){
+        const currentPlayer = gameStateManager.getCurrentPlayer();
+        const allTerritories = Object.values(gameStateManager.mapManager.territories);
+        const objectiveType = currentPlayer.objective.type;
+        const objectiveDescription = currentPlayer.objective.description;
+
+        const totalAvailableTroops = currentPlayer.availableTroops;
+        const ownedTerritories = Array.from(currentPlayer.ownedTerritories).map(t => {
+            const enemyNeighbors = t.neighbors.reduce((acc, neighborId) => {
+                const neighbor = gameStateManager.mapManager.getTerritory(neighborId);
+                if (neighbor && neighbor.owner !== currentPlayer) {
+                    acc.push({
+                        id: neighbor.id,
+                        name: neighbor.name,
+                        troops: neighbor.troops
+                    });
+                }
+                return acc;
+            }, []); 
+            return {
+                id: t.id,
+                territoryName: t.name,
+                continent: t.continent,
+                troops: t.troops,
+                enemyNeighbors: enemyNeighbors
+            };
+        });
+
+        const requestData = {
+            data: {
+                objectiveType: objectiveType,
+                objectiveDescription: objectiveDescription,
+                totalAvailableTroops: totalAvailableTroops,
+                ownedTerritories: ownedTerritories,
+            }
+        };
+        
+        return await this.getBotResponse(requestData, "reinforcement")
+
+    }
+
 }
