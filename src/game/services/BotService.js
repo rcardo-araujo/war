@@ -129,39 +129,33 @@ export default class BotService{
         const currentPlayer = gameStateManager.getCurrentPlayer();
         const objectiveType = currentPlayer.objective.type;
         const objectiveDescription = currentPlayer.objective.description;
-        const territoriesCanAttackFrom = Array.from(currentPlayer.ownedTerritories).reduce((acc, t) => {
-            const neighborIds = Array.from(t.neighbors || []);
-            const enemyNeighbors = neighborIds.reduce((enemies, neighborId) => {
-                const neighbor = gameStateManager.mapManager.getTerritory(neighborId);
-                if (neighbor && neighbor.owner !== currentPlayer){
-                    enemies.push({
-                        id: neighbor.id,
-                        name: neighbor.name,
-                        troops: neighbor.troops,
-                        owner: neighbor.owner.name,
-                        continent: neighbor.continent
+        const possibleAttacks = [];
+        Array.from(currentPlayer.ownedTerritories).forEach(source => {
+            if (source.troops < 2) {
+                return;
+            }
+            Array.from(source.neighbors).forEach(neighborId => {
+                const target = gameStateManager.mapManager.getTerritory(neighborId);
+                if (target && target.owner !== currentPlayer){
+                    const ratio = (source.troops - 1) / target.troops;
+                    possibleAttacks.push({
+                        sourceId: source.id,
+                        sourceTroops: source.troops,
+                        sourceContinent: source.continent,
+                        targetId: target.id,                    
+                        targetTroops: target.troops,
+                        targetContinent: target.continent,
+                        advantage: ratio > 1.5 ? "high": (ratio > 1 ? "medium": "low"),
                     });
                 }
-                return enemies;
-            }, []);
-            if (enemyNeighbors.length > 0){
-                acc.push({
-                    id: t.id,
-                    territoryName: t.name,
-                    continent: t.continent,
-                    troops: t.troops,
-                    maxDice: Math.min(3, t.troops - 1),
-                    enemyNeighbors: enemyNeighbors
-                });
-            }
-            return acc;
-        }, []);
+            });
 
+        });        
         const requestData = {
             data: {
                 objectiveType: objectiveType,
                 objectiveDescription: objectiveDescription,
-                territoriesCanAttackFrom: territoriesCanAttackFrom,
+                validAttacks: possibleAttacks,
                 botName: currentPlayer.name,
             }
         };
