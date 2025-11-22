@@ -264,5 +264,8 @@ export default class GameController {
         player.availableTroops += bonusTroops;
         this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
         this.gsm.emit('game:cardsTraded', player);
+        if (this.gsm.territoryCardManager.isUsedTerritoryCardsFull()) {
+            this.gsm.territoryCardManager.reshuffleUsedTerritoryCards();
+        }
     }
 }

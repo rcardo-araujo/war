@@ -110,4 +110,16 @@ export default class TerritoryCardManager {
             }
         });
     }
+
+    isUsedTerritoryCardsFull() {
+        return this.usedTerritoryCards.size === Object.keys(this.territoryCards).length;
+    }
+
+    reshuffleUsedTerritoryCards() {
+        this.usedTerritoryCards.forEach(cardId => {
+            const card = this.getTerritoryCard(cardId);
+            card.setOwner(null);
+        });
+        this.usedTerritoryCards.clear();
+    }
 }
