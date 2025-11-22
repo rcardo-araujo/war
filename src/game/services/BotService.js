@@ -1,11 +1,16 @@
+import { PLAYER_TYPES } from "../config/playerTypes";
+import TurnManager from "../managers/TurnManager";
+
 export default class BotService{
-    constructor(apiUrl = 'http://localhost:8080'){
+    constructor(apiUrl = 'http://localhost:8080', statusUrl = 'http://localhost:8082'){
         this.apiUrl = apiUrl;
+        this.statusUrl = statusUrl;
+        this.wantsStatus = true
         this.totalReinforcementCalls = 0;
         this.totalAttackCalls = 0;
         this.reinforcementFallbackCount = 0;
         this.attackFallbackCount = 0;
-        this.apiErros = 0;
+        this.apiErrors = 0;
     }
 
     getBotStats(){
@@ -14,8 +19,39 @@ export default class BotService{
             "attackFallbackCount": this.attackFallbackCount,
             "totalReinforcementCalls": this.totalReinforcementCalls,
             "reinforcementFallbackCount": this.reinforcementFallbackCount,
+            "apiErrors": this.apiErrors,
         }
         return data;
+    }
+
+    checkIfPreviousPlayerWasBot(player){
+        if (this.wantsStatus){
+            if (player && player.type == PLAYER_TYPES.BOT){
+                this.sendBotStatsToServer()
+            }
+        }
+    }
+
+    sendBotStatsToServer(){
+        const stats = this.getBotStats()
+        console.log('Enviando stats:', stats)
+        fetch(`${this.statusUrl}/stats`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ data: stats })
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log('Stats enviados com sucesso:', stats);
+            } else {
+                console.log(`Erro ao enviar stats: ${response.status}`);
+            }
+        })
+        .catch(error => {
+            console.log(`Erro ao enviar stats:`, error.message);
+        });
     }
 
     async getBotResponse(requestData, phase){
@@ -23,8 +59,6 @@ export default class BotService{
         if (phase === "reinforcement" || phase === "first_reinforcement"){
             endpoint = "reinforcement"
         }
-        
-        requestData["botStats"] = this.getBotStats();
 
         try{
             const response = await fetch(`${this.apiUrl}/${endpoint}`, {
@@ -41,7 +75,7 @@ export default class BotService{
             return data.generated_json;
         } catch (error){
             console.log('Erro ao chamar API do bot: ',error);
-            this.apiErros += 1;
+            this.apiErrors += 1;
         }
 
     }
@@ -82,7 +116,6 @@ export default class BotService{
                 ownedTerritories: groupedTerritories,
                 totalAvailableTroops: currentPlayer.getTotalAvailableTroops(),
                 phase: phase,
-                botStats: this.getBotStats(), 
                 botName: currentPlayer.name,
             }
         };
@@ -129,7 +162,6 @@ export default class BotService{
                 objectiveType: objectiveType,
                 objectiveDescription: objectiveDescription,
                 territoriesCanAttackFrom: territoriesCanAttackFrom,
-                botStats: this.getBotStats(),
                 botName: currentPlayer.name,
             }
         };
@@ -157,11 +189,9 @@ export default class BotService{
         return {action: "reinforcement_fallback", placements: placements};
     }
 
-    // inutilizado, pode só usar um return onde a chamada der errado
-    // como se o bot tivesse decidido não atacar ngm
+    
     getFallbackAttack(){
         this.attackFallbackCount += 1;
-        return {action: "attack", skipAttack: true};
     }
 
 }

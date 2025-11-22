@@ -191,6 +191,8 @@ export default class GameController {
     }
 
     onNextTurn(turnManager) {
+        const previousPlayer = turnManager.getPreviousPlayer()
+        this.botService.checkIfPreviousPlayerWasBot(previousPlayer);
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
@@ -257,11 +259,12 @@ export default class GameController {
             territory.addTroops(placement.troops);
             currentPlayer.allocateTroops(territory, placement.troops);
             this.gsm.emit('game:troopCountChanged', territory.id);
-            
+
         }
+
         this.gsm.emit('game:setMapInteractive', true);
         this.gsm.turnManager.endPhase();
-        
+
     }
 
     async executeBotAttack(currentPlayer){

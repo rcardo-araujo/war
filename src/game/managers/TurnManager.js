@@ -31,6 +31,11 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         return this.players[this.currentPlayerIndex] || null;
     }
 
+    getPreviousPlayer(){
+        const prevIndex = (this.currentPlayerIndex - 1 + this.players.length) % this.players.length;
+        return this.players[prevIndex] || null;
+    }
+
     getCurrentPhase(){
         return this.currentPhase;
     }
