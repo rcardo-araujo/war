@@ -104,6 +104,7 @@ export default class BotService{
             groupedTerritories[t.continent].push({
                 id: t.id,
                 name: t.name,
+                color: t.color,
                 troops: t.troops,
                 is_border: isBorder
             });
@@ -144,6 +145,7 @@ export default class BotService{
                         sourceContinent: source.continent,
                         targetId: target.id,                    
                         targetTroops: target.troops,
+                        targetColor: target.color,
                         targetContinent: target.continent,
                         advantage: ratio > 1.5 ? "high": (ratio > 1 ? "medium": "low"),
                     });

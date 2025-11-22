@@ -67,7 +67,8 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
                 this.setPhase(TURN_PHASES.ATTACK);
                 break;
             case TURN_PHASES.ATTACK:
-                this.setPhase(TURN_PHASES.STRATEGIC);
+                // Pula STRATEGIC e END, vai direto para próximo turno
+                this.endTurn();
                 break;
             case TURN_PHASES.STRATEGIC:
                 this.setPhase(TURN_PHASES.END);
