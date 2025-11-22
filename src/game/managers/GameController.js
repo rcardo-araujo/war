@@ -34,6 +34,9 @@ export default class GameController {
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
 
+        this.gsm.on('ui:tradeCardsClicked', this.handleTradeClick, this);
+        this.gsm.on('game:tradeCardsSelected', this.onTradeCommit, this);
+
     }
 
     checkObjectiveForPlayer(player, defender) {
