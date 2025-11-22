@@ -294,24 +294,28 @@ export default class GameController {
         const defender = this.gsm.mapManager.getTerritory(decision.defenderTerritoryId);
         if (!attacker || !defender){
             console.log('Território inválido - pulando ataque do bot');
+            this.botService.getFallbackAttack();
             this.gsm.emit('game:setMapInteractive', true);
             this.gsm.turnManager.endPhase();
             return;
         }
         if (attacker.owner !== currentPlayer){
             console.log("Bot tentou atacar de território que não possui - pulando ataque");
+            this.botService.getFallbackAttack();
             this.gsm.emit('game:setMapInteractive', true);
             this.gsm.turnManager.endPhase();
             return;
         }
         if (!attacker.neighbors.has(defender.id)){
             console.log("Bot tentou atacar território que não é vizinho - pulando ataque");
+            this.botService.getFallbackAttack();
             this.gsm.emit('game:setMapInteractive', true);
             this.gsm.turnManager.endPhase();
             return;
         }
         if (defender.owner === currentPlayer){
             console.log("Bot tentou atacar seu próprio território - pulando ataque");
+            this.botService.getFallbackAttack();
             this.gsm.emit('game:setMapInteractive', true);
             this.gsm.turnManager.endPhase();
             return;
@@ -320,6 +324,7 @@ export default class GameController {
         const attackDice = Math.min(decision.attackDice, maxDice);
         if (attackDice < 1){
             console.log('Dados de ataque inválidos - pulando ataque');
+            this.botService.getFallbackAttack();
             this.gsm.emit('game:setMapInteractive', true);
             this.gsm.turnManager.endPhase();
             return;
