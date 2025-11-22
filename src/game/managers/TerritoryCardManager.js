@@ -99,4 +99,15 @@ export default class TerritoryCardManager {
         });
         return bonusTroops;
     }
+
+    clearOwnershipAfterTrade(player, tradedCardIds) {
+        tradedCardIds.forEach(cardId => {
+            const card = this.getTerritoryCard(cardId);
+            card.setOwner(null);
+            const index = player.territoryCards.indexOf(cardId);
+            if (index > -1) {
+                player.territoryCards.splice(index, 1);
+            }
+        });
+    }
 }

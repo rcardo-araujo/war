@@ -31,7 +31,6 @@ export default class GameController {
         this.gsm.on('game:strategyConfirmed', this.handleStrategyConfirm, this);
         this.gsm.on('game:strategyCommitted', this.onStrategyCommit, this);
 
-
         this.gsm.turnManager.on('phaseChanged', this.onPhaseChanged, this);
         this.gsm.turnManager.on('nextTurn', this.onNextTurn, this);
 
@@ -258,7 +257,9 @@ export default class GameController {
     }
 
     onTradeCommit({ player, cards }) {
-        this.gsm.territoryCardManager.tradeCardsForTroops(player, cards);
+        const bonusTroops = this.gsm.territoryCardManager.calculateTradeBonus(player, cards);
+        player.availableTroops += bonusTroops;
+        this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
         this.gsm.emit('game:cardsTraded', player);
     }
 }
