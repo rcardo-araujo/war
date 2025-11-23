@@ -15,10 +15,15 @@ export default class TerritoryCardManager {
         });
     }
 
+    addUsedTerritoryCards(cardIds) {
+        cardIds.forEach(cardId => {
+            this.usedTerritoryCards.add(cardId);
+        });
+    }
+
     changePlayerTerritoryCardOwnership(territoryCardId, newOwner) {
         const territoryCard = this.getTerritoryCard(territoryCardId);
         territoryCard.setOwner(newOwner);
-        this.usedTerritoryCards.add(territoryCardId);
         newOwner.territoryCards.push(territoryCardId);
     }
 
