@@ -82,6 +82,13 @@ export class GameHUD extends GameObjects.Container {
             'territory-cards'
         ).setOrigin(0.5);
 
+        this.territoryCardsCount = scene.add.text(
+            config.territoryCardsCount.x,
+            config.territoryCardsCount.y,
+            '0',
+            config.territoryCardsCount.textStyle
+        ).setOrigin(0.5, 0.5);
+
         this.add([
             this.centerBar, 
             this.centerBarStroke,
@@ -89,6 +96,7 @@ export class GameHUD extends GameObjects.Container {
             this.rightPanel, 
             this.phaseIcon,
             this.territoryCards,
+            this.territoryCardsCount,
             this.phaseLabelBackground, 
             this.phaseLabel,
             ...Object.values(this.phaseBars),
@@ -148,5 +156,9 @@ export class GameHUD extends GameObjects.Container {
         this.rightPanel.setTint(color);
         this.centerBarStroke.setTint(color);
         this.nextButton.setTint(color);
+    }
+
+    updateTerritoryCardsCount(count) {
+        this.territoryCardsCount.setText(count.toString())
     }
 }
