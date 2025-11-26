@@ -51,7 +51,7 @@ export const UIConfig = {
         },
         phaseBars: {
             x: 107,
-            y: 40,
+            y: 36,
             offsets: {
                 fortify: 0,
                 attack: 70,
