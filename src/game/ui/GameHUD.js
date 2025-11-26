@@ -135,4 +135,11 @@ export class GameHUD extends GameObjects.Container {
             }
         }
     }
+
+    updateColor(color) {
+        this.leftPanel.setTint(color);
+        this.rightPanel.setTint(color);
+        this.centerBarStroke.setTint(color);
+        this.nextButton.setTint(color);
+    }
 }

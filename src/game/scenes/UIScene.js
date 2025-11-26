@@ -50,6 +50,8 @@ export class UIScene extends Phaser.Scene {
         });
         this.confirmButton = null;
 
+        this.hud.updateColor(currentPlayer.color);
+
         this.createTargetButton();        
         this.setupEvents();
         this.updateButtonText(this.gameStateManager.getCurrentPhase());
@@ -87,7 +89,9 @@ export class UIScene extends Phaser.Scene {
             this.showAttackInput(attackerTerritory, defenderTerritory);
         }, this);
 
-
+        this.gameStateManager.on('game:nextTurn', (player) => {
+            this.hud.updateColor(player.color); // <--- Chamada dinâmica
+        }, this);
         this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
             this.showConfirmButton("Confirm Strategy", () => {
                 this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
