@@ -24,6 +24,12 @@ export class GameHUD extends GameObjects.Container {
             config.centerBar.y, 
             'center-bar'
         ).setOrigin(0, 0);
+
+        this.centerBarStroke = scene.add.image(
+            config.centerBar.x, 
+            config.centerBar.y, 
+            'center-bar-stroke'
+        ).setOrigin(0, 0);
         
         this.phaseLabelBackground = scene.add.image(
             config.phaseLabel.x, 
@@ -72,6 +78,7 @@ export class GameHUD extends GameObjects.Container {
 
         this.add([
             this.centerBar, 
+            this.centerBarStroke,
             this.leftPanel, 
             this.rightPanel, 
             this.phaseIcon,
