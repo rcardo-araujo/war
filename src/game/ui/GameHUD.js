@@ -38,6 +38,12 @@ export class GameHUD extends GameObjects.Container {
             config.phaseLabel.textStyle
         ).setOrigin(0.5, 0.5);
 
+        this.phaseIcon = scene.add.image(
+            config.phaseIcons.x,
+            config.phaseIcons.y,
+            'icon-fortify-phase' 
+        ).setOrigin(0.5, 0.5);
+
         this.phaseBars = {};
         const barConfig = config.phaseBars;
         
@@ -68,6 +74,7 @@ export class GameHUD extends GameObjects.Container {
             this.centerBar, 
             this.leftPanel, 
             this.rightPanel, 
+            this.phaseIcon,
             this.phaseLabelBackground, 
             this.phaseLabel,
             ...Object.values(this.phaseBars),
@@ -79,21 +86,46 @@ export class GameHUD extends GameObjects.Container {
     }
 
     updatePhase(currentPhase) {
-        const texts = {
-            [TURN_PHASES.REINFORCEMENT]: 'FORTIFICAÇÃO',
-            [TURN_PHASES.ATTACK]: 'ATAQUE',
-            [TURN_PHASES.STRATEGIC]: 'MOVIMENTAÇÃO',
-            [TURN_PHASES.END]: 'FIM DE TURNO'
+        const phaseConfig = {
+            [TURN_PHASES.REINFORCEMENT]: { 
+                text: 'FORTIFICAÇÃO',
+                icon: 'icon-fortify-phase',
+                activeBar: 'fortify'
+            },
+            [TURN_PHASES.ATTACK]: { 
+                text: 'ATAQUE',
+                icon: 'icon-attack-phase',
+                activeBar: 'attack'
+            },
+            [TURN_PHASES.STRATEGIC]: { 
+                text: 'MOVIMENTAÇÃO',
+                icon: 'icon-relocation-phase',
+                activeBar: 'relocate'
+            },
+            [TURN_PHASES.END]: { 
+                text: 'FIM DE TURNO',
+                icon: 'icon-fortify-phase',
+                activeBar: null
+            }
         };
-        this.phaseLabel.setText(texts[currentPhase]);
 
-        Object.keys(this.phaseBars).forEach(key => {
-            let isActive = false;
-            if (key === 'fortify' && currentPhase === TURN_PHASES.REINFORCEMENT) isActive = true;
-            if (key === 'attack' && currentPhase === TURN_PHASES.ATTACK) isActive = true;
-            if (key === 'relocate' && currentPhase === TURN_PHASES.STRATEGIC) isActive = true;
+        const config = phaseConfig[currentPhase];
 
-            this.phaseBars[key].setTexture(isActive ? 'phase-bar-active' : 'phase-bar-inactive');
-        });
+        if (config) {
+            this.phaseLabel.setText(config.text);
+            
+            this.phaseIcon.setTexture(config.icon);
+
+            Object.keys(this.phaseBars).forEach(key => {
+                const isActive = (key === config.activeBar);
+                this.phaseBars[key].setTexture(isActive ? 'phase-bar-active' : 'phase-bar-inactive');
+            });
+
+            if (currentPhase === TURN_PHASES.STRATEGIC) {
+                this.nextButtonText.setText('ENCERRAR');
+            } else {
+                this.nextButtonText.setText('PRÓXIMO');
+            }
+        }
     }
 }

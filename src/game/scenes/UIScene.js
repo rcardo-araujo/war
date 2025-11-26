@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { TURN_PHASES } from '../managers/TurnManager';
+import { GameHUD } from '../ui/GameHUD';
 
 export class UIScene extends Phaser.Scene {
     constructor() {
@@ -14,6 +15,11 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
+        this.hud = new GameHUD(this);
+
+        const initialPhase = this.gameStateManager.getCurrentPhase();
+        this.hud.updatePhase(initialPhase);
+
         const padding = 20;
         const bottomY = this.cameras.main.height - padding;
         const leftX = padding;
@@ -51,6 +57,12 @@ export class UIScene extends Phaser.Scene {
     }
 
     setupEvents() {
+        this.gameStateManager.on('game:phaseChanged', (newPhase) => {
+            this.hud.updatePhase(newPhase);
+        }, this);
+        this.hud.nextButton.on('pointerdown', () => {
+            this.gameStateManager.emit('ui:endPhaseClicked');
+        });
         this.gameStateManager.on('game:nextTurn', this.updateTurnLabel, this);
         this.gameStateManager.on('game:phaseChanged', this.updateButtonText, this);
         this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
