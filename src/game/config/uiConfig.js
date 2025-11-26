@@ -60,11 +60,11 @@ export const UIConfig = {
         },
         phaseIcons: {
             x: 86.97 / 2,
-            y: 84.95 / 2
+            y: (84.95 + 6) / 2
         },
         territoryCards: {
             x: 408.97 - (86.97 / 2),
-            y: 84.95 / 2
+            y: (84.95 + 6) / 2
         }
     }
 }
