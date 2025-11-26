@@ -76,12 +76,19 @@ export class GameHUD extends GameObjects.Container {
             config.nextTurnButton.textStyle
         ).setOrigin(0.5, 0.5);
 
+        this.territoryCards = scene.add.image(
+            config.territoryCards.x,
+            config.territoryCards.y,
+            'territory-cards'
+        ).setOrigin(0.5);
+
         this.add([
             this.centerBar, 
             this.centerBarStroke,
             this.leftPanel, 
             this.rightPanel, 
             this.phaseIcon,
+            this.territoryCards,
             this.phaseLabelBackground, 
             this.phaseLabel,
             ...Object.values(this.phaseBars),
