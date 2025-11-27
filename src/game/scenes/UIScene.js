@@ -25,15 +25,8 @@ export class UIScene extends Phaser.Scene {
         const leftX = padding;
 
         let currentPlayer = this.gameStateManager.getCurrentPlayer();
-        this.label = this.add.text(leftX, bottomY, 'Turno do Jogador #' + currentPlayer.name, {
-            font: '15px Arial',
-            fill: '#ffffff',
-            backgroundColor: `#${currentPlayer.color.toString(16).padStart(6, '0')}`,
-            padding: { x: 10, y: 10 },
-            align: 'center'
-        }).setOrigin(0, 1);
 
-        this.button = this.add.text(leftX, bottomY - this.label.height, 'Próximo turno', {
+        this.button = this.add.text(leftX, bottomY, 'Próximo turno', {
             font: '12px Arial',
             fill: '#ffffff',
             backgroundColor: '#007bff',
@@ -65,7 +58,6 @@ export class UIScene extends Phaser.Scene {
         this.hud.nextButton.on('pointerdown', () => {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
-        this.gameStateManager.on('game:nextTurn', this.updateTurnLabel, this);
         this.gameStateManager.on('game:phaseChanged', this.updateButtonText, this);
         this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
         this.gameStateManager.on('game:error', (message) => {
@@ -90,7 +82,7 @@ export class UIScene extends Phaser.Scene {
         }, this);
 
         this.gameStateManager.on('game:nextTurn', (player) => {
-            this.hud.updateColor(player.color); // <--- Chamada dinâmica
+            this.hud.updateColor(player.color); 
         }, this);
         this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
             this.showConfirmButton("Confirm Strategy", () => {
@@ -109,13 +101,6 @@ export class UIScene extends Phaser.Scene {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
-    }
-
-    updateTurnLabel(newPlayer) {
-        this.label.setText("Turno do jogador # " + newPlayer.name);
-        this.label.setStyle({
-            backgroundColor: `#${newPlayer.color.toString(16).padStart(6, '0')}`
-        });
     }
 
     updateButtonText(newPhase) {
