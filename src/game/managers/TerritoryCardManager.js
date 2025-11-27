@@ -111,6 +111,13 @@ export default class TerritoryCardManager {
     }
 
     drawCard(player){
+        if (this.territoryCards.length === 0){
+            this.usedTerritoryCards.forEach(function(element){
+                this.territoryCards.push(element);
+                this.usedTerritoryCards.delete(element);
+            })
+            this.shuffleDeck();
+        }
         let card = this.territoryCards[this.territoryCards.length - 1];
         this.changePlayerTerritoryCardOwnership(card.id, player);
     }
