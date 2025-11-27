@@ -1,5 +1,6 @@
 import { Game, Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig'
+import { bordersData } from '../config/bordersData';
 
 export class Preloader extends Scene
 {
@@ -75,6 +76,10 @@ export class Preloader extends Scene
                 this.load.image(`${id}-stroke`, `assets/images/maps/stroke/${id}-stroke.png`);
             });
         }, this);
+
+        Object.keys(bordersData).forEach(key => {
+            this.load.image(`border-${key}`, `assets/images/maps/border/border-${key}.png`);
+        });
     }
 
     create ()
