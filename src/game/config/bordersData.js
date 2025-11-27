@@ -14,7 +14,7 @@ export const bordersData = {
     'peninsula-iberica-egito': { x: 607, y: 317 },
     'polonia-egito': { x: 643, y: 330 },
     'reino-unido-alemanha': { x: 560, y: 249 },
-    'reino-unido-peninsula-ibera': { x: 526, y: 259 },
+    'reino-unido-peninsula-iberica': { x: 526, y: 259 },
     'reino-unido-suecia': { x: 557, y: 198 },
     'sudao-madagascar': { x: 735, y: 490 },
     'sumatra-australia': { x: 983, y: 558 },
