@@ -247,7 +247,7 @@ export class UIScene extends Phaser.Scene {
 
     showConfirmButton(text, callback) {
         const centerX = this.cameras.main.centerX;
-        const bottomY = this.cameras.main.height - 20;
+        const bottomY = 20;
 
         this.confirmButton = this.add.text(centerX, bottomY, text, {
             font: '16px Arial',
@@ -256,7 +256,7 @@ export class UIScene extends Phaser.Scene {
             padding: { x: 10, y: 10 },
             align: 'center'
         })
-            .setOrigin(0, 1)
+            .setOrigin(0.5, 0)
             .setInteractive();
 
         this.confirmButton.on('pointerdown', callback);
