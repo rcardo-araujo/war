@@ -20,10 +20,6 @@ export class UIScene extends Phaser.Scene {
         const initialPhase = this.gameStateManager.getCurrentPhase();
         this.hud.updatePhase(initialPhase);
 
-        const padding = 20;
-        const bottomY = this.cameras.main.height - padding;
-        const leftX = padding;
-
         let currentPlayer = this.gameStateManager.getCurrentPlayer();
 
         this.confirmButton = null;
