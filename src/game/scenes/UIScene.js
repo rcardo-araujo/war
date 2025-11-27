@@ -26,15 +26,12 @@ export class UIScene extends Phaser.Scene {
 
         let currentPlayer = this.gameStateManager.getCurrentPlayer();
 
-        this.phaseText = this.add.text(10, 10, `Fase: `);
-
         this.confirmButton = null;
 
         this.hud.updateColor(currentPlayer.color);
 
         this.createTargetButton();        
         this.setupEvents();
-        this.updatePhaseText(this.gameStateManager.getCurrentPhase());
     }
 
     setupEvents() {
@@ -44,7 +41,6 @@ export class UIScene extends Phaser.Scene {
         this.hud.nextButton.on('pointerdown', () => {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
-        this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
         this.gameStateManager.on('game:error', (message) => {
             alert(message);
         }, this);
@@ -86,10 +82,6 @@ export class UIScene extends Phaser.Scene {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
-    }
-
-    updatePhaseText(newPhase) {
-        this.phaseText.setText(`Fase: ${newPhase}`);
     }
 
     showTroopInput(territory, currentPlayer) {
