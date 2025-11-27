@@ -18,15 +18,17 @@ export class UIScene extends Phaser.Scene {
         this.hud = new GameHUD(this);
 
         const initialPhase = this.gameStateManager.getCurrentPhase();
-        this.hud.updatePhase(initialPhase);
-
         let currentPlayer = this.gameStateManager.getCurrentPlayer();
 
+        this.hud.updatePhase(initialPhase);
+
+        if(currentPlayer) {
+            this.hud.updateColor(currentPlayer.color);
+        }
+
         this.confirmButton = null;
+        this.createTargetButton();
 
-        this.hud.updateColor(currentPlayer.color);
-
-        this.createTargetButton();        
         this.setupEvents();
     }
 
