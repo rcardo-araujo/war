@@ -108,12 +108,15 @@ export class GameHUD extends GameObjects.Container {
     }
 
     updatePhase(currentPhase) {
+        const fortifyConfig = {
+            text: 'FORTIFICAÇÃO',
+            icon: 'icon-fortify-phase',
+            activeBar: 'fortify'
+        };
+
         const phaseConfig = {
-            [TURN_PHASES.REINFORCEMENT]: { 
-                text: 'FORTIFICAÇÃO',
-                icon: 'icon-fortify-phase',
-                activeBar: 'fortify'
-            },
+            [TURN_PHASES.FIRST_REINFORCEMENT]: fortifyConfig,
+            [TURN_PHASES.REINFORCEMENT]: fortifyConfig,
             [TURN_PHASES.ATTACK]: { 
                 text: 'ATAQUE',
                 icon: 'icon-attack-phase',
@@ -143,7 +146,7 @@ export class GameHUD extends GameObjects.Container {
                 this.phaseBars[key].setTexture(isActive ? 'phase-bar-active' : 'phase-bar-inactive');
             });
 
-            if (currentPhase === TURN_PHASES.STRATEGIC) {
+            if (currentPhase === TURN_PHASES.STRATEGIC || currentPhase === TURN_PHASES.FIRST_REINFORCEMENT) {
                 this.nextButtonText.setText('ENCERRAR');
             } else {
                 this.nextButtonText.setText('PRÓXIMO');
