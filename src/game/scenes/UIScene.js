@@ -26,28 +26,14 @@ export class UIScene extends Phaser.Scene {
 
         let currentPlayer = this.gameStateManager.getCurrentPlayer();
 
-        this.button = this.add.text(leftX, bottomY, 'Próximo turno', {
-            font: '12px Arial',
-            fill: '#ffffff',
-            backgroundColor: '#007bff',
-            padding: { x: 8, y: 8 },
-            align: 'center'
-        })
-            .setOrigin(0, 1)
-            .setInteractive();
-
         this.phaseText = this.add.text(10, 10, `Fase: `);
 
-        this.button.on('pointerdown', () => {
-            this.gameStateManager.emit('ui:endPhaseClicked');
-        });
         this.confirmButton = null;
 
         this.hud.updateColor(currentPlayer.color);
 
         this.createTargetButton();        
         this.setupEvents();
-        this.updateButtonText(this.gameStateManager.getCurrentPhase());
         this.updatePhaseText(this.gameStateManager.getCurrentPhase());
     }
 
@@ -58,7 +44,6 @@ export class UIScene extends Phaser.Scene {
         this.hud.nextButton.on('pointerdown', () => {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
-        this.gameStateManager.on('game:phaseChanged', this.updateButtonText, this);
         this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
         this.gameStateManager.on('game:error', (message) => {
             alert(message);
@@ -101,14 +86,6 @@ export class UIScene extends Phaser.Scene {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
-    }
-
-    updateButtonText(newPhase) {
-        if (newPhase === TURN_PHASES.FIRST_REINFORCEMENT || newPhase === TURN_PHASES.END) {
-            this.button.setText('Finalizar turno');
-        } else {
-            this.button.setText('Próxima fase');
-        }
     }
 
     updatePhaseText(newPhase) {
