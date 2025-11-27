@@ -184,7 +184,7 @@
             "continent": "europe",
             "type": "square",
             "neighbors": ["reino-unido", "alemanha", "polonia", "egito"],
-            "position": { "x": 521.4, "y": 252.25 }
+            "position": { "x": 521.4, "y": 260.25 }
         },
         {
             "id": "reino-unido",
