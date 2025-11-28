@@ -14,7 +14,6 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         this.currentPhase = TURN_PHASES.FIRST_REINFORCEMENT;
         this.currentTurnCount = 0;
         this.currentRoundCount = 0;
-        this.capture = false;
     }
 
     setPlayers(players = []){
@@ -86,9 +85,5 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
             this.resetTurnState();
         }
         this.emit("nextTurn", this);
-    }
-
-    setCapture(boolean){
-        this.capture = boolean;
     }
 }

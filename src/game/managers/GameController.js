@@ -18,6 +18,7 @@ export default class GameController {
             origin: null,
             destination: null
         }
+        this.capture = false;
     }
 
     setupEventListeners() {
@@ -162,8 +163,7 @@ export default class GameController {
                 const movingTroops = attackDice;
                 attacker.removeTroops(movingTroops);
                 defender.addTroops(movingTroops);
-                this.gsm.turnManager.setCapture(true);
-
+                this.capture = true;
             }
 
             this.gsm.emit('game:troopCountChanged', attacker.id);
@@ -243,6 +243,7 @@ export default class GameController {
     }
 
     onNextTurn(turnManager) {
+        this.capture = false;
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.movementController.reset();
