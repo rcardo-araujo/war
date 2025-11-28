@@ -79,7 +79,6 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         }
 
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-        this.setCapture(false);
 
         if(this.currentRoundCount != 0){
             this.resetTurnState();
