@@ -44,6 +44,7 @@ export class UIScene extends Phaser.Scene {
         });
         this.confirmButton = null;
 
+        this.createTargetButton();        
         this.setupEvents();
         this.updateButtonText(this.gameStateManager.getCurrentPhase());
         this.updatePhaseText(this.gameStateManager.getCurrentPhase());
@@ -86,6 +87,11 @@ export class UIScene extends Phaser.Scene {
         this.gameStateManager.on('game:strategyConfirmed', (destinationTerritory, originTerritory) => {
             this.hideConfirmButton();
             this.showStrategyInput(originTerritory, destinationTerritory);
+        }, this);
+        this.gameStateManager.on('game:nextTurn', (newPlayer) => {
+            if (this.targetElipse && newPlayer && newPlayer.color) {
+                this.targetElipse.setTint(newPlayer.color);
+            }
         }, this);
     }
 
@@ -293,6 +299,91 @@ export class UIScene extends Phaser.Scene {
             this.confirmButton.destroy();
             this.confirmButton = null;
         }
+    }
+
+    createTargetButton() {
+        const padding = 60;
+        const x = this.cameras.main.width - padding;
+        const y = this.cameras.main.height - padding;
+
+        this.targetContainer = this.add.container(x, y);
+
+        const elipse = this.add.image(0, 0, 'target-elipse').setOrigin(0.5);
+        const aim = this.add.image(0, 0, 'target-aim').setOrigin(0.5);
+
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
+        if (currentPlayer && currentPlayer.color) {
+            elipse.setTint(currentPlayer.color);
+        }
+        this.targetElipse = elipse;
+
+        this.targetContainer.add([elipse, aim]);
+        this.targetContainer.setDepth(10000);
+
+        try {
+            elipse.setInteractive({ pixelPerfect: true });
+        } catch (e) {
+            elipse.setInteractive();
+        }
+        aim.setInteractive({ pixelPerfect: true });
+
+        const onClick = () => this.showObjectiveModal();
+        elipse.on('pointerdown', onClick);
+        aim.on('pointerdown', onClick);
+    }
+
+    showObjectiveModal() {
+        const w = this.cameras.main.width;
+        const h = this.cameras.main.height;
+
+        this.gameStateManager.emit('game:setMapInteractive', false);
+
+        this.modalOverlay = this.add.rectangle(0, 0, w, h, 0x000000, 0.65).setOrigin(0).setDepth(10001).setInteractive();
+
+        const card = this.add.image(w / 2, h / 2, 'objective-card').setDepth(10002);
+
+        const player = this.gameStateManager.getCurrentPlayer();
+        let objectiveText = 'Objetivo não disponível';
+        if (player && player.objective) {
+            objectiveText = player.objective.description || player.objective.main || player.objective.main?.text || objectiveText;
+        }
+
+        const displayW = card.displayWidth || card.width;
+        const textStyle = {
+            font: '18px JetBrainsMono',
+            color: '#ffffff',
+            align: 'center',
+            wordWrap: { width: Math.max(100, displayW - 40) }
+        };
+
+        this.objectiveText = this.add.text(w / 2, h / 2, objectiveText, textStyle).setOrigin(0.5).setDepth(10003);
+
+        const maxW = w - 80;
+        const maxH = h - 80;
+        if (card.width > maxW || card.height > maxH) {
+            const scale = Math.min(maxW / card.width, maxH / card.height);
+            card.setScale(scale);
+        }
+
+        this.modalOverlay.on('pointerdown', () => this.hideObjectiveModal());
+    }
+
+    hideObjectiveModal() {
+        if (this.modalOverlay) {
+            this.modalOverlay.destroy();
+            this.modalOverlay = null;
+        }
+        const card = this.children.getByName && this.children.getByName('objective-card');
+        this.children.list.slice().forEach(child => {
+            if (child.texture && child.texture.key === 'objective-card') child.destroy();
+        });
+
+        if (this.objectiveText) {
+            this.objectiveText.destroy();
+            this.objectiveText = null;
+        }
+
+        this.gameStateManager.emit('game:setMapInteractive', true);
     }
 
     update(time, delta) {
