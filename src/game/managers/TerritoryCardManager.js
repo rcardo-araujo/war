@@ -62,7 +62,7 @@ export default class TerritoryCardManager {
     
 
     calculateTradeBonus(player, tradedCardIds) {
-        const baseBonus = 4;
+        let baseBonus = 4;
 
         baseBonus += this.calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds);
         
@@ -91,7 +91,7 @@ export default class TerritoryCardManager {
     }
 
     calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds) {
-        const bonusTroops = 0;
+        let bonusTroops = 0;
 
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
