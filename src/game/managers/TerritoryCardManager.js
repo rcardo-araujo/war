@@ -3,15 +3,17 @@ import TerritoryCard from "../gameObjects/TerritoryCard";
 export default class TerritoryCardManager {
     constructor (mapData) {
         this.territoryCards = {};
+        this.drawPile = [];
         this.initializeTerritoryCards(mapData);
-        
         this.usedTerritoryCards = new Set();
         this.currentTrade = 1;
     }
 
     initializeTerritoryCards (mapData) {
         mapData.territories.forEach(data => {
-            this.territoryCards[data.id] = new TerritoryCard(data.id, data.name, data.type);
+            let territory = new TerritoryCard(data.id, data.name, data.type);
+            this.territoryCards[data.id] = territory;
+            this.drawPile.push(territory);
             this.shuffleDeck();
         });
     }
@@ -102,23 +104,23 @@ export default class TerritoryCardManager {
     }
 
     shuffleDeck() {
-        for (let i = this.territoryCards.length -1; i > 0; i--) {
+        for (let i = this.drawPile.length -1; i > 0; i--) {
           let j = Math.floor(Math.random() * (i+1));
-          let k = this.territoryCards[i];
-          this.territoryCards[i] = this.territoryCards[j];
-          this.territoryCards[j] = k;
+          let k = this.drawPile[i];
+          this.drawPile[i] = this.drawPile[j];
+          this.drawPile[j] = k;
         }
     }
 
     drawCard(player){
-        if (this.territoryCards.length === 0){
+        if (this.drawPile.length === 0){
             this.usedTerritoryCards.forEach(function(element){
-                this.territoryCards.push(element);
+                this.drawPile.push(element);
                 this.usedTerritoryCards.delete(element);
             })
             this.shuffleDeck();
         }
-        let card = this.territoryCards[this.territoryCards.length - 1];
+        let card = this.drawPile[this.drawPile.length - 1];
         this.changePlayerTerritoryCardOwnership(card.id, player);
     }
 }

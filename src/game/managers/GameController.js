@@ -241,7 +241,7 @@ export default class GameController {
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
         if (newPhase === TURN_PHASES.END){
-            this.gsm.TerritoryCardManager.drawCard(this.gsm.getCurrentPlayer());
+            this.gsm.territoryCardManager.drawCard(this.gsm.getCurrentPlayer());
         }
     }
 
