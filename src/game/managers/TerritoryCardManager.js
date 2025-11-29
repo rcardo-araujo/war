@@ -123,4 +123,8 @@ export default class TerritoryCardManager {
         let card = this.drawPile[this.drawPile.length - 1];
         this.changePlayerTerritoryCardOwnership(card.id, player);
     }
+
+    getTerritoryCard(territoryCardId){
+       return this.territoryCards[territoryCardId];
+    }
 }
