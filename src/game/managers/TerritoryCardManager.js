@@ -3,15 +3,18 @@ import TerritoryCard from "../gameObjects/TerritoryCard";
 export default class TerritoryCardManager {
     constructor (mapData) {
         this.territoryCards = {};
+        this.drawPile = [];
         this.initializeTerritoryCards(mapData);
-        
         this.usedTerritoryCards = new Set();
         this.currentTrade = 1;
     }
 
     initializeTerritoryCards (mapData) {
         mapData.territories.forEach(data => {
-            this.territoryCards[data.id] = new TerritoryCard(data.id, data.name, data.type);
+            let territory = new TerritoryCard(data.id, data.name, data.type);
+            this.territoryCards[data.id] = territory;
+            this.drawPile.push(territory);
+            this.shuffleDeck();
         });
     }
 
@@ -59,7 +62,7 @@ export default class TerritoryCardManager {
     
 
     calculateTradeBonus(player, tradedCardIds) {
-        const baseBonus = 4;
+        let baseBonus = 4;
 
         baseBonus += this.calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds);
         
@@ -88,7 +91,7 @@ export default class TerritoryCardManager {
     }
 
     calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds) {
-        const bonusTroops = 0;
+        let bonusTroops = 0;
 
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
@@ -105,6 +108,31 @@ export default class TerritoryCardManager {
         return bonusTroops;
     }
 
+    shuffleDeck() {
+        for (let i = this.drawPile.length -1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i+1));
+          let k = this.drawPile[i];
+          this.drawPile[i] = this.drawPile[j];
+          this.drawPile[j] = k;
+        }
+    }
+
+    drawCard(player){
+        if (this.drawPile.length === 0){
+            this.usedTerritoryCards.forEach(function(element){
+                this.drawPile.push(element);
+                this.usedTerritoryCards.delete(element);
+            })
+            this.shuffleDeck();
+        }
+        let card = this.drawPile[this.drawPile.length - 1];
+        this.changePlayerTerritoryCardOwnership(card.id, player);
+    }
+
+    getTerritoryCard(territoryCardId){
+       return this.territoryCards[territoryCardId];
+    }
+    
     clearOwnershipAfterTrade(player, tradedCardIds) {
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
@@ -114,17 +142,5 @@ export default class TerritoryCardManager {
                 player.territoryCards.splice(index, 1);
             }
         });
-    }
-
-    isUsedTerritoryCardsFull() {
-        return this.usedTerritoryCards.size === Object.keys(this.territoryCards).length;
-    }
-
-    reshuffleUsedTerritoryCards() {
-        this.usedTerritoryCards.forEach(cardId => {
-            const card = this.getTerritoryCard(cardId);
-            card.setOwner(null);
-        });
-        this.usedTerritoryCards.clear();
     }
 }
