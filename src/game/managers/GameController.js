@@ -118,6 +118,17 @@ export default class GameController {
         );
     }
 
+    checkPlayerElimination(){
+        console.log("Checando eliminação de jogadores...");
+        for (let player of this.gsm.playerManager.getPlayers()){
+            if (player.ownedTerritories.size === 0){
+                this.gsm.playerManager.removePlayer(player);
+                this.gsm.emit("game:playerEliminated", player);
+                console.log(`Jogador ${player.name} foi eliminado!`);
+            }
+        }
+    }
+
     handleTerritoryClick(territory) {
         switch (this.gsm.getCurrentPhase()) {
             case TURN_PHASES.FIRST_REINFORCEMENT:
@@ -126,6 +137,7 @@ export default class GameController {
                 break;
             case TURN_PHASES.ATTACK:
                 this.handleAttackClick(territory);
+                this.checkPlayerElimination();
                 break;
             case TURN_PHASES.STRATEGIC:
                 this.handleStrategicClick(territory);

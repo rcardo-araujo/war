@@ -168,4 +168,9 @@ export default class PlayerManager {
         }
         return false;
     }
+
+    removePlayer(player) {
+        let index = this.players.findIndex(p => p === player);
+        this.players.splice(index, 1);  
+    }
 }

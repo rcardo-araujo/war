@@ -165,5 +165,4 @@ export default class Player {
                 break;
         }
     }
-
 }
