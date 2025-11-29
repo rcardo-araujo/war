@@ -132,6 +132,7 @@ export default class TerritoryCardManager {
     getTerritoryCard(territoryCardId){
        return this.territoryCards[territoryCardId];
     }
+    
     clearOwnershipAfterTrade(player, tradedCardIds) {
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
@@ -141,17 +142,5 @@ export default class TerritoryCardManager {
                 player.territoryCards.splice(index, 1);
             }
         });
-    }
-
-    isUsedTerritoryCardsFull() {
-        return this.usedTerritoryCards.size === Object.keys(this.territoryCards).length;
-    }
-
-    reshuffleUsedTerritoryCards() {
-        this.usedTerritoryCards.forEach(cardId => {
-            const card = this.getTerritoryCard(cardId);
-            card.setOwner(null);
-        });
-        this.usedTerritoryCards.clear();
     }
 }
