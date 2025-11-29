@@ -337,8 +337,5 @@ export default class GameController {
         this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
         this.gsm.territoryCardManager.addUsedTerritoryCards(cards);
         this.gsm.emit("game:cardsTraded", player);
-        if (this.gsm.territoryCardManager.isUsedTerritoryCardsFull()) {
-            this.gsm.territoryCardManager.reshuffleUsedTerritoryCards();
-        }
     }
 }
