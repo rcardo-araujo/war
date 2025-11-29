@@ -10,7 +10,6 @@ export const bordersData = {
     'labrador-groenlandia': { x: 406, y: 145 },
     'mackenzie-groenlandia': { x: 369, y: 71 },
     'nova-guine-australia': { x: 1142, y: 551 },
-    'peninsula-iberica-argelia': { x: 540, y: 324 },
     'peninsula-iberica-egito': { x: 607, y: 317 },
     'polonia-egito': { x: 643, y: 330 },
     'reino-unido-alemanha': { x: 560, y: 249 },
