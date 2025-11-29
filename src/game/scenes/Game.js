@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { COLORS } from '../config/colors';
+import DebugTools from '../config/DebugTools';
 
 const highlightTerritoryNumber = Object.freeze({
     FIRST: "FIRST",
@@ -19,6 +20,9 @@ export class Game extends Scene {
 
     create() {
         this.gameState = new GameStateManager(this, this.playerSetup);
+
+        this.debug = new DebugTools(this.gameState);
+        window.debug = this.debug;
 
         this.add.image(0, 0, 'board-background')
             .setOrigin(0)
