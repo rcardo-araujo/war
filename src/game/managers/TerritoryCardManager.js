@@ -131,6 +131,7 @@ export default class TerritoryCardManager {
 
     getTerritoryCard(territoryCardId){
        return this.territoryCards[territoryCardId];
+    }
     clearOwnershipAfterTrade(player, tradedCardIds) {
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
