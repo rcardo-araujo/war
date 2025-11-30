@@ -355,9 +355,10 @@ export default class GameController {
             this.gsm.emit('game:setBotTurnActive', false);
         }
 
-        if (newPhase === TURN_PHASES.END){
+        if (newPhase === TURN_PHASES.END && this.capture) {
             this.gsm.territoryCardManager.drawCard(this.gsm.getCurrentPlayer());
             this.gsm.emit('game:cardDrawn', this.gsm.getCurrentPlayer());
+            console.log(`Jogador ${this.gsm.getCurrentPlayer().name} possui ${this.gsm.getCurrentPlayer().territoryCards.length} cartas.`);
         }
     }
 
