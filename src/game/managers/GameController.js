@@ -89,14 +89,13 @@ export default class GameController {
         ) {
             this.gsm.emit(
                 "game:error",
-                `Você ainda tem ${
-                    player.availableTroops +
-                    player.availableTroopsSouthAmerica +
-                    player.availableTroopsNorthAmerica +
-                    player.availableTroopsEurope +
-                    player.availableTroopsAfrica +
-                    player.availableTroopsAsia +
-                    player.availableTroopsOceania
+                `Você ainda tem ${player.availableTroops +
+                player.availableTroopsSouthAmerica +
+                player.availableTroopsNorthAmerica +
+                player.availableTroopsEurope +
+                player.availableTroopsAfrica +
+                player.availableTroopsAsia +
+                player.availableTroopsOceania
                 } tropas para alocar!`
             );
             return;
@@ -131,6 +130,19 @@ export default class GameController {
         console.log(
             `Alocadas ${troops} tropas para o território ${territory.name}`
         );
+    }
+
+    checkPlayerElimination(attackerPlayer, defenderPlayer) {
+        console.log("Checando eliminação de jogadores...");
+        if (defenderPlayer.ownedTerritories.size === 0) {
+            for(let card of defenderPlayer.territoryCards){
+                this.gsm.territoryCardManager.changePlayerTerritoryCardOwnership(card.id, attackerPlayer);
+            }
+
+            this.gsm.playerManager.removePlayer(defenderPlayer);
+            this.gsm.emit("game:playerEliminated", defenderPlayer);
+            console.log(`Jogador ${defenderPlayer.name} foi eliminado!`);
+        }
     }
 
     handleTerritoryClick(territory) {
@@ -242,6 +254,7 @@ export default class GameController {
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
         console.log("Ataque concluído");
+        this.checkPlayerElimination(attacker.owner, defender.owner);
         this.checkObjectiveForPlayer(attacker.owner, defendingPlayer);
     }
 

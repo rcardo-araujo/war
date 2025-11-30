@@ -16,6 +16,7 @@ export default class DebugTools {
         territory.removeTroops(territory.getTroopCount());
         territory.addTroops(1);
         
+        this.gsm.gameController.checkPlayerElimination(attacker, defender);
         this.gsm.gameController.checkObjectiveForPlayer(attacker, defender);
         console.log(`DebugTools: ${attacker.name} is the owner of ${territory.name}`);
     }
@@ -32,8 +33,14 @@ export default class DebugTools {
             this.attackTerritory(players[playerIndex].name, territory.id);
             playerIndex = (playerIndex + 1) % players.length;
         }
+    }
 
-        this.gsm.gameController.checkPlayerElimination();
+    eliminatePlayerWithAttacker(playerName, attackerName) {
+        let player = this.gsm.playerManager.getPlayers().find(p => p.name === playerName);
+        let attacker = this.gsm.playerManager.getPlayers().find(p => p.name === attackerName);
+        for (let territory of player.ownedTerritories) {
+            this.attackTerritory(attacker.name, territory.id);
+        }
     }
 
     skipFirstRound(){
