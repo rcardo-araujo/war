@@ -149,6 +149,13 @@ export default class PlayerManager {
             const totalTroops = this.totalTroopsForPlayer(defender);
             if (totalTroops === 0) {
                 if (obj.type === 'destruction' && player.objective.target === defender) {
+                    for (let p of this.players) {
+                        if (p.objective.type === 'destruction') {
+                            if (p != player && p.objective.target === defender) {
+                                p.objective = p.objective.default;
+                            }
+                        }
+                    }
                     return true;
                 }
                 else {
