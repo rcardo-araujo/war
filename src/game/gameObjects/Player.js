@@ -43,7 +43,7 @@ export default class Player {
     }
 
     setAvailableTroops() {
-        this.availableTroops = this.calculateReinforcements();
+        this.availableTroops += this.calculateReinforcements();
         this.setContinentBonus();
     }
     
