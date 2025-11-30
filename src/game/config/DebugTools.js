@@ -15,7 +15,7 @@ export default class DebugTools {
         this.gsm.emit("game:ownerChanged", territory.id);
         territory.removeTroops(territory.getTroopCount());
         territory.addTroops(1);
-
+        
         this.gsm.gameController.checkPlayerElimination(attacker, defender);
         this.gsm.gameController.checkObjectiveForPlayer(attacker, defender);
         console.log(`DebugTools: ${attacker.name} is the owner of ${territory.name}`);
@@ -35,17 +35,9 @@ export default class DebugTools {
         }
     }
 
-    eliminatePlayerWithAttacker(playerName, attackerName) {
-        let player = this.gsm.playerManager.getPlayers().find(p => p.name === playerName);
-        let attacker = this.gsm.playerManager.getPlayers().find(p => p.name === attackerName);
-        for (let territory of player.ownedTerritories) {
-            this.attackTerritory(attacker.name, territory.id);
-        }
-    }
-
-    skipFirstRound() {
+    skipFirstRound(){
         let players = this.gsm.playerManager.getPlayers();
-        for (let player of players) {
+        for (let player of players){
             let territory = player.ownedTerritories.values().next().value;
 
             this.gsm.emit("troopsAllocated", { troops: 4, territory: territory });
