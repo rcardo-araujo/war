@@ -302,6 +302,13 @@ export class UIScene extends Phaser.Scene {
         }
     }
 
+    showVictoryModal(player, objective) {
+        this.gameStateManager.emit("game:setMapInteractive", false);
+
+        const w = this.cameras.main.width;
+        const h = this.cameras.main.height;
+    }
+
     createTargetButton() {
         const padding = 60;
         const x = this.cameras.main.width - padding;
