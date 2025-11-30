@@ -50,7 +50,8 @@ export default class GameController {
         this.gsm.turnManager.on("nextTurn", this.onNextTurn, this);
 
         this.gsm.on("ui:tradeCardsClicked", this.handleTradeClick, this);
-        this.gsm.on("game:tradeCardsConfirmed", this.onTradeCommit, this);
+        this.gsm.on("game:tradeCardsConfirmed", this.onTradeConfirm, this);
+        this.gsm.on("game:tradeCardsCommitted", this.onTradeCommit, this);
     }
 
     checkObjectiveForPlayer(player, defender) {
@@ -356,6 +357,7 @@ export default class GameController {
 
         if (newPhase === TURN_PHASES.END){
             this.gsm.territoryCardManager.drawCard(this.gsm.getCurrentPlayer());
+            this.gsm.emit('game:cardDrawn', this.gsm.getCurrentPlayer());
         }
     }
 
@@ -394,6 +396,23 @@ export default class GameController {
                 "Você não possui cartas suficientes que satisfaçam a troca!"
             );
         }
+    }
+
+    onTradeConfirm(currentPlayer) {
+        const selectedCards = this.gsm.territoryCardManager.selectTerritoryCardsForTradeAutomatically(currentPlayer);
+
+        this.gsm.emit("game:tradeCardsConfirmed", {currentPlayer, selectedCards});
+    }
+
+    onTradeCommit({ player, cards }) {
+        const bonusTroops = this.gsm.territoryCardManager.calculateTradeBonus(
+            player,
+            cards
+        );
+        player.availableTroops += bonusTroops;
+        this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
+        this.gsm.territoryCardManager.addUsedTerritoryCards(cards);
+        this.gsm.emit("game:cardsTraded", player);
     }
 
     onSceneReady(){
@@ -681,16 +700,5 @@ export default class GameController {
 
         this.gsm.emit('game:setMapInteractive', true);
         this.gsm.turnManager.endPhase();
-    }
-
-    onTradeCommit({ player, cards }) {
-        const bonusTroops = this.gsm.territoryCardManager.calculateTradeBonus(
-            player,
-            cards
-        );
-        player.availableTroops += bonusTroops;
-        this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
-        this.gsm.territoryCardManager.addUsedTerritoryCards(cards);
-        this.gsm.emit("game:cardsTraded", player);
     }
 }
