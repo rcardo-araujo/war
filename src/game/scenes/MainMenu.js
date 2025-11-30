@@ -84,6 +84,7 @@ export class MainMenu extends Scene
 
     changeScene ()
     {
+        localStorage.clear();
         this.scene.start('PlayerSelection');
     }
 }
