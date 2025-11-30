@@ -2,7 +2,7 @@ import { PLAYER_TYPES } from "../config/playerTypes";
 import TurnManager from "../managers/TurnManager";
 
 export default class BotService{
-    constructor(apiUrl = 'http://localhost:8080', statusUrl = 'http://localhost:8082'){
+    constructor(apiUrl = 'https://warllm.gdac7.xyz', statusUrl = 'https://warstats.gdac7.xyz'){
         this.apiUrl = apiUrl;
         this.statusUrl = statusUrl;
         this.wantsStatus = true
