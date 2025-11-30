@@ -333,6 +333,61 @@ export class UIScene extends Phaser.Scene {
         const SPACING = 36;
 
         let cursorY = cardY + PADDING_TOP;
+
+        this.victoryTitle = this.add.text(
+            w / 2,
+            cursorY,
+            "⟡ VITÓRIA ⟡",
+            {
+                font: "30px JetBrainsMono",
+                color: "#ffffff",
+                align: "center",
+                wordWrap: { width: cardW - SIDE_PADDING * 2 }
+            }
+        )
+            .setOrigin(0.5, 0)
+            .setDepth(30003);
+
+        let bounds = this.victoryTitle.getBounds();
+        cursorY = bounds.y + bounds.height + SPACING;
+
+        const msg = `O jogador ${player?.name ?? "Jogador"} alcançou seu objetivo e venceu a partida!`;
+        this.victoryMessage = this.add.text(
+            w / 2,
+            cursorY,
+            msg,
+            {
+                font: "18px JetBrainsMono",
+                color: "#ffffff",
+                align: "center",
+                wordWrap: { width: cardW - SIDE_PADDING * 2 }
+            }
+        )
+            .setOrigin(0.5, 0)
+            .setDepth(30003);
+
+        bounds = this.victoryMessage.getBounds();
+        cursorY = bounds.y + bounds.height + SPACING;
+
+        if (objective && (objective.description || objective.main)) {
+            const obj = objective.description ?? objective.main ?? "";
+            this.victoryObjective = this.add.text(
+                w / 2,
+                cursorY,
+                obj,
+                {
+                    font: "16px JetBrainsMono",
+                    color: "#cccccc",
+                    align: "center",
+                    wordWrap: { width: cardW - SIDE_PADDING * 2 }
+                }
+            )
+                .setOrigin(0.5, 0)
+                .setDepth(30003);
+
+            bounds = this.victoryObjective.getBounds();
+            cursorY = bounds.y + bounds.height + SPACING;
+        }
     }
 
     createTargetButton() {
