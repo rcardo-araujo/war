@@ -32,32 +32,38 @@ export default class TerritoryCardManager {
 
     checkTradeEligibility(player) {
         const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
-        if (playerOwnedCards.length > 2) {
-            if (playerOwnedCards.length > 2 && playerOwnedCards.length < 5) {
-                circle_count = 0;
-                square_count = 0;
-                triangle_count = 0;
 
-                for (let card of playerOwnedCards) {
-                    if (card.type === 'circle') {
-                        circle_count += 1;
-                    } else if (card.type === 'square') {
-                        square_count += 1;
-                    } else if (card.type === 'triangle') {
-                        triangle_count += 1;
-                    }
-                }
-
-                if (circle_count === 3 || square_count === 3 || triangle_count === 3 || 
-                    (circle_count >= 1 && square_count >= 1 && triangle_count >= 1)) {
-                    return true;
-                }
-                return false;
-            }
+        // Precisa de pelo menos 3 cartas para trocar
+        if (playerOwnedCards.length < 3) {
+            return false;
         }
-        else {
+
+        // Com 5 ou mais cartas, a troca é obrigatória
+        if (playerOwnedCards.length >= 5) {
             return true;
         }
+
+        // Com 3-4 cartas, verifica se tem combinação válida
+        let circle_count = 0;
+        let square_count = 0;
+        let triangle_count = 0;
+
+        for (let card of playerOwnedCards) {
+            if (card.type === 'circle') {
+                circle_count += 1;
+            } else if (card.type === 'square') {
+                square_count += 1;
+            } else if (card.type === 'triangle') {
+                triangle_count += 1;
+            }
+        }
+
+        // Retorna true se tiver trio do mesmo tipo OU um de cada tipo
+        if (circle_count >= 3 || square_count >= 3 || triangle_count >= 3 ||
+            (circle_count >= 1 && square_count >= 1 && triangle_count >= 1)) {
+            return true;
+        }
+        return false;
     }   
     
 
