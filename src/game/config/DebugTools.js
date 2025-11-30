@@ -35,6 +35,14 @@ export default class DebugTools {
         }
     }
 
+    eliminatePlayerWithAttacker(playerName, attackerName) {
+        let player = this.gsm.playerManager.getPlayers().find(p => p.name === playerName);
+        let attacker = this.gsm.playerManager.getPlayers().find(p => p.name === attackerName);
+        for (let territory of player.ownedTerritories) {
+            this.attackTerritory(attacker.name, territory.id);
+        }
+    }
+
     skipFirstRound(){
         let players = this.gsm.playerManager.getPlayers();
         for (let player of players){
