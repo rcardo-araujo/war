@@ -30,6 +30,44 @@ export default class TerritoryCardManager {
         newOwner.territoryCards.push(territoryCardId);
     }
 
+    selectTerritoryCardsForTradeAutomatically(player) {
+        const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
+
+        let selectedCards = [];
+
+        // Prioriza trios do mesmo tipo
+        const typeCounts = {};
+
+        for (let card of playerOwnedCards) {
+            if (!typeCounts[card.type]) {
+                typeCounts[card.type] = [];
+            }
+            typeCounts[card.type].push(card);
+        }
+
+        for (let type in typeCounts) {
+            if (typeCounts[type].length >= 3) {
+                selectedCards = typeCounts[type].slice(0, 3);
+                return selectedCards;
+            }   
+        }
+
+        // Se não houver trios, tenta um de cada tipo
+        const types = ['circle', 'square', 'triangle'];
+        const oneOfEach = [];
+        for (let type of types) {
+            const card = playerOwnedCards.find(card => card.type === type);
+            if (card) {
+                oneOfEach.push(card);
+            }
+        }
+
+        if (oneOfEach.length === 3) {
+            selectedCards = oneOfEach;
+        }
+        return selectedCards;
+    }
+
     checkTradeEligibility(player) {
         const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
 
