@@ -6,3 +6,9 @@ export function storePlayers(players, currentPlayer){
 export function storeTerritories(territories){
         localStorage.setItem('territories', JSON.stringify(territories));
     }
+
+export function deleteOngoingGame(){
+    localStorage.removeItem('players');
+    localStorage.removeItem('currentPlayer');
+    localStorage.removeItem('territories');
+}

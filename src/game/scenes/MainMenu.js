@@ -2,6 +2,7 @@ import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig'
 import { COLORS } from '../config/colors';
+import { deleteOngoingGame } from '../utils/store';
 
 export class MainMenu extends Scene
 {
@@ -84,7 +85,7 @@ export class MainMenu extends Scene
 
     changeScene ()
     {
-        localStorage.clear();
+        deleteOngoingGame();
         this.scene.start('PlayerSelection');
     }
 }
