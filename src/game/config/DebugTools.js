@@ -6,6 +6,7 @@ export default class DebugTools {
     attackTerritory(atackerName, territoryId) {
         let territory = this.gsm.getTerritory(territoryId);
         let attacker = this.gsm.playerManager.getPlayers().find(p => p.name === atackerName);
+        let defender = territory.owner;
 
         this.gsm.mapManager.changePlayerTerritoryOwnership(
             territory.id,
@@ -14,7 +15,8 @@ export default class DebugTools {
         this.gsm.emit("game:ownerChanged", territory.id);
         territory.removeTroops(territory.getTroopCount());
         territory.addTroops(1);
-
+        
+        this.gsm.gameController.checkObjectiveForPlayer(attacker, defender);
         console.log(`DebugTools: ${attacker.name} is the owner of ${territory.name}`);
     }
 
