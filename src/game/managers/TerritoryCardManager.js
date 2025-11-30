@@ -68,6 +68,13 @@ export default class TerritoryCardManager {
         return selectedCards;
     }
 
+    isPlayerObligatedToTrade(player) {
+        if (player.territoryCards.length >= 5) {
+            return true;
+        }
+        return false;
+    }
+
     checkTradeEligibility(player) {
         const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
 
