@@ -46,7 +46,7 @@ export class UIScene extends Phaser.Scene {
 
         this.gameStateManager.on('game:cardDrawn', (player) => {
             if (player === this.gameStateManager.getCurrentPlayer()) {
-                this.hud.territoryCards.updateCardCount(player.territoryCards.length);
+                this.hud.updateTerritoryCardsCount(player.territoryCards.length);
             }
         });
 
@@ -62,7 +62,7 @@ export class UIScene extends Phaser.Scene {
 
         this.gameStateManager.on('game:cardsTraded', (player) => {
             if (player === this.gameStateManager.getCurrentPlayer()) {
-                this.hud.territoryCards.updateCardCount(player.territoryCards.length);
+                this.hud.updateTerritoryCardsCount(player.territoryCards.length);
             }
         }, this);
 
@@ -119,7 +119,7 @@ export class UIScene extends Phaser.Scene {
                 this.targetElipse.setTint(newPlayer.color);
             }
 
-            this.hud.territoryCards.updateCardCount(newPlayer.territoryCards.length);
+            this.hud.updateTerritoryCardsCount(newPlayer.territoryCards.length);
 
         }, this);
 
