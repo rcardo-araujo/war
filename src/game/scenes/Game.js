@@ -121,7 +121,6 @@ export class Game extends Scene {
             }
         }, this);
         
-        // MERGE: Listener da sua branch
         this.gameState.on('game:attackResult', ({winnerId, loserId}) => {
             this.flashAttackResult(winnerId, loserId);
         })
@@ -161,7 +160,6 @@ export class Game extends Scene {
     updateTroops(territoryId) {
         const troopText = this.territorySprites[territoryId].troops;
         troopText.setText(this.gameState.getTerritory(territoryId).getTroopCount());
-        // MERGE: Mantendo funcionalidade visual da sua branch
         this.flashTerritory(territoryId);
     }
 
@@ -180,7 +178,6 @@ export class Game extends Scene {
         counterStroke.setTint(newColor);
     }
 
-    // MERGE: Método visual da sua branch (HEAD)
     flashTerritory(territoryId){
         const sprites = this.territorySprites[territoryId];
         const originalColor = this.gameState.getTerritory(territoryId).owner.getColor();
@@ -207,7 +204,6 @@ export class Game extends Scene {
         })
     }
 
-    // MERGE: Método visual da sua branch (HEAD)
     flashAttackResult(winnerId, loserId){
         const winnerSprites = this.territorySprites[winnerId];
         const loserSprites = this.territorySprites[loserId];
@@ -246,7 +242,6 @@ export class Game extends Scene {
         })
     }
 
-    // MERGE: Método estrutural da branch DEV (necessário para os listeners funcionarem)
     highlightTerritorySelection(territory, color, territoryNumber) {
         this.highlightTerritory(territory, color);
         if (territoryNumber === highlightTerritoryNumber.FIRST) {

@@ -8,8 +8,10 @@ export default class BotService{
         this.wantsStatus = true
         this.totalReinforcementCalls = 0;
         this.totalAttackCalls = 0;
+        this.totalStrategicCalls = 0;
         this.reinforcementFallbackCount = 0;
         this.attackFallbackCount = 0;
+        this.strategicFallbackCount = 0;
         this.apiErrors = 0;
     }
 
@@ -19,6 +21,8 @@ export default class BotService{
             "attackFallbackCount": this.attackFallbackCount,
             "totalReinforcementCalls": this.totalReinforcementCalls,
             "reinforcementFallbackCount": this.reinforcementFallbackCount,
+            "totalStrategicCalls": this.totalStrategicCalls,
+            "strategicFallbackCount": this.strategicFallbackCount,
             "apiErrors": this.apiErrors,
         }
         return data;
@@ -143,7 +147,7 @@ export default class BotService{
                         sourceId: source.id,
                         sourceTroops: source.troops,
                         sourceContinent: source.continent,
-                        targetId: target.id,                    
+                        targetId: target.id,
                         targetTroops: target.troops,
                         targetColor: target.color,
                         targetContinent: target.continent,
@@ -152,7 +156,7 @@ export default class BotService{
                 }
             });
 
-        });        
+        });
         const requestData = {
             data: {
                 objectiveType: objectiveType,
@@ -163,6 +167,62 @@ export default class BotService{
         };
         return await this.getBotResponse(requestData, "attack");
     }
+
+    async getStrategicDecision(gameStateManager){
+        this.totalStrategicCalls += 1
+        const currentPlayer = gameStateManager.getCurrentPlayer();
+        const mapManager = gameStateManager.mapManager;
+        const movementController = gameStateManager.movementController;
+        const objectiveDescription = currentPlayer.objective.description;
+        const validMoves = [];
+
+        Array.from(currentPlayer.ownedTerritories).forEach(source => {
+            const availableTroops = movementController.getAvailableTroops(source);
+            if (availableTroops < 1) {
+                return;
+            }
+
+            const isBorderSource = Array.from(source.neighbors).some(neighborId => {
+                const neighbor = mapManager.getTerritory(neighborId);
+                return neighbor && neighbor.owner !== currentPlayer;
+            });
+
+            Array.from(source.neighbors).forEach(neighborId => {
+                const target = mapManager.getTerritory(neighborId);
+                if (target && target.owner === currentPlayer){
+                    const isBorderTarget = Array.from(target.neighbors).some(nId => {
+                        const neighbor = mapManager.getTerritory(nId);
+                        return neighbor && neighbor.owner !== currentPlayer;
+                    });
+
+                    validMoves.push({
+                        fromId: source.id,
+                        fromName: source.name,
+                        fromTroops: source.troops,
+                        fromContinent: source.continent,
+                        fromIsBorder: isBorderSource,
+                        toId: target.id,
+                        toName: target.name,
+                        toTroops: target.troops,
+                        toContinent: target.continent,
+                        toIsBorder: isBorderTarget,
+                        availableTroops: availableTroops
+                    });
+                }
+            });
+        });
+
+        const requestData = {
+            data: {
+                objectiveDescription: objectiveDescription,
+                validMoves: validMoves,
+                botName: currentPlayer.name,
+            }
+        };
+        return await this.getBotResponse(requestData, "strategic");
+    }
+
+    // FALLBACKS
 
     getFallbackReinforcement(gsm, currentPlayer){
         this.reinforcementFallbackCount += 1
@@ -185,9 +245,14 @@ export default class BotService{
         return {action: "reinforcement_fallback", placements: placements};
     }
 
-    
+
     getFallbackAttack(){
         this.attackFallbackCount += 1;
+    }
+
+    getFallbackStrategic(){
+        this.strategicFallbackCount += 1;
+        return {action: "strategic", skipMove: true};
     }
 
 }

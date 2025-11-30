@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { TURN_PHASES } from '../managers/TurnManager';
-import { PLAYER_TYPES } from '../config/playerTypes'; // HEAD: Importante para o Bot
-import { GameHUD } from '../ui/GameHUD'; // DEV: Nova UI
+import { PLAYER_TYPES } from '../config/playerTypes'; 
+import { GameHUD } from '../ui/GameHUD'; 
 
 export class UIScene extends Phaser.Scene {
     constructor() {
@@ -16,7 +16,6 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
-        // MERGE: Usando a nova classe GameHUD da Dev
         this.hud = new GameHUD(this);
 
         const initialPhase = this.gameStateManager.getCurrentPhase();
@@ -26,8 +25,6 @@ export class UIScene extends Phaser.Scene {
 
         if(currentPlayer) {
             this.hud.updateColor(currentPlayer.color);
-            
-            // MERGE: Lógica do Bot da HEAD aplicada na estrutura da DEV
             const isBot = currentPlayer.type === PLAYER_TYPES.BOT;
             this.setButtonInteractive(!isBot);
         }
@@ -39,12 +36,10 @@ export class UIScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        // Listener do botão da HUD (Dev structure)
         this.hud.nextButton.on('pointerdown', () => {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
 
-        // Eventos gerais
         this.gameStateManager.on('game:phaseChanged', (newPhase) => {
             this.hud.updatePhase(newPhase);
         }, this);
@@ -57,9 +52,8 @@ export class UIScene extends Phaser.Scene {
             this.showTroopInput(territory, currentPlayer);
         });
 
-        // --- LÓGICA DE ATAQUE (HEAD/Shared) ---
+        
         this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
-            // Reutilizando showConfirmButton para ambos os casos
             this.showConfirmButton("Confirm Attack", () => {
                 this.gameStateManager.emit('game:attackConfirmed', defenderTerritory, attackerTerritory, this);
             })
@@ -75,7 +69,6 @@ export class UIScene extends Phaser.Scene {
         }, this);
 
 
-        // --- LÓGICA DE ESTRATÉGIA/MOVIMENTO (DEV) ---
         this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
             this.showConfirmButton("Confirm Strategy", () => {
                 this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
@@ -91,25 +84,21 @@ export class UIScene extends Phaser.Scene {
             this.showStrategyInput(originTerritory, destinationTerritory);
         }, this);
 
-
-        // --- LÓGICA DE TURNO E BOT (MERGE) ---
+        
         this.gameStateManager.on('game:nextTurn', (newPlayer) => {
-            // Atualiza HUD (Dev)
+          
             this.hud.updateColor(newPlayer.color);
             
-            // Atualiza Target Button (Dev)
             if (this.targetElipse && newPlayer && newPlayer.color) {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
 
-        // Controle do Bot sobre a UI (HEAD)
         this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
             this.setButtonInteractive(!isActive);
         }, this);
     }
 
-    // MERGE: Adaptado para funcionar com a GameHUD
     setButtonInteractive(isInteractive) {
         if (!this.hud || !this.hud.nextButton) return;
 
