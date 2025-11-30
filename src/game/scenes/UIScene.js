@@ -437,6 +437,28 @@ export class UIScene extends Phaser.Scene {
         });
     }
 
+    hideVictoryModal() {
+        if (this.victoryOverlay) this.victoryOverlay.destroy();
+        if (this.victoryCardBg) this.victoryCardBg.destroy();
+        if (this.victoryTitle) this.victoryTitle.destroy();
+        if (this.victoryMessage) this.victoryMessage.destroy();
+        if (this.victoryObjective) this.victoryObjective.destroy();
+
+        if (this.victoryReturnBg) this.victoryReturnBg.destroy();
+
+        if (this.victoryReturn) this.victoryReturn.destroy();
+
+        this.victoryOverlay = null;
+        this.victoryCardBg = null;
+        this.victoryTitle = null;
+        this.victoryMessage = null;
+        this.victoryObjective = null;
+        this.victoryReturnBg = null;
+        this.victoryReturn = null;
+
+        this.gameStateManager.emit('game:setMapInteractive', true);
+    }
+
     createTargetButton() {
         const padding = 60;
         const x = this.cameras.main.width - padding;
