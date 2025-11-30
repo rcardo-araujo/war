@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { TURN_PHASES } from '../managers/TurnManager';
-import { GameHUD } from '../ui/GameHUD';
+import { PLAYER_TYPES } from '../config/playerTypes'; 
+import { GameHUD } from '../ui/GameHUD'; 
 
 export class UIScene extends Phaser.Scene {
     constructor() {
@@ -18,12 +19,14 @@ export class UIScene extends Phaser.Scene {
         this.hud = new GameHUD(this);
 
         const initialPhase = this.gameStateManager.getCurrentPhase();
-        let currentPlayer = this.gameStateManager.getCurrentPlayer();
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
 
         this.hud.updatePhase(initialPhase);
 
         if(currentPlayer) {
             this.hud.updateColor(currentPlayer.color);
+            const isBot = currentPlayer.type === PLAYER_TYPES.BOT;
+            this.setButtonInteractive(!isBot);
         }
 
         this.confirmButton = null;
@@ -33,53 +36,79 @@ export class UIScene extends Phaser.Scene {
     }
 
     setupEvents() {
-        this.gameStateManager.on('game:phaseChanged', (newPhase) => {
-            this.hud.updatePhase(newPhase);
-        }, this);
         this.hud.nextButton.on('pointerdown', () => {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
+
+        this.gameStateManager.on('game:phaseChanged', (newPhase) => {
+            this.hud.updatePhase(newPhase);
+        }, this);
+
         this.gameStateManager.on('game:error', (message) => {
             alert(message);
         }, this);
+
         this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
             this.showTroopInput(territory, currentPlayer);
         });
 
-
+        
         this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
             this.showConfirmButton("Confirm Attack", () => {
                 this.gameStateManager.emit('game:attackConfirmed', defenderTerritory, attackerTerritory, this);
             })
         }, this);
+
         this.gameStateManager.on('game:unselectAttacker', (territory) => {
             this.hideConfirmButton();
         }, this);
+
         this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
             this.hideConfirmButton();
             this.showAttackInput(attackerTerritory, defenderTerritory);
         }, this);
 
-        this.gameStateManager.on('game:nextTurn', (player) => {
-            this.hud.updateColor(player.color); 
-        }, this);
+
         this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
             this.showConfirmButton("Confirm Strategy", () => {
                 this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
             })
         }, this);
+
         this.gameStateManager.on('game:unselectOrigin', (territory) => {
             this.hideConfirmButton();
         }, this);
+
         this.gameStateManager.on('game:strategyConfirmed', (destinationTerritory, originTerritory) => {
             this.hideConfirmButton();
             this.showStrategyInput(originTerritory, destinationTerritory);
         }, this);
+
+        
         this.gameStateManager.on('game:nextTurn', (newPlayer) => {
+          
+            this.hud.updateColor(newPlayer.color);
+            
             if (this.targetElipse && newPlayer && newPlayer.color) {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
+
+        this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
+            this.setButtonInteractive(!isActive);
+        }, this);
+    }
+
+    setButtonInteractive(isInteractive) {
+        if (!this.hud || !this.hud.nextButton) return;
+
+        if (isInteractive) {
+            this.hud.nextButton.setInteractive();
+            this.hud.nextButton.setAlpha(1);
+        } else {
+            this.hud.nextButton.disableInteractive();
+            this.hud.nextButton.setAlpha(0.5);
+        }
     }
 
     showTroopInput(territory, currentPlayer) {
@@ -123,7 +152,7 @@ export class UIScene extends Phaser.Scene {
                     inputContainer.destroy();
                 }
             });
-        }
+    }
 
     showAttackInput(attackerTerritory, defenderTerritory) {
         const centerX = this.cameras.main.centerX;

@@ -14,7 +14,7 @@ export default class PlayerManager {
     initializePlayers(playerConfigs = []) {
         this.players = playerConfigs
             .filter(cfg => cfg.type !== PLAYER_TYPES.NONE)
-            .map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color)));
+            .map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color), cfg.type));
     }
 
     initializeObjectives(objectivesData) {
@@ -87,11 +87,10 @@ export default class PlayerManager {
     }
 
     totalTroopsForPlayer(player) {
-        let totalTroops = 0;
-        player.ownedTerritories.forEach(territory => {
-            totalTroops += territory.getTroopCount();
-        });
-        return totalTroops;
+        return Array.from(player.ownedTerritories).reduce(
+            (sum, t) => sum + (t?.getTroopCount?.() ?? 0),
+            0
+        );
     }
 
     checkAccumulateObjective(player) {

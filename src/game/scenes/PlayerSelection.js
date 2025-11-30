@@ -176,19 +176,11 @@ export class PlayerSelection extends Scene {
     }
     
     updateArrow(){
-        if (this.botCount == (this.playerCount - 1)){
-            this.cards.forEach((card, index) =>{
-                if(card.playerType==PLAYER_TYPES.HUMAN){
-                    card.selector.leftArrow.setVisible(false);
-                    card.selector.rightArrow.setVisible(false);
-                } 
-            });
-        } else {
-            this.cards.forEach((card, index) =>{
-                card.selector.leftArrow.setVisible(true);
-                card.selector.rightArrow.setVisible(true);
-            });
-        }
+        // Permite todos serem bots - sem restrição
+        this.cards.forEach((card, index) =>{
+            card.selector.leftArrow.setVisible(true);
+            card.selector.rightArrow.setVisible(true);
+        });
     }
 
     updateStartButton(){
