@@ -121,13 +121,12 @@ export default class PlayerManager {
 
         if (Array.isArray(main.continents) && main.continents.length > 0) {
             const territories = Object.values(mapManager.territories);
-            const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]/g, '');
 
             for (let continentName of main.continents) {
                 if (continentName === 'X') {
                     continue;
                 }
-                const neededTerritories = territories.filter(t => normalize(t.continent) === normalize(continentName));
+                const neededTerritories = territories.filter(t => t.continent === continentName);
                 if (neededTerritories.length === 0) {
                     return false;
                 }
