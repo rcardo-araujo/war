@@ -431,8 +431,10 @@ export class UIScene extends Phaser.Scene {
 
         this.victoryReturn.on('pointerdown', () => {
             try {
-                this.scene.stop('Game');
-            } catch (e) { }
+                window.location.reload();
+            } catch (e) { 
+                window.location.reload();
+            }
             this.scene.start('MainMenu');
         });
     }
