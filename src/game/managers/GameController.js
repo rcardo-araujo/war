@@ -408,9 +408,70 @@ export default class GameController {
     }
 
     ///////// BOT METHODS
+
+    selectCardsForBotTrade(player) {
+        const playerCards = Object.values(this.gsm.territoryCardManager.territoryCards)
+            .filter(card => card.owner === player);
+
+        const cardsByType = {
+            circle: [],
+            square: [],
+            triangle: []
+        };
+
+        playerCards.forEach(card => {
+            if (cardsByType[card.type]) {
+                cardsByType[card.type].push(card.id);
+            }
+        });
+
+        if (cardsByType.circle.length >= 3) {
+            return cardsByType.circle.slice(0, 3);
+        }
+        if (cardsByType.square.length >= 3) {
+            return cardsByType.square.slice(0, 3);
+        }
+        if (cardsByType.triangle.length >= 3) {
+            return cardsByType.triangle.slice(0, 3);
+        }
+
+        if (cardsByType.circle.length >= 1 &&
+            cardsByType.square.length >= 1 &&
+            cardsByType.triangle.length >= 1) {
+            return [
+                cardsByType.circle[0],
+                cardsByType.square[0],
+                cardsByType.triangle[0]
+            ];
+        }
+
+        return null;
+    }
+
+    
+    executeBotCardTrade(player) {
+        if (!this.gsm.territoryCardManager.checkTradeEligibility(player)) {
+            return;
+        }
+
+        const cardsToTrade = this.selectCardsForBotTrade(player);
+
+        if (!cardsToTrade || cardsToTrade.length !== 3) {
+            console.log(`Bot ${player.name} não conseguiu selecionar cartas para troca`);
+            return;
+        }
+
+        console.log(`Bot ${player.name} trocando cartas: ${cardsToTrade.join(', ')}`);
+
+        this.onTradeCommit({ player, cards: cardsToTrade });
+    }
+
     async executeBotReinforcement(currentPlayer, phase){
         console.log(`Bot ${currentPlayer.name} pensando (${phase})...`)
         this.gsm.emit('game:setMapInteractive', false);
+
+        this.executeBotCardTrade(currentPlayer);
+
         let decision = null
         try {
             decision = await this.botService.getReinforcementDecision(this.gsm, phase);
