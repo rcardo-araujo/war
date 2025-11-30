@@ -2,6 +2,8 @@ import { TURN_PHASES } from './TurnManager';
 import { executeCombat } from '../utils/diceRoller';
 import BotService from '../services/BotService';
 import { PLAYER_TYPES } from '../config/playerTypes';
+import { storePlayers } from "../utils/store";
+import { storeTerritories } from "../utils/store";
 
 export default class GameController {
     constructor(gsm) {
@@ -350,11 +352,11 @@ export default class GameController {
 
         this.capture = false;
         this.movementController.reset();
-
+        storeTerritories(this.gsm.mapManager.territories);
+        storePlayers(this.gsm.playerManager.getPlayers(), this.gsm.getCurrentPlayer());
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.gsm.emit('game:nextTurn', newPlayer);
-
         const currentPhase = this.gsm.getCurrentPhase();
         if (newPlayer.type === PLAYER_TYPES.BOT) {
             this.gsm.emit('game:setBotTurnActive', true);
@@ -363,7 +365,8 @@ export default class GameController {
             }
         } else {
             this.gsm.emit('game:setBotTurnActive', false);
-        }
+        }     
+
     }
 
     handleTradeClick() {
