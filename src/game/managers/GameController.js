@@ -102,6 +102,11 @@ export default class GameController {
             return;
         }
 
+        if (phase === TURN_PHASES.END && this.gsm.territoryCardManager.isPlayerObligatedToTrade(player)) {
+            this.gsm.emit("game:error", "Você possui 5 ou mais cartas de território e é obrigado a trocar antes de terminar a fase.");
+            return;
+        }
+
         this.gsm.turnManager.endPhase();
     }
 
