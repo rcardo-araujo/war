@@ -1,5 +1,7 @@
 import { Scene } from 'phaser';
 import { TURN_PHASES } from '../managers/TurnManager';
+import { PLAYER_TYPES } from '../config/playerTypes'; 
+import { GameHUD } from '../ui/GameHUD'; 
 
 export class UIScene extends Phaser.Scene {
     constructor() {
@@ -14,62 +16,53 @@ export class UIScene extends Phaser.Scene {
     }
 
     create() {
-        const padding = 20;
-        const bottomY = this.cameras.main.height - padding;
-        const leftX = padding;
+        this.hud = new GameHUD(this);
 
-        let currentPlayer = this.gameStateManager.getCurrentPlayer();
-        this.label = this.add.text(leftX, bottomY, 'Turno do Jogador #' + currentPlayer.name, {
-            font: '15px Arial',
-            fill: '#ffffff',
-            backgroundColor: `#${currentPlayer.color.toString(16).padStart(6, '0')}`,
-            padding: { x: 10, y: 10 },
-            align: 'center'
-        }).setOrigin(0, 1);
+        const initialPhase = this.gameStateManager.getCurrentPhase();
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
 
-        this.button = this.add.text(leftX, bottomY - this.label.height, 'Próximo turno', {
-            font: '12px Arial',
-            fill: '#ffffff',
-            backgroundColor: '#007bff',
-            padding: { x: 8, y: 8 },
-            align: 'center'
-        })
-            .setOrigin(0, 1)
-            .setInteractive();
+        this.hud.updatePhase(initialPhase);
 
-        this.phaseText = this.add.text(10, 10, `Fase: `);
+        if(currentPlayer) {
+            this.hud.updateColor(currentPlayer.color);
+            const isBot = currentPlayer.type === PLAYER_TYPES.BOT;
+            this.setButtonInteractive(!isBot);
+        }
 
-        this.button.on('pointerdown', () => {
-            this.gameStateManager.emit('ui:endPhaseClicked');
-        });
         this.confirmButton = null;
+        this.createTargetButton();
 
-        this.createTargetButton();        
         this.setupEvents();
-        this.updateButtonText(this.gameStateManager.getCurrentPhase());
-        this.updatePhaseText(this.gameStateManager.getCurrentPhase());
     }
 
     setupEvents() {
-        this.gameStateManager.on('game:nextTurn', this.updateTurnLabel, this);
-        this.gameStateManager.on('game:phaseChanged', this.updateButtonText, this);
-        this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
+        this.hud.nextButton.on('pointerdown', () => {
+            this.gameStateManager.emit('ui:endPhaseClicked');
+        });
+
+        this.gameStateManager.on('game:phaseChanged', (newPhase) => {
+            this.hud.updatePhase(newPhase);
+        }, this);
+
         this.gameStateManager.on('game:error', (message) => {
             alert(message);
         }, this);
+
         this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
             this.showTroopInput(territory, currentPlayer);
         });
 
-
+        
         this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
             this.showConfirmButton("Confirm Attack", () => {
                 this.gameStateManager.emit('game:attackConfirmed', defenderTerritory, attackerTerritory, this);
             })
         }, this);
+
         this.gameStateManager.on('game:unselectAttacker', (territory) => {
             this.hideConfirmButton();
         }, this);
+
         this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
             this.hideConfirmButton();
             this.showAttackInput(attackerTerritory, defenderTerritory);
@@ -81,37 +74,41 @@ export class UIScene extends Phaser.Scene {
                 this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
             })
         }, this);
+
         this.gameStateManager.on('game:unselectOrigin', (territory) => {
             this.hideConfirmButton();
         }, this);
+
         this.gameStateManager.on('game:strategyConfirmed', (destinationTerritory, originTerritory) => {
             this.hideConfirmButton();
             this.showStrategyInput(originTerritory, destinationTerritory);
         }, this);
+
+        
         this.gameStateManager.on('game:nextTurn', (newPlayer) => {
+          
+            this.hud.updateColor(newPlayer.color);
+            
             if (this.targetElipse && newPlayer && newPlayer.color) {
                 this.targetElipse.setTint(newPlayer.color);
             }
         }, this);
+
+        this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
+            this.setButtonInteractive(!isActive);
+        }, this);
     }
 
-    updateTurnLabel(newPlayer) {
-        this.label.setText("Turno do jogador # " + newPlayer.name);
-        this.label.setStyle({
-            backgroundColor: `#${newPlayer.color.toString(16).padStart(6, '0')}`
-        });
-    }
+    setButtonInteractive(isInteractive) {
+        if (!this.hud || !this.hud.nextButton) return;
 
-    updateButtonText(newPhase) {
-        if (newPhase === TURN_PHASES.FIRST_REINFORCEMENT || newPhase === TURN_PHASES.END) {
-            this.button.setText('Finalizar turno');
+        if (isInteractive) {
+            this.hud.nextButton.setInteractive();
+            this.hud.nextButton.setAlpha(1);
         } else {
-            this.button.setText('Próxima fase');
+            this.hud.nextButton.disableInteractive();
+            this.hud.nextButton.setAlpha(0.5);
         }
-    }
-
-    updatePhaseText(newPhase) {
-        this.phaseText.setText(`Fase: ${newPhase}`);
     }
 
     showTroopInput(territory, currentPlayer) {
@@ -155,7 +152,7 @@ export class UIScene extends Phaser.Scene {
                     inputContainer.destroy();
                 }
             });
-        }
+    }
 
     showAttackInput(attackerTerritory, defenderTerritory) {
         const centerX = this.cameras.main.centerX;
@@ -279,7 +276,7 @@ export class UIScene extends Phaser.Scene {
 
     showConfirmButton(text, callback) {
         const centerX = this.cameras.main.centerX;
-        const bottomY = this.cameras.main.height - 20;
+        const bottomY = 20;
 
         this.confirmButton = this.add.text(centerX, bottomY, text, {
             font: '16px Arial',
@@ -288,7 +285,7 @@ export class UIScene extends Phaser.Scene {
             padding: { x: 10, y: 10 },
             align: 'center'
         })
-            .setOrigin(0, 1)
+            .setOrigin(0.5, 0)
             .setInteractive();
 
         this.confirmButton.on('pointerdown', callback);

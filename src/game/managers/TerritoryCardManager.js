@@ -3,15 +3,18 @@ import TerritoryCard from "../gameObjects/TerritoryCard";
 export default class TerritoryCardManager {
     constructor (mapData) {
         this.territoryCards = {};
+        this.drawPile = [];
         this.initializeTerritoryCards(mapData);
-        
         this.usedTerritoryCards = new Set();
         this.currentTrade = 1;
     }
 
     initializeTerritoryCards (mapData) {
         mapData.territories.forEach(data => {
-            this.territoryCards[data.id] = new TerritoryCard(data.id, data.name, data.type);
+            let territory = new TerritoryCard(data.id, data.name, data.type);
+            this.territoryCards[data.id] = territory;
+            this.drawPile.push(territory);
+            this.shuffleDeck();
         });
     }
 
@@ -29,37 +32,43 @@ export default class TerritoryCardManager {
 
     checkTradeEligibility(player) {
         const playerOwnedCards = Object.values(this.territoryCards).filter(card => card.owner === player);
-        if (playerOwnedCards.length > 2) {
-            if (playerOwnedCards.length > 2 && playerOwnedCards.length < 5) {
-                circle_count = 0;
-                square_count = 0;
-                triangle_count = 0;
 
-                for (let card of playerOwnedCards) {
-                    if (card.type === 'circle') {
-                        circle_count += 1;
-                    } else if (card.type === 'square') {
-                        square_count += 1;
-                    } else if (card.type === 'triangle') {
-                        triangle_count += 1;
-                    }
-                }
-
-                if (circle_count === 3 || square_count === 3 || triangle_count === 3 || 
-                    (circle_count >= 1 && square_count >= 1 && triangle_count >= 1)) {
-                    return true;
-                }
-                return false;
-            }
+        // Precisa de pelo menos 3 cartas para trocar
+        if (playerOwnedCards.length < 3) {
+            return false;
         }
-        else {
+
+        // Com 5 ou mais cartas, a troca é obrigatória
+        if (playerOwnedCards.length >= 5) {
             return true;
         }
+
+        // Com 3-4 cartas, verifica se tem combinação válida
+        let circle_count = 0;
+        let square_count = 0;
+        let triangle_count = 0;
+
+        for (let card of playerOwnedCards) {
+            if (card.type === 'circle') {
+                circle_count += 1;
+            } else if (card.type === 'square') {
+                square_count += 1;
+            } else if (card.type === 'triangle') {
+                triangle_count += 1;
+            }
+        }
+
+        // Retorna true se tiver trio do mesmo tipo OU um de cada tipo
+        if (circle_count >= 3 || square_count >= 3 || triangle_count >= 3 ||
+            (circle_count >= 1 && square_count >= 1 && triangle_count >= 1)) {
+            return true;
+        }
+        return false;
     }   
     
 
     calculateTradeBonus(player, tradedCardIds) {
-        const baseBonus = 4;
+        let baseBonus = 4;
 
         baseBonus += this.calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds);
         
@@ -88,7 +97,7 @@ export default class TerritoryCardManager {
     }
 
     calculeBonusForTerritoriesOwnedByPlayer(player, tradedCardIds) {
-        const bonusTroops = 0;
+        let bonusTroops = 0;
 
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
@@ -105,6 +114,31 @@ export default class TerritoryCardManager {
         return bonusTroops;
     }
 
+    shuffleDeck() {
+        for (let i = this.drawPile.length -1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i+1));
+          let k = this.drawPile[i];
+          this.drawPile[i] = this.drawPile[j];
+          this.drawPile[j] = k;
+        }
+    }
+
+    drawCard(player){
+        if (this.drawPile.length === 0){
+            this.usedTerritoryCards.forEach(function(element){
+                this.drawPile.push(element);
+                this.usedTerritoryCards.delete(element);
+            })
+            this.shuffleDeck();
+        }
+        let card = this.drawPile[this.drawPile.length - 1];
+        this.changePlayerTerritoryCardOwnership(card.id, player);
+    }
+
+    getTerritoryCard(territoryCardId){
+       return this.territoryCards[territoryCardId];
+    }
+    
     clearOwnershipAfterTrade(player, tradedCardIds) {
         tradedCardIds.forEach(cardId => {
             const card = this.getTerritoryCard(cardId);
@@ -114,17 +148,5 @@ export default class TerritoryCardManager {
                 player.territoryCards.splice(index, 1);
             }
         });
-    }
-
-    isUsedTerritoryCardsFull() {
-        return this.usedTerritoryCards.size === Object.keys(this.territoryCards).length;
-    }
-
-    reshuffleUsedTerritoryCards() {
-        this.usedTerritoryCards.forEach(cardId => {
-            const card = this.getTerritoryCard(cardId);
-            card.setOwner(null);
-        });
-        this.usedTerritoryCards.clear();
     }
 }

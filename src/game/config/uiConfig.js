@@ -1,3 +1,4 @@
+import { toHex } from '../utils/toHex.js';
 import { COLORS } from './colors.js';
 import { GameConfig } from './gameConfig.js';
 
@@ -45,13 +46,13 @@ export const UIConfig = {
             textStyle: {
                 fontSize: '16px',
                 fontFamily: 'JetBrainsMono',
-                color: COLORS.primary,
+                color: toHex(COLORS.primary),
                 align: 'center'
             }
         },
         phaseBars: {
             x: 107,
-            y: 40,
+            y: 36,
             offsets: {
                 fortify: 0,
                 attack: 70,
@@ -60,11 +61,21 @@ export const UIConfig = {
         },
         phaseIcons: {
             x: 86.97 / 2,
-            y: 84.95 / 2
+            y: (84.95 + 6) / 2
         },
         territoryCards: {
             x: 408.97 - (86.97 / 2),
-            y: 84.95 / 2
+            y: (84.95 + 6) / 2
+        },
+        territoryCardsCount: {
+            x: 408.97 - (86.97 / 2),
+            y: 84.95 / 2,
+            textStyle: {
+                fontSize: '22px',
+                fontFamily: 'JetBrainsMono',
+                color: toHex(COLORS.white),
+                align: 'center'
+            }
         }
     }
 }

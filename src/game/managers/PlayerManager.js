@@ -14,37 +14,37 @@ export default class PlayerManager {
     initializePlayers(playerConfigs = []) {
         this.players = playerConfigs
             .filter(cfg => cfg.type !== PLAYER_TYPES.NONE)
-            .map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color)));
+            .map(cfg => new Player(cfg.name, cfg.color, this.getPlayerColorName(cfg.color), cfg.type));
     }
 
-    initializeObjectives(objectivesData){
-        if (this.players.length == 0){
+    initializeObjectives(objectivesData) {
+        if (this.players.length == 0) {
             return;
         }
-        if (!objectivesData){
+        if (!objectivesData) {
             return;
         }
 
         const fallbackDefinition = objectivesData.fallback;
 
-        const conquestDeck = Array.isArray(objectivesData.conquest) ? 
-        objectivesData.conquest.map(definition => new Objective({
-            type: 'conquest',
-            description: definition.description,
-            main: definition.main,
-            fallback:  fallbackDefinition
-        })) : [];
-        
+        const conquestDeck = Array.isArray(objectivesData.conquest) ?
+            objectivesData.conquest.map(definition => new Objective({
+                type: 'conquest',
+                description: definition.description,
+                main: definition.main,
+                fallback: fallbackDefinition
+            })) : [];
+
         shuffleInPlace(conquestDeck);
-        
+
         const availableTypes = Array.isArray(objectivesData.types) ? [...objectivesData.types] : ["conquest"];
         const destructionDefinition = objectivesData.destruction ?? null;
 
         this.players.forEach(player => {
             const type = chooseObjectiveType(availableTypes, conquestDeck.length, this.players.length);
-            if (type === "destruction" && destructionDefinition){
+            if (type === "destruction" && destructionDefinition) {
                 const opponent = getRandomOpponent(player, this.players);
-                if (opponent){
+                if (opponent) {
                     const colorKey = opponent.colorKey;
                     const colorLabel = destructionDefinition.colorLabels?.[colorKey];
                     const descriptionTemplate = destructionDefinition.description ?? '';
@@ -52,7 +52,7 @@ export default class PlayerManager {
                     const objective = new Objective({
                         type: 'destruction',
                         description: description,
-                        main: {targetColor: colorKey},
+                        main: { targetColor: colorKey },
                         fallback: fallbackDefinition,
                         target: opponent
                     });
@@ -87,11 +87,10 @@ export default class PlayerManager {
     }
 
     totalTroopsForPlayer(player) {
-        let totalTroops = 0;
-        player.ownedTerritories.forEach(territory => {
-            totalTroops += territory.getTroopCount();
-        });
-        return totalTroops;
+        return Array.from(player.ownedTerritories).reduce(
+            (sum, t) => sum + (t?.getTroopCount?.() ?? 0),
+            0
+        );
     }
 
     checkAccumulateObjective(player) {
@@ -122,13 +121,12 @@ export default class PlayerManager {
 
         if (Array.isArray(main.continents) && main.continents.length > 0) {
             const territories = Object.values(mapManager.territories);
-            const normalize = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-z0-9]/g, '');
 
             for (let continentName of main.continents) {
                 if (continentName === 'X') {
                     continue;
                 }
-                const neededTerritories = territories.filter(t => normalize(t.continent) === normalize(continentName));
+                const neededTerritories = territories.filter(t => t.continent === continentName);
                 if (neededTerritories.length === 0) {
                     return false;
                 }
@@ -145,14 +143,31 @@ export default class PlayerManager {
         const obj = player.objective;
         const main = obj.main || {};
 
-        if (obj.type === 'destruction' && defender) {
-            if (player.objective.target === defender) {
-                const totalTroops = this.totalTroopsForPlayer(defender);
-                if (totalTroops === 0) {
+        if (defender) {
+            const totalTroops = this.totalTroopsForPlayer(defender);
+            if (totalTroops === 0) {
+                if (obj.type === 'destruction' && player.objective.target === defender) {
+                    for (let p of this.players) {
+                        if (p.objective.type === 'destruction') {
+                            if (p != player && p.objective.target === defender) {
+                                p.objective = p.objective.default;
+                            }
+                        }
+                    }
                     return true;
+                }
+                else {
+                    for (let p of this.players) {
+                        if (p.objective.type === 'destruction') {
+                            if (p.objective.target === defender) {
+                                p.objective = p.objective.default;
+                            }
+                        }
+                    }
                 }
             }
         }
+
         return false;
     }
 
@@ -168,4 +183,10 @@ export default class PlayerManager {
         }
         return false;
     }
+
+    removePlayer(player) {
+        let index = this.players.findIndex(p => p === player);
+        this.players.splice(index, 1);
+    }
 }
+

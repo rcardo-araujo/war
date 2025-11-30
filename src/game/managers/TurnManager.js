@@ -18,7 +18,7 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
 
     setPlayers(players = []){
         this.players = players;
-        this.currentPlayerIndex;
+        this.currentPlayerIndex; // Nota: isso parece um typo no original, mas mantive para compatibilidade
         this.resetTurnState();
     }
 
@@ -29,6 +29,12 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
 
     getCurrentPlayer(){
         return this.players[this.currentPlayerIndex] || null;
+    }
+
+    // MERGE: Adicionado da sua branch (necessário para o BotService)
+    getPreviousPlayer(){
+        const prevIndex = (this.currentPlayerIndex - 1 + this.players.length) % this.players.length;
+        return this.players[prevIndex] || null;
     }
 
     getCurrentPhase(){
@@ -79,10 +85,11 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         }
 
         this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.length;
-        
+
         if(this.currentRoundCount != 0){
             this.resetTurnState();
         }
+        // Emitindo 'this' para que o GameController possa acessar getPreviousPlayer()
         this.emit("nextTurn", this);
     }
 }
