@@ -97,6 +97,10 @@ export class UIScene extends Phaser.Scene {
         this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
             this.setButtonInteractive(!isActive);
         }, this);
+
+        this.gameStateManager.on('game:objectiveAchieved', ({ player, objective }) => {
+            this.showVictoryModal(player, objective);
+        }, this);
     }
 
     setButtonInteractive(isInteractive) {
