@@ -80,7 +80,8 @@ export class GameHUD extends GameObjects.Container {
             config.territoryCards.x,
             config.territoryCards.y,
             'territory-cards'
-        ).setOrigin(0.5);
+        ).setOrigin(0.5)
+        .setInteractive({cursor: 'pointer'});
 
         this.territoryCardsCount = scene.add.text(
             config.territoryCardsCount.x,

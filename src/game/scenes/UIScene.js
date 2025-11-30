@@ -40,6 +40,10 @@ export class UIScene extends Phaser.Scene {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
 
+        this.hud.territoryCards.on('pointerdown', () => {
+            this.gameStateManager.emit('ui:tradeCardsClicked')
+        })
+
         this.gameStateManager.on('game:phaseChanged', (newPhase) => {
             this.hud.updatePhase(newPhase);
         }, this);

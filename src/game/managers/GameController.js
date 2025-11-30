@@ -50,7 +50,7 @@ export default class GameController {
         this.gsm.turnManager.on("nextTurn", this.onNextTurn, this);
 
         this.gsm.on("ui:tradeCardsClicked", this.handleTradeClick, this);
-        this.gsm.on("game:tradeCardsSelected", this.onTradeCommit, this);
+        this.gsm.on("game:tradeCardsConfirmed", this.onTradeCommit, this);
     }
 
     checkObjectiveForPlayer(player, defender) {
@@ -391,7 +391,7 @@ export default class GameController {
         } else {
             this.gsm.emit(
                 "game:error",
-                "Você não possui cartas suficientes para trocar!"
+                "Você não possui cartas suficientes que satisfaçam a troca!"
             );
         }
     }
