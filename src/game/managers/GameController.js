@@ -1,5 +1,7 @@
 import { TURN_PHASES } from "./TurnManager";
 import { executeCombat } from "../utils/diceRoller";
+import { storePlayers } from "../utils/store";
+import { storeTerritories } from "../utils/store";
 
 export default class GameController {
     constructor(gsm) {
@@ -311,6 +313,8 @@ export default class GameController {
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.movementController.reset();
+        storeTerritories(this.gsm.mapManager.territories);
+        storePlayers(this.gsm.playerManager.getPlayers(), this.gsm.getCurrentPlayer());
         this.gsm.emit("game:nextTurn", newPlayer);
     }
 
