@@ -388,6 +388,53 @@ export class UIScene extends Phaser.Scene {
             bounds = this.victoryObjective.getBounds();
             cursorY = bounds.y + bounds.height + SPACING;
         }
+
+        const contentHeight = cursorY - (cardY + PADDING_TOP);
+        const freeSpace = cardH - (PADDING_TOP * 2) - contentHeight;
+        if (freeSpace > 0) {
+            const offset = Math.floor(freeSpace / 2);
+            this.victoryTitle.y += offset;
+            this.victoryMessage.y += offset;
+            if (this.victoryObjective) this.victoryObjective.y += offset;
+        }
+
+
+        const BUTTON_WIDTH = 280;
+        const BUTTON_HEIGHT = 48;
+        const BUTTON_RADIUS = 12;
+
+        const buttonBottomMargin = 32;
+        const btnY = cardY + cardH - BUTTON_HEIGHT - buttonBottomMargin;
+
+        this.victoryReturnBg = this.add.graphics().setDepth(30004);
+        this.victoryReturnBg.fillStyle(winnerColor, 0.75); 
+        this.victoryReturnBg.fillRoundedRect(
+            w / 2 - BUTTON_WIDTH / 2,
+            btnY,
+            BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            BUTTON_RADIUS
+        );
+
+        this.victoryReturn = this.add.text(
+            w / 2,
+            btnY + BUTTON_HEIGHT / 2,
+            'Voltar ao menu inicial',
+            {
+                font: '18px JetBrainsMono',
+                color: '#ffffff'
+            }
+        )
+            .setOrigin(0.5)
+            .setDepth(30005)
+            .setInteractive({ useHandCursor: true });
+
+        this.victoryReturn.on('pointerdown', () => {
+            try {
+                this.scene.stop('Game');
+            } catch (e) { }
+            this.scene.start('MainMenu');
+        });
     }
 
     createTargetButton() {
