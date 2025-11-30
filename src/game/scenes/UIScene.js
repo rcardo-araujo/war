@@ -97,6 +97,10 @@ export class UIScene extends Phaser.Scene {
         this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
             this.setButtonInteractive(!isActive);
         }, this);
+
+        this.gameStateManager.on('game:objectiveAchieved', ({ player, objective }) => {
+            this.showVictoryModal(player, objective);
+        }, this);
     }
 
     setButtonInteractive(isInteractive) {
@@ -296,6 +300,165 @@ export class UIScene extends Phaser.Scene {
             this.confirmButton.destroy();
             this.confirmButton = null;
         }
+    }
+
+    showVictoryModal(player, objective) {
+        this.gameStateManager.emit("game:setMapInteractive", false);
+
+        const w = this.cameras.main.width;
+        const h = this.cameras.main.height;
+
+        this.victoryOverlay = this.add.rectangle(0, 0, w, h, 0x000000, 0.92)
+            .setOrigin(0)
+            .setDepth(30000)
+            .setInteractive();
+
+        const cardW = Math.min(760, w - 120);
+        const cardH = Math.min(600, h - 200);
+        const cardX = w / 2 - cardW / 2;
+        const cardY = h / 2 - cardH / 2;
+        const radius = 18;
+
+        const winnerColor = player?.color ?? 0x007bff;
+
+        const cardGraphics = this.add.graphics().setDepth(30001);
+        cardGraphics.fillStyle(0x000000, 0.5);
+        cardGraphics.lineStyle(4, winnerColor, 1);
+        cardGraphics.fillRoundedRect(cardX, cardY, cardW, cardH, radius);
+        cardGraphics.strokeRoundedRect(cardX, cardY, cardW, cardH, radius);
+        this.victoryCardBg = cardGraphics;
+
+        const PADDING_TOP = 28;
+        const SIDE_PADDING = 40;
+        const SPACING = 36;
+
+        let cursorY = cardY + PADDING_TOP;
+
+        this.victoryTitle = this.add.text(
+            w / 2,
+            cursorY,
+            "⟡ VITÓRIA ⟡",
+            {
+                font: "30px JetBrainsMono",
+                color: "#ffffff",
+                align: "center",
+                wordWrap: { width: cardW - SIDE_PADDING * 2 }
+            }
+        )
+            .setOrigin(0.5, 0)
+            .setDepth(30003);
+
+        let bounds = this.victoryTitle.getBounds();
+        cursorY = bounds.y + bounds.height + SPACING;
+
+        const msg = `O jogador ${player?.name ?? "Jogador"} alcançou seu objetivo e venceu a partida!`;
+        this.victoryMessage = this.add.text(
+            w / 2,
+            cursorY,
+            msg,
+            {
+                font: "18px JetBrainsMono",
+                color: "#ffffff",
+                align: "center",
+                wordWrap: { width: cardW - SIDE_PADDING * 2 }
+            }
+        )
+            .setOrigin(0.5, 0)
+            .setDepth(30003);
+
+        bounds = this.victoryMessage.getBounds();
+        cursorY = bounds.y + bounds.height + SPACING;
+
+        if (objective && (objective.description || objective.main)) {
+            const obj = objective.description ?? objective.main ?? "";
+            this.victoryObjective = this.add.text(
+                w / 2,
+                cursorY,
+                obj,
+                {
+                    font: "16px JetBrainsMono",
+                    color: "#cccccc",
+                    align: "center",
+                    wordWrap: { width: cardW - SIDE_PADDING * 2 }
+                }
+            )
+                .setOrigin(0.5, 0)
+                .setDepth(30003);
+
+            bounds = this.victoryObjective.getBounds();
+            cursorY = bounds.y + bounds.height + SPACING;
+        }
+
+        const contentHeight = cursorY - (cardY + PADDING_TOP);
+        const freeSpace = cardH - (PADDING_TOP * 2) - contentHeight;
+        if (freeSpace > 0) {
+            const offset = Math.floor(freeSpace / 2);
+            this.victoryTitle.y += offset;
+            this.victoryMessage.y += offset;
+            if (this.victoryObjective) this.victoryObjective.y += offset;
+        }
+
+
+        const BUTTON_WIDTH = 280;
+        const BUTTON_HEIGHT = 48;
+        const BUTTON_RADIUS = 12;
+
+        const buttonBottomMargin = 32;
+        const btnY = cardY + cardH - BUTTON_HEIGHT - buttonBottomMargin;
+
+        this.victoryReturnBg = this.add.graphics().setDepth(30004);
+        this.victoryReturnBg.fillStyle(winnerColor, 0.75); 
+        this.victoryReturnBg.fillRoundedRect(
+            w / 2 - BUTTON_WIDTH / 2,
+            btnY,
+            BUTTON_WIDTH,
+            BUTTON_HEIGHT,
+            BUTTON_RADIUS
+        );
+
+        this.victoryReturn = this.add.text(
+            w / 2,
+            btnY + BUTTON_HEIGHT / 2,
+            'Voltar ao menu inicial',
+            {
+                font: '18px JetBrainsMono',
+                color: '#ffffff'
+            }
+        )
+            .setOrigin(0.5)
+            .setDepth(30005)
+            .setInteractive({ useHandCursor: true });
+
+        this.victoryReturn.on('pointerdown', () => {
+            try {
+                window.location.reload();
+            } catch (e) { 
+                window.location.reload();
+            }
+            this.scene.start('MainMenu');
+        });
+    }
+
+    hideVictoryModal() {
+        if (this.victoryOverlay) this.victoryOverlay.destroy();
+        if (this.victoryCardBg) this.victoryCardBg.destroy();
+        if (this.victoryTitle) this.victoryTitle.destroy();
+        if (this.victoryMessage) this.victoryMessage.destroy();
+        if (this.victoryObjective) this.victoryObjective.destroy();
+
+        if (this.victoryReturnBg) this.victoryReturnBg.destroy();
+
+        if (this.victoryReturn) this.victoryReturn.destroy();
+
+        this.victoryOverlay = null;
+        this.victoryCardBg = null;
+        this.victoryTitle = null;
+        this.victoryMessage = null;
+        this.victoryObjective = null;
+        this.victoryReturnBg = null;
+        this.victoryReturn = null;
+
+        this.gameStateManager.emit('game:setMapInteractive', true);
     }
 
     createTargetButton() {
