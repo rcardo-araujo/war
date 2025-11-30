@@ -44,6 +44,12 @@ export class UIScene extends Phaser.Scene {
             this.gameStateManager.emit('ui:tradeCardsClicked')
         })
 
+        this.gameStateManager.on('game:cardDrawn', (player) => {
+            if (player === this.gameStateManager.getCurrentPlayer()) {
+                this.hud.territoryCards.updateCardCount(player.territoryCards.length);
+            }
+        });
+
         this.gameStateManager.on('game:tradeCards', (currentPlayer) => {
             this.showConfirmButton("Confirm Trade", () => {
                 this.gameStateManager.emit('game:tradeCardsConfirmed', currentPlayer, this);
@@ -52,6 +58,12 @@ export class UIScene extends Phaser.Scene {
 
         this.gameStateManager.on('game:tradeCardsConfirmed', (currentPlayer) => {
             this.hideConfirmButton();
+        }, this);
+
+        this.gameStateManager.on('game:cardsTraded', (player) => {
+            if (player === this.gameStateManager.getCurrentPlayer()) {
+                this.hud.territoryCards.updateCardCount(player.territoryCards.length);
+            }
         }, this);
 
         this.gameStateManager.on('game:phaseChanged', (newPhase) => {
@@ -106,6 +118,9 @@ export class UIScene extends Phaser.Scene {
             if (this.targetElipse && newPlayer && newPlayer.color) {
                 this.targetElipse.setTint(newPlayer.color);
             }
+
+            this.hud.territoryCards.updateCardCount(newPlayer.territoryCards.length);
+
         }, this);
 
         this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
