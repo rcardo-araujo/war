@@ -307,6 +307,32 @@ export class UIScene extends Phaser.Scene {
 
         const w = this.cameras.main.width;
         const h = this.cameras.main.height;
+
+        this.victoryOverlay = this.add.rectangle(0, 0, w, h, 0x000000, 0.92)
+            .setOrigin(0)
+            .setDepth(30000)
+            .setInteractive();
+
+        const cardW = Math.min(760, w - 120);
+        const cardH = Math.min(600, h - 200);
+        const cardX = w / 2 - cardW / 2;
+        const cardY = h / 2 - cardH / 2;
+        const radius = 18;
+
+        const winnerColor = player?.color ?? 0x007bff;
+
+        const cardGraphics = this.add.graphics().setDepth(30001);
+        cardGraphics.fillStyle(0x000000, 0.5);
+        cardGraphics.lineStyle(4, winnerColor, 1);
+        cardGraphics.fillRoundedRect(cardX, cardY, cardW, cardH, radius);
+        cardGraphics.strokeRoundedRect(cardX, cardY, cardW, cardH, radius);
+        this.victoryCardBg = cardGraphics;
+
+        const PADDING_TOP = 28;
+        const SIDE_PADDING = 40;
+        const SPACING = 36;
+
+        let cursorY = cardY + PADDING_TOP;
     }
 
     createTargetButton() {
