@@ -1,118 +1,132 @@
-    import { Scene } from 'phaser';
-    import { TURN_PHASES } from '../managers/TurnManager';
-    import { PLAYER_TYPES } from '../config/playerTypes';
+import { Scene } from 'phaser';
+import { TURN_PHASES } from '../managers/TurnManager';
+import { PLAYER_TYPES } from '../config/playerTypes'; // HEAD: Importante para o Bot
+import { GameHUD } from '../ui/GameHUD'; // DEV: Nova UI
 
-    export class UIScene extends Phaser.Scene {
-        constructor() {
-            super({ key: 'UIScene' });
-        }
+export class UIScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'UIScene' });
+    }
 
-        preload() {
-        }
+    preload() {
+    }
 
-        init(data) {
-            this.gameStateManager = data.gameStateManager;
-        }
+    init(data) {
+        this.gameStateManager = data.gameStateManager;
+    }
 
-        create() {
-            const padding = 20;
-            const bottomY = this.cameras.main.height - padding;
-            const leftX = padding;
+    create() {
+        // MERGE: Usando a nova classe GameHUD da Dev
+        this.hud = new GameHUD(this);
 
-            let currentPlayer = this.gameStateManager.getCurrentPlayer();
-            this.label = this.add.text(leftX, bottomY, 'Turno do Jogador #' + currentPlayer.name, {
-                font: '15px Arial',
-                fill: '#ffffff',
-                backgroundColor: `#${currentPlayer.color.toString(16).padStart(6, '0')}`,
-                padding: { x: 10, y: 10 },
-                align: 'center'
-            }).setOrigin(0, 1);
+        const initialPhase = this.gameStateManager.getCurrentPhase();
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
+
+        this.hud.updatePhase(initialPhase);
+
+        if(currentPlayer) {
+            this.hud.updateColor(currentPlayer.color);
             
-            this.button = this.add.text(leftX, bottomY - this.label.height, 'Próximo turno', {
-                font: '12px Arial',
-                fill: '#ffffff',
-                backgroundColor: '#007bff',
-                padding: { x: 8, y: 8 },
-                align: 'center'
-            })
-            .setOrigin(0, 1)
-            .setInteractive();
-
-            this.phaseText = this.add.text(10, 10, `Fase: `);
-
-            this.button.on('pointerdown', () => {
-                this.gameStateManager.emit('ui:endPhaseClicked');
-            });
-            this.attackButton = null;
-
-            this.setupEvents();
-            this.updateButtonText(this.gameStateManager.getCurrentPhase());
-            this.updatePhaseText(this.gameStateManager.getCurrentPhase());
-
-            // Inicializa o estado do botão baseado no tipo do jogador atual
+            // MERGE: Lógica do Bot da HEAD aplicada na estrutura da DEV
             const isBot = currentPlayer.type === PLAYER_TYPES.BOT;
             this.setButtonInteractive(!isBot);
         }
 
-        setupEvents() {
-            this.gameStateManager.on('game:nextTurn', this.updateTurnLabel, this);
-            this.gameStateManager.on('game:phaseChanged', this.updateButtonText, this);
-            this.gameStateManager.on('game:phaseChanged', this.updatePhaseText, this);
-            this.gameStateManager.on('game:error', (message) => {
-                alert(message);
-            }, this);
-            this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
-                this.showTroopInput(territory, currentPlayer);
-            });
-            this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
-                this.showConfirmAttack({"defender": defenderTerritory, "attacker": attackerTerritory});
-            }, this);
-            this.gameStateManager.on('game:unselectAttacker', (territory) => {
-                this.hideConfirmAttack();
-            }, this);
-            this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
-                this.hideConfirmAttack();
-                this.showAttackInput(attackerTerritory, defenderTerritory);
-            }, this);
-            this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
-                this.setButtonInteractive(!isActive);
-            }, this);
-        }
+        this.confirmButton = null;
+        this.createTargetButton();
 
-        setButtonInteractive(isInteractive) {
-            if (isInteractive) {
-                this.button.setInteractive();
-                this.button.setAlpha(1);
-            } else {
-                this.button.disableInteractive();
-                this.button.setAlpha(0.5);
+        this.setupEvents();
+    }
+
+    setupEvents() {
+        // Listener do botão da HUD (Dev structure)
+        this.hud.nextButton.on('pointerdown', () => {
+            this.gameStateManager.emit('ui:endPhaseClicked');
+        });
+
+        // Eventos gerais
+        this.gameStateManager.on('game:phaseChanged', (newPhase) => {
+            this.hud.updatePhase(newPhase);
+        }, this);
+
+        this.gameStateManager.on('game:error', (message) => {
+            alert(message);
+        }, this);
+
+        this.gameStateManager.on('territorySelected', (territory, currentPlayer) => {
+            this.showTroopInput(territory, currentPlayer);
+        });
+
+        // --- LÓGICA DE ATAQUE (HEAD/Shared) ---
+        this.gameStateManager.on('game:defenderSelected', (defenderTerritory, attackerTerritory) => {
+            // Reutilizando showConfirmButton para ambos os casos
+            this.showConfirmButton("Confirm Attack", () => {
+                this.gameStateManager.emit('game:attackConfirmed', defenderTerritory, attackerTerritory, this);
+            })
+        }, this);
+
+        this.gameStateManager.on('game:unselectAttacker', (territory) => {
+            this.hideConfirmButton();
+        }, this);
+
+        this.gameStateManager.on('game:attackConfirmed', (defenderTerritory, attackerTerritory) => {
+            this.hideConfirmButton();
+            this.showAttackInput(attackerTerritory, defenderTerritory);
+        }, this);
+
+
+        // --- LÓGICA DE ESTRATÉGIA/MOVIMENTO (DEV) ---
+        this.gameStateManager.on('game:destinationSelected', (destinationTerritory, originTerritory) => {
+            this.showConfirmButton("Confirm Strategy", () => {
+                this.gameStateManager.emit('game:strategyConfirmed', destinationTerritory, originTerritory, this);
+            })
+        }, this);
+
+        this.gameStateManager.on('game:unselectOrigin', (territory) => {
+            this.hideConfirmButton();
+        }, this);
+
+        this.gameStateManager.on('game:strategyConfirmed', (destinationTerritory, originTerritory) => {
+            this.hideConfirmButton();
+            this.showStrategyInput(originTerritory, destinationTerritory);
+        }, this);
+
+
+        // --- LÓGICA DE TURNO E BOT (MERGE) ---
+        this.gameStateManager.on('game:nextTurn', (newPlayer) => {
+            // Atualiza HUD (Dev)
+            this.hud.updateColor(newPlayer.color);
+            
+            // Atualiza Target Button (Dev)
+            if (this.targetElipse && newPlayer && newPlayer.color) {
+                this.targetElipse.setTint(newPlayer.color);
             }
+        }, this);
+
+        // Controle do Bot sobre a UI (HEAD)
+        this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
+            this.setButtonInteractive(!isActive);
+        }, this);
+    }
+
+    // MERGE: Adaptado para funcionar com a GameHUD
+    setButtonInteractive(isInteractive) {
+        if (!this.hud || !this.hud.nextButton) return;
+
+        if (isInteractive) {
+            this.hud.nextButton.setInteractive();
+            this.hud.nextButton.setAlpha(1);
+        } else {
+            this.hud.nextButton.disableInteractive();
+            this.hud.nextButton.setAlpha(0.5);
         }
+    }
 
-        updateTurnLabel(newPlayer) {
-            this.label.setText("Turno do jogador # " + newPlayer.name);
-            this.label.setStyle({
-                backgroundColor: `#${newPlayer.color.toString(16).padStart(6, '0')}`
-            });
-        }
+    showTroopInput(territory, currentPlayer) {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
 
-        updateButtonText(newPhase) {
-            if (newPhase === TURN_PHASES.FIRST_REINFORCEMENT || newPhase === TURN_PHASES.END) {
-                this.button.setText('Finalizar turno');
-            } else {
-                this.button.setText('Próxima fase');
-            }
-        }
-
-        updatePhaseText(newPhase) {
-            this.phaseText.setText(`Fase: ${newPhase}`);
-        }
-
-        showTroopInput(territory, currentPlayer) {
-            const centerX = this.cameras.main.centerX;
-            const centerY = this.cameras.main.centerY;
-
-            const html = `
+        const html = `
                 <div style="
                     background: rgba(0,0,0,0.8);
                     padding: 20px;
@@ -131,12 +145,12 @@
                 </div>
                 `;
 
-            const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
+        const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
 
-            inputContainer.addListener('click');
-            inputContainer.on('click', (event) => {
-                if (event.target.id === 'confirmButton') {
-                    const value = parseInt(inputContainer.getChildByID('troops').value, 10);
+        inputContainer.addListener('click');
+        inputContainer.on('click', (event) => {
+            if (event.target.id === 'confirmButton') {
+                const value = parseInt(inputContainer.getChildByID('troops').value, 10);
 
                     if (!isNaN(value) && value <= (currentPlayer.availableTroops+currentPlayer.getContinentBonus(territory))) {
                         this.gameStateManager.emit('troopsAllocated', { troops: value, territory: territory });
@@ -149,15 +163,15 @@
                     inputContainer.destroy();
                 }
             });
-        }
+    }
 
-        showAttackInput(attackerTerritory, defenderTerritory) {
-            const centerX = this.cameras.main.centerX;
-            const centerY = this.cameras.main.centerY;
+    showAttackInput(attackerTerritory, defenderTerritory) {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
 
-            const maxAttackDice = Math.min(3, attackerTerritory.troops - 1);
+        const maxAttackDice = Math.min(3, attackerTerritory.troops - 1);
 
-            const html = `
+        const html = `
             <div style="
                 background: rgba(0,0,0,0.8);
                 padding: 20px;
@@ -187,64 +201,199 @@
             </div>
             `;
 
-            const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
+        const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
 
-            inputContainer.addListener('click');
-            inputContainer.on('click', (event) => {
-                
-                if (event.target.id === 'confirmAttackButton') {
-                    const value = parseInt(inputContainer.getChildByID('attack-troops-input').value, 10);
-                    if (!isNaN(value) && value >= 1 && value <= maxAttackDice) {
-                        this.gameStateManager.emit('game:attackCommitted', { 
-                            attackDice: value, 
-                            attacker: attackerTerritory, 
-                            defender: defenderTerritory 
-                        });
-                        inputContainer.destroy();
-                        
-                    } else {
-                        this.gameStateManager.emit('game:error', `Número inválido. Deve ser entre 1 e ${maxAttackDice}.`, this);
-                    }
-                    
-                } else if (event.target.id === 'cancelAttackButton') {
-                    this.gameStateManager.emit('game:attackCommitted', { 
-                        attackDice: 0, 
-                        attacker: attackerTerritory, 
-                        defender: defenderTerritory 
+        inputContainer.addListener('click');
+        inputContainer.on('click', (event) => {
+
+            if (event.target.id === 'confirmAttackButton') {
+                const value = parseInt(inputContainer.getChildByID('attack-troops-input').value, 10);
+                if (!isNaN(value) && value >= 1 && value <= maxAttackDice) {
+                    this.gameStateManager.emit('game:attackCommitted', {
+                        attackDice: value,
+                        attacker: attackerTerritory,
+                        defender: defenderTerritory
                     });
                     inputContainer.destroy();
-                    
+
+                } else {
+                    this.gameStateManager.emit('game:error', `Número inválido. Deve ser entre 1 e ${maxAttackDice}.`, this);
                 }
-            });
-        }
 
-        showConfirmAttack(territories) {
-            const centerX = this.cameras.main.centerX;
-            const bottomY = this.cameras.main.height - 20;
-            const { defender, attacker } = territories;
+            } else if (event.target.id === 'cancelAttackButton') {
+                this.gameStateManager.emit('game:attackCommitted', {
+                    attackDice: 0,
+                    attacker: attackerTerritory,
+                    defender: defenderTerritory
+                });
+                inputContainer.destroy();
 
-            this.attackButton = this.add.text(centerX, bottomY, 'Confirmar Ataque', {
-                font: '16px Arial',
-                fill: '#ffffff',
-                backgroundColor: '#dc3545',
-                padding: { x: 10, y: 10 },
-                align: 'center'
-            })
-            .setOrigin(0, 1)
+            }
+        });
+    }
+
+    showStrategyInput(originTerritory, destinationTerritory) {
+        const centerX = this.cameras.main.centerX;
+        const centerY = this.cameras.main.centerY;
+
+        let availableTroops = this.gameStateManager.movementController.getAvailableTroops(originTerritory);
+
+        const html = `
+                <div style="
+                    background: rgba(0,0,0,0.8);
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: center;
+                    color: white;
+                    font-family: Arial;
+                ">
+                    <p>Território: <strong>${originTerritory.name}</strong></p>
+                    <p>Tropas disponíveis: <strong>${availableTroops}</strong></p>
+                    <p>Quantas tropas colocar?</p>
+                    <input id="troops" type="number" min="1" max="${availableTroops}" value="1" style="width: 60px; text-align: center;">
+                    <br><br>
+                    <button id="confirmButton">Confirmar</button>
+                    <button id="cancelButton">Cancelar</button>
+                </div>
+                `;
+
+        const inputContainer = this.add.dom(centerX, centerY).createFromHTML(html);
+
+        inputContainer.addListener('click');
+        inputContainer.on('click', (event) => {
+            if (event.target.id === 'confirmButton') {
+                const value = parseInt(inputContainer.getChildByID('troops').value, 10);
+
+                if (!isNaN(value) && value <= availableTroops) {
+                    this.gameStateManager.emit('game:strategyCommitted', {
+                        troopsAllocated: value,
+                        origin: originTerritory,
+                        destination: destinationTerritory
+                    });
+                    inputContainer.destroy();
+                } else {
+                    this.gameStateManager.emit('game:error', `Digite um número válido entre 1 e ${availableTroops}!`, this);
+                }
+            } else if (event.target.id === 'cancelButton') {
+                this.gameStateManager.emit('game:strategyCommitted', {
+                    troopsAllocated: 0,
+                    origin: originTerritory,
+                    destination: destinationTerritory
+                });
+                inputContainer.destroy();
+            }
+        });
+    }
+
+    showConfirmButton(text, callback) {
+        const centerX = this.cameras.main.centerX;
+        const bottomY = 20;
+
+        this.confirmButton = this.add.text(centerX, bottomY, text, {
+            font: '16px Arial',
+            fill: '#ffffff',
+            backgroundColor: '#dc3545',
+            padding: { x: 10, y: 10 },
+            align: 'center'
+        })
+            .setOrigin(0.5, 0)
             .setInteractive();
 
-            this.attackButton.on('pointerdown', () => {
-                this.gameStateManager.emit('game:attackConfirmed', defender, attacker, this);
-            });
-        }
+        this.confirmButton.on('pointerdown', callback);
+    }
 
-        hideConfirmAttack() {
-            if (this.attackButton) {
-                this.attackButton.destroy();
-                this.attackButton = null;
-            }
-        }
-
-        update(time, delta) {
+    hideConfirmButton() {
+        if (this.confirmButton) {
+            this.confirmButton.destroy();
+            this.confirmButton = null;
         }
     }
+
+    createTargetButton() {
+        const padding = 60;
+        const x = this.cameras.main.width - padding;
+        const y = this.cameras.main.height - padding;
+
+        this.targetContainer = this.add.container(x, y);
+
+        const elipse = this.add.image(0, 0, 'target-elipse').setOrigin(0.5);
+        const aim = this.add.image(0, 0, 'target-aim').setOrigin(0.5);
+
+        const currentPlayer = this.gameStateManager.getCurrentPlayer();
+        if (currentPlayer && currentPlayer.color) {
+            elipse.setTint(currentPlayer.color);
+        }
+        this.targetElipse = elipse;
+
+        this.targetContainer.add([elipse, aim]);
+        this.targetContainer.setDepth(10000);
+
+        try {
+            elipse.setInteractive({ pixelPerfect: true });
+        } catch (e) {
+            elipse.setInteractive();
+        }
+        aim.setInteractive({ pixelPerfect: true });
+
+        const onClick = () => this.showObjectiveModal();
+        elipse.on('pointerdown', onClick);
+        aim.on('pointerdown', onClick);
+    }
+
+    showObjectiveModal() {
+        const w = this.cameras.main.width;
+        const h = this.cameras.main.height;
+
+        this.gameStateManager.emit('game:setMapInteractive', false);
+
+        this.modalOverlay = this.add.rectangle(0, 0, w, h, 0x000000, 0.65).setOrigin(0).setDepth(10001).setInteractive();
+
+        const card = this.add.image(w / 2, h / 2, 'objective-card').setDepth(10002);
+
+        const player = this.gameStateManager.getCurrentPlayer();
+        let objectiveText = 'Objetivo não disponível';
+        if (player && player.objective) {
+            objectiveText = player.objective.description || player.objective.main || player.objective.main?.text || objectiveText;
+        }
+
+        const displayW = card.displayWidth || card.width;
+        const textStyle = {
+            font: '18px JetBrainsMono',
+            color: '#ffffff',
+            align: 'center',
+            wordWrap: { width: Math.max(100, displayW - 40) }
+        };
+
+        this.objectiveText = this.add.text(w / 2, h / 2, objectiveText, textStyle).setOrigin(0.5).setDepth(10003);
+
+        const maxW = w - 80;
+        const maxH = h - 80;
+        if (card.width > maxW || card.height > maxH) {
+            const scale = Math.min(maxW / card.width, maxH / card.height);
+            card.setScale(scale);
+        }
+
+        this.modalOverlay.on('pointerdown', () => this.hideObjectiveModal());
+    }
+
+    hideObjectiveModal() {
+        if (this.modalOverlay) {
+            this.modalOverlay.destroy();
+            this.modalOverlay = null;
+        }
+        const card = this.children.getByName && this.children.getByName('objective-card');
+        this.children.list.slice().forEach(child => {
+            if (child.texture && child.texture.key === 'objective-card') child.destroy();
+        });
+
+        if (this.objectiveText) {
+            this.objectiveText.destroy();
+            this.objectiveText = null;
+        }
+
+        this.gameStateManager.emit('game:setMapInteractive', true);
+    }
+
+    update(time, delta) {
+    }
+}
