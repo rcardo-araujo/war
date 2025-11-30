@@ -16,8 +16,9 @@ export default class GameController {
 
         this.strategyTerritories = {
             origin: null,
-            destination: null,
+            destination: null
         };
+        this.capture = false;
     }
 
     setupEventListeners() {
@@ -220,6 +221,7 @@ export default class GameController {
                 const movingTroops = attackDice;
                 attacker.removeTroops(movingTroops);
                 defender.addTroops(movingTroops);
+                this.capture = true;
             }
 
             this.gsm.emit("game:troopCountChanged", attacker.id);
@@ -311,9 +313,13 @@ export default class GameController {
         this.strategyTerritories.destination = null;
         this.attackTerritories.attacker = null;
         this.attackTerritories.defender = null;
+        if (newPhase === TURN_PHASES.END){
+            this.gsm.territoryCardManager.drawCard(this.gsm.getCurrentPlayer());
+        }
     }
 
     onNextTurn(turnManager) {
+        this.capture = false;
         const newPlayer = turnManager.getCurrentPlayer();
         this.gsm.playerManager.calculateReinforcements(newPlayer);
         this.movementController.reset();
@@ -343,8 +349,5 @@ export default class GameController {
         this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
         this.gsm.territoryCardManager.addUsedTerritoryCards(cards);
         this.gsm.emit("game:cardsTraded", player);
-        if (this.gsm.territoryCardManager.isUsedTerritoryCardsFull()) {
-            this.gsm.territoryCardManager.reshuffleUsedTerritoryCards();
-        }
     }
 }

@@ -2,6 +2,7 @@ import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig';
 import GameStateManager from '../managers/GameStateManager';
 import { COLORS } from '../config/colors';
+import { bordersData } from '../config/bordersData';
 import DebugTools from '../config/DebugTools';
 
 const highlightTerritoryNumber = Object.freeze({
@@ -34,6 +35,7 @@ export class Game extends Scene {
         this.highlightedSecond = null;
 
         this.drawMap();
+        this.drawBorders();
         this.setupInteractivity();
         this.setupGameEventListeners();
 
@@ -41,6 +43,12 @@ export class Game extends Scene {
     }
 
     update() {
+    }
+
+    drawBorders() {
+        Object.entries(bordersData).forEach(([key, position]) => {
+            this.add.image(position.x, position.y, `border-${key}`).setOrigin(0);
+        });
     }
 
     drawMap() {

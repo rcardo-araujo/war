@@ -1,0 +1,22 @@
+export const bordersData = {
+    'africa-do-sul-madagascar': { x: 697, y: 565 },
+    'borneo-australia': { x: 1042, y: 535 },
+    'borneo-nova-guine': { x: 1066, y: 477 },
+    'brasil-argelia': { x: 422, y: 416 },
+    'china-japao': { x: 1061, y: 346 },
+    'groenlandia-islandia': { x: 517, y: 89 }, 
+    'india-sumatra': { x: 883, y: 445 },
+    'islandia-reino-unido': { x: 504, y: 173 },
+    'labrador-groenlandia': { x: 406, y: 145 },
+    'mackenzie-groenlandia': { x: 369, y: 71 },
+    'nova-guine-australia': { x: 1142, y: 551 },
+    'peninsula-iberica-egito': { x: 607, y: 317 },
+    'polonia-egito': { x: 643, y: 330 },
+    'reino-unido-alemanha': { x: 560, y: 249 },
+    'reino-unido-peninsula-iberica': { x: 526, y: 259 },
+    'reino-unido-suecia': { x: 557, y: 198 },
+    'sudao-madagascar': { x: 735, y: 490 },
+    'sumatra-australia': { x: 983, y: 558 },
+    'vietna-borneo': { x: 1000, y: 440 },
+    'vladivostok-japao': { x: 1124, y: 255 }
+};
