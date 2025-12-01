@@ -85,7 +85,7 @@ export class MainMenu extends Scene
 
     changeScene ()
     {
-        deleteOngoingGame();
+        //deleteOngoingGame();
         this.scene.start('PlayerSelection');
     }
 }

@@ -705,7 +705,6 @@ export default class GameController {
     loadGame(){
         this.loadMap();
         this.loadQueue();
-
     }
 
     loadMap(){
@@ -722,6 +721,16 @@ export default class GameController {
     loadQueue(){
         let data = loadPlayers();
         this.gsm.turnManager.reorganize(data);
-        console.log(JSON.stringify(data));
+        this.updateCards(data)
     }
+
+    updateCards(data){
+        for (let i = 0; i < data.length; i++){
+            const player = this.gsm.playerManager.getPlayer(data[i].name);
+            for (let j = 0; j < data[i].territoryCards.length; j++){
+                this.gsm.territoryCardManager.changePlayerTerritoryCardOwnership(data[i].territoryCards[j], player);
+            }
+        }
+    }
+
 }
