@@ -67,3 +67,13 @@ export function loadPlayers(){
 export function loadObjective(number){
     return JSON.parse(localStorage.getItem('objetivoplayer' + number));
 }
+
+export function loadContinueData(){
+    const playerCount = Number(localStorage.getItem('playerCount'));
+    let players = []
+    for (let i = 0; i < playerCount; i++){
+        const string = 'player' + i.toString();
+        players.push(JSON.parse(localStorage.getItem(string)));
+    }
+    
+}
