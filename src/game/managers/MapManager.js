@@ -70,4 +70,9 @@ export default class MapManager {
     getTerritory(id) {
         return this.territories[id];
     }
+
+    loadTroops(territoryId, amount){
+        const territory = this.getTerritory(territoryId);
+        territory.setTroops(amount);
+    }
 }

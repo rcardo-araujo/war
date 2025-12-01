@@ -5,7 +5,7 @@ import { PLAYER_TYPES } from '../config/playerTypes';
 import { storePlayers } from "../utils/store";
 import { storeTerritories } from "../utils/store";
 import { saveDataExists } from '../utils/store';
-import { loadGame } from '../utils/store';
+import { loadTerritories } from '../utils/store';
 
 export default class GameController {
     constructor(gsm) {
@@ -14,7 +14,7 @@ export default class GameController {
         this.capture = false;
 
         if (saveDataExists()){
-            loadGame();
+            this.loadGame();
         }
         
         // MERGE: Inicialização de ambos os serviços
@@ -698,5 +698,22 @@ export default class GameController {
         this.gsm.territoryCardManager.clearOwnershipAfterTrade(player, cards);
         this.gsm.territoryCardManager.addUsedTerritoryCards(cards);
         this.gsm.emit("game:cardsTraded", player);
+    }
+
+// Carregar save
+    loadGame(){
+        this.loadMap();
+
+    }
+
+     loadMap(){
+
+        let data = loadTerritories();
+        let dataArray = Object.values(data);
+        for(let territory of dataArray){
+            this.gsm.mapManager.changePlayerTerritoryOwnership(territory.id, this.gsm.playerManager.getPlayer(territory.owner));
+            this.gsm.mapManager.loadTroops(territory.id, Number(territory.troops));
+        }
+
     }
 }

@@ -42,4 +42,8 @@ export default class Territory {
     getContinent(){
         return this.continent;
     }
+
+    setTroops(amount){
+        this.troops = amount;
+    }
 }

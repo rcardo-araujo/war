@@ -188,5 +188,12 @@ export default class PlayerManager {
         let index = this.players.findIndex(p => p === player);
         this.players.splice(index, 1);
     }
+
+    getPlayer(nome){
+        for(let i=0; i<this.players.length; i++){
+            if (this.players[i].name == nome) return this.players[i];
+        }
+        return null
+    }
 }
 

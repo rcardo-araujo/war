@@ -7,9 +7,7 @@ export function storePlayers(players, currentPlayer){
             let p = 'player' + i.toString();
             let player = players [i%players.length]
             localStorage.setItem(p, JSON.stringify(player, replacerP))
-            console.log(localStorage.getItem(p));
         }
-        loadPlayers();
     }
 
 function replacerP(key,value){
@@ -21,7 +19,6 @@ function replacerP(key,value){
 
 export function storeTerritories(territories){
     localStorage.setItem('territories', JSON.stringify(territories, replacerT));
-    console.log(localStorage.getItem('territories'))
 }
 
 function replacerT(key,value){
@@ -41,6 +38,6 @@ export function saveDataExists(){
     else return true;
 }
 
-export function loadGame(){
-    
+export function loadTerritories(){
+    return JSON.parse(localStorage.getItem('territories'));
 }
