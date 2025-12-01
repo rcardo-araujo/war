@@ -195,5 +195,14 @@ export default class PlayerManager {
         }
         return null
     }
+
+    updateObjectives(player, obj){
+        let old = player.objective;
+        old.type = obj.type;
+        if (old.type === 'destruction') old.target = this.getPlayer(obj.target);
+        old.main = obj.main;
+        old.default = obj.default;
+        old.description = obj.description;
+    }
 }
 

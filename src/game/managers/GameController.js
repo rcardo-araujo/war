@@ -7,6 +7,7 @@ import { storeTerritories } from "../utils/store";
 import { saveDataExists } from '../utils/store';
 import { loadTerritories } from '../utils/store';
 import { loadPlayers } from '../utils/store';
+import { loadObjective } from '../utils/store';
 
 export default class GameController {
     constructor(gsm) {
@@ -730,6 +731,8 @@ export default class GameController {
             for (let j = 0; j < data[i].territoryCards.length; j++){
                 this.gsm.territoryCardManager.changePlayerTerritoryCardOwnership(data[i].territoryCards[j], player);
             }
+            const objective = loadObjective(i);
+            this.gsm.playerManager.updateObjectives(player, objective);
         }
     }
 
