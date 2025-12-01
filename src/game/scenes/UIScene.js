@@ -40,6 +40,32 @@ export class UIScene extends Phaser.Scene {
             this.gameStateManager.emit('ui:endPhaseClicked');
         });
 
+        this.hud.territoryCards.on('pointerdown', () => {
+            this.gameStateManager.emit('ui:tradeCardsClicked')
+        })
+
+        this.gameStateManager.on('game:cardDrawn', (player) => {
+            if (player === this.gameStateManager.getCurrentPlayer()) {
+                this.hud.updateTerritoryCardsCount(player.territoryCards.length);
+            }
+        });
+
+        this.gameStateManager.on('game:tradeCards', (currentPlayer) => {
+            this.showConfirmButton("Confirm Trade", () => {
+                this.gameStateManager.emit('game:tradeCardsConfirmed', currentPlayer, this);
+            })
+        }, this)
+
+        this.gameStateManager.on('game:tradeCardsConfirmed', (currentPlayer) => {
+            this.hideConfirmButton();
+        }, this);
+
+        this.gameStateManager.on('game:cardsTraded', (player) => {
+            if (player === this.gameStateManager.getCurrentPlayer()) {
+                this.hud.updateTerritoryCardsCount(player.territoryCards.length);
+            }
+        }, this);
+
         this.gameStateManager.on('game:phaseChanged', (newPhase) => {
             this.hud.updatePhase(newPhase);
         }, this);
@@ -92,6 +118,9 @@ export class UIScene extends Phaser.Scene {
             if (this.targetElipse && newPlayer && newPlayer.color) {
                 this.targetElipse.setTint(newPlayer.color);
             }
+
+            this.hud.updateTerritoryCardsCount(newPlayer.territoryCards.length);
+
         }, this);
 
         this.gameStateManager.on('game:setBotTurnActive', (isActive) => {
