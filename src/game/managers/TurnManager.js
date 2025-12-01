@@ -1,3 +1,5 @@
+import Phaser from 'phaser';
+
 export const TURN_PHASES = Object.freeze({
     FIRST_REINFORCEMENT: "first_reinforcement",
     REINFORCEMENT: "reinforcement",
