@@ -1,14 +1,14 @@
 export function storePlayers(players, currentPlayer){
         let playerCount = players.length;
         let pc = playerCount.toString();
+        let n = players.indexOf(currentPlayer)
         localStorage.setItem('playerCount', pc);
-        for(let i = 0; i < playerCount; i++){
+        for(let i = n; i < playerCount+n; i++){
             let p = 'player' + i.toString();
-            let player = players [i]
+            let player = players [i%players.length]
             localStorage.setItem(p, JSON.stringify(player, replacerP))
             console.log(localStorage.getItem(p));
         }
-        localStorage.setItem('currentPlayer', JSON.stringify(currentPlayer));
         loadPlayers();
     }
 
@@ -34,26 +34,4 @@ export function deleteOngoingGame(){
     localStorage.removeItem('currentPlayer');
     localStorage.removeItem('territories');
     localStorage.clear();
-}
-
-export function loadPlayers(){
-    let n = Number(localStorage.getItem('playerCount'));
-    for (let i = 0; i < n; i++){
-        let p = 'player' + i.toString();
-        console.log(localStorage.getItem(p+'name'));
-        console.log(localStorage.getItem(p+'color'));
-        console.log(localStorage.getItem(p+'colorKey'));
-        console.log(localStorage.getItem(p+'ownedTerritories'));
-        console.log(localStorage.getItem(p+'territoryCards'));
-        console.log(localStorage.getItem(p+'availableTroops'));
-        console.log(localStorage.getItem(p+'type'));
-    }
-}
-
-function savePlayer(string, player){
-    localStorage.setItem(string+'name', JSON.stringify(player.name));
-    localStorage.setItem(string+'ownedTerritories', JSON.stringify(player.ownedTerritories));
-    localStorage.setItem(string+'territoryCards', JSON.stringify(player.territoryCards));
-    localStorage.setItem(string+'availableTroops', JSON.stringify(player.availableTroops));
-    localStorage.setItem(string+'type', JSON.stringify(player.type));
 }
