@@ -6,7 +6,7 @@ import MovementController from './MovementController';
 import GameController from './GameController';
 import TerritoryCardManager from './TerritoryCardManager'
 
-export default class GameStateManager extends Phaser.Events.EventEmitter {
+export default class GameStateManager extends EventEmitter {
     constructor(scene, playerSetup = []) {
         super();
         this.mapManager = new MapManager(scene.cache.json.get('mapData'));
