@@ -35,3 +35,12 @@ export function deleteOngoingGame(){
     localStorage.removeItem('territories');
     localStorage.clear();
 }
+
+export function saveDataExists(){
+    if (localStorage.getItem('territories')==null) return false;
+    else return true;
+}
+
+export function loadGame(){
+    
+}

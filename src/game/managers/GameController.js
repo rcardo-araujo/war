@@ -4,10 +4,18 @@ import BotService from '../services/BotService';
 import { PLAYER_TYPES } from '../config/playerTypes';
 import { storePlayers } from "../utils/store";
 import { storeTerritories } from "../utils/store";
+import { saveDataExists } from '../utils/store';
+import { loadGame } from '../utils/store';
 
 export default class GameController {
     constructor(gsm) {
         this.gsm = gsm;
+
+        this.capture = false;
+
+        if (saveDataExists()){
+            loadGame();
+        }
         
         // MERGE: Inicialização de ambos os serviços
         this.botService = new BotService();
@@ -26,8 +34,6 @@ export default class GameController {
             origin: null,
             destination: null
         };
-        
-        this.capture = false;
         
         this.setupEventListeners();
     }
