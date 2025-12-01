@@ -3,6 +3,7 @@ import { Scene } from 'phaser';
 import { GameConfig } from '../config/gameConfig'
 import { COLORS } from '../config/colors';
 import { deleteOngoingGame } from '../utils/store';
+import { loadContinueData } from '../utils/store';
 
 export class MainMenu extends Scene
 {
@@ -75,6 +76,7 @@ export class MainMenu extends Scene
         const buttonSpacing = 60;
         const startY = GameConfig.height - marginY * 2.5;
 
+        this.createMenuButton(marginX, startY - buttonSpacing * 4, 'CONTINUAR', () => this.continue());
         this.createMenuButton(marginX, startY - buttonSpacing * 3, 'JOGAR', () => this.changeScene());
         this.createMenuButton(marginX, startY - buttonSpacing * 2, 'HISTÓRICO', () => console.log('Abrir histórico'));
         this.createMenuButton(marginX, startY - buttonSpacing, 'OPÇÕES', () => console.log('Abrir opções'));
@@ -86,6 +88,12 @@ export class MainMenu extends Scene
     changeScene ()
     {
         deleteOngoingGame();
+        this.scene.start('PlayerSelection');
+    }
+
+    continue ()
+    {
+        loadContinueData();
         this.scene.start('PlayerSelection');
     }
 }

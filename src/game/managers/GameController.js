@@ -4,6 +4,10 @@ import BotService from "../services/BotService";
 import { PLAYER_TYPES } from "../config/playerTypes";
 import { storePlayers } from "../utils/store";
 import { storeTerritories } from "../utils/store";
+import { saveDataExists } from '../utils/store';
+import { loadTerritories } from '../utils/store';
+import { loadPlayers } from '../utils/store';
+import { loadObjective } from '../utils/store';
 
 export default class GameController {
     constructor(gsm) {
@@ -801,5 +805,38 @@ export default class GameController {
 
         this.gsm.emit("game:setMapInteractive", true);
         this.gsm.turnManager.endPhase();
+    }
+// Carregar save
+    loadGame(){
+        this.loadMap();
+        this.loadQueue();
+    }
+
+    loadMap(){
+
+        let data = loadTerritories();
+        let dataArray = Object.values(data);
+        for(let territory of dataArray){
+            this.gsm.mapManager.changePlayerTerritoryOwnership(territory.id, this.gsm.playerManager.getPlayer(territory.owner));
+            this.gsm.mapManager.loadTroops(territory.id, Number(territory.troops));
+        }
+
+    }
+
+    loadQueue(){
+        let data = loadPlayers();
+        this.gsm.turnManager.reorganize(data);
+        this.updateCards(data)
+    }
+
+    updateCards(data){
+        for (let i = 0; i < data.length; i++){
+            const player = this.gsm.playerManager.getPlayer(data[i].name);
+            for (let j = 0; j < data[i].territoryCards.length; j++){
+                this.gsm.territoryCardManager.changePlayerTerritoryCardOwnership(data[i].territoryCards[j], player);
+            }
+            const objective = loadObjective(i);
+            this.gsm.playerManager.updateObjectives(player, objective);
+        }
     }
 }

@@ -188,5 +188,21 @@ export default class PlayerManager {
         let index = this.players.findIndex(p => p === player);
         this.players.splice(index, 1);
     }
+
+    getPlayer(nome){
+        for(let i=0; i<this.players.length; i++){
+            if (this.players[i].name == nome) return this.players[i];
+        }
+        return null
+    }
+
+    updateObjectives(player, obj){
+        let old = player.objective;
+        old.type = obj.type;
+        if (old.type === 'destruction') old.target = this.getPlayer(obj.target);
+        old.main = obj.main;
+        old.default = obj.default;
+        old.description = obj.description;
+    }
 }
 

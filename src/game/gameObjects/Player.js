@@ -7,12 +7,12 @@ export default class Player {
         this.territoryCards = [];
         this.objective = null;
         this.availableTroops = 0;
-        this.availableTroopsSouthAmerica = 0;
-        this.availableTroopsNorthAmerica = 0;
-        this.availableTroopsEurope = 0;
-        this.availableTroopsAsia = 0;
-        this.availableTroopsAfrica = 0;
-        this.availableTroopsOceania = 0;
+        this.continentTroopsSouthAmerica = 0;
+        this.continentTroopsNorthAmerica = 0;
+        this.continentTroopsEurope = 0;
+        this.continentTroopsAsia = 0;
+        this.continentTroopsAfrica = 0;
+        this.continentTroopsOceania = 0;
         this.type = type
     }
 
@@ -78,90 +78,90 @@ export default class Player {
             }
         }
         if (sa == 4){
-            this.availableTroopsSouthAmerica = 2;
+            this.continentTroopsSouthAmerica = 2;
         }
         if (na == 9){
-            this.availableTroopsNorthAmerica = 5;
+            this.continentTroopsNorthAmerica = 5;
         }
         if (eu == 7){
-            this.availableTroopsEurope = 5;
+            this.continentTroopsEurope = 5;
         }
         if (af == 6){
-            this.availableTroopsAfrica = 3;
+            this.continentTroopsAfrica = 3;
         }
         if (as == 12){
-            this.availableTroopsAsia = 7;
+            this.continentTroopsAsia = 7;
         }
         if (oc == 4){
-            this.availableTroopsOceania = 2;
+            this.continentTroopsOceania = 2;
         }
     }
 
     getContinentBonus(territory){
         switch(territory.getContinent()) {
             case "south_america":
-                return this.availableTroopsSouthAmerica;
+                return this.continentTroopsSouthAmerica;
             case "north_america":
-                return this.availableTroopsNorthAmerica;
+                return this.continentTroopsNorthAmerica;
             case "europe":
-                return this. availableTroopsEurope;
+                return this. continentTroopsEurope;
             case "africa":
-                return this.availableTroopsAfrica;
+                return this.continentTroopsAfrica;
             case "asia":
-                return this.availableTroopsAsia;
+                return this.continentTroopsAsia;
             case "oceania":
-                return this.availableTroopsOceania;
+                return this.continentTroopsOceania;
         }
     }
 
     allocateTroops(territory, troops){
         switch(territory.getContinent()) {
             case "south_america":
-                if (this.availableTroopsSouthAmerica <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsSouthAmerica);
-                    this.availableTroopsSouthAmerica = 0;
+                if (this.continentTroopsSouthAmerica <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsSouthAmerica);
+                    this.continentTroopsSouthAmerica = 0;
                 } else {
-                    this.availableTroopsSouthAmerica -= troops;
+                    this.continentTroopsSouthAmerica -= troops;
                 }
                 break;
             case "north_america":
-                if (this.availableTroopsNorthAmerica <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsNorthAmerica);
-                    this.availableTroopsNorthAmerica = 0;
+                if (this.continentTroopsNorthAmerica <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsNorthAmerica);
+                    this.continentTroopsNorthAmerica = 0;
                 } else {
-                    this.availableTroopsNorthAmerica -= troops;
+                    this.continentTroopsNorthAmerica -= troops;
                 }
                 break;
             case "europe":
-                if (this.availableTroopsEurope <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsEurope);
-                    this.availableTroopsEurope = 0;
+                if (this.continentTroopsEurope <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsEurope);
+                    this.continentTroopsEurope = 0;
                 } else {
-                    this.availableTroopsEurope -= troops;
+                    this.continentTroopsEurope -= troops;
                 }
                 break;
             case "africa":
-                if (this.availableTroopsAfrica <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsAfrica);
-                    this.availableTroopsAfrica = 0;
+                if (this.continentTroopsAfrica <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsAfrica);
+                    this.continentTroopsAfrica = 0;
                 } else {
-                    this.availableTroopsAfrica -= troops;
+                    this.continentTroopsAfrica -= troops;
                 }
                 break;
             case "asia":
-                if (this.availableTroopsAsia <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsAsia);
-                    this.availableTroopsAsia = 0;
+                if (this.continentTroopsAsia <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsAsia);
+                    this.continentTroopsAsia = 0;
                 } else {
-                    this.availableTroopsAsia -= troops;
+                    this.continentTroopsAsia -= troops;
                 }
                 break;
             case "oceania":
-                if (this.availableTroopsOceania <= troops){
-                    this.availableTroops -= (troops - this.availableTroopsOceania);
-                    this.availableTroopsOceania = 0;
+                if (this.continentTroopsOceania <= troops){
+                    this.availableTroops -= (troops - this.continentTroopsOceania);
+                    this.continentTroopsOceania = 0;
                 } else {
-                    this.availableTroopsOceania -= troops;
+                    this.continentTroopsOceania -= troops;
                 }
                 break;
         }
@@ -169,12 +169,12 @@ export default class Player {
 
     getTotalAvailableTroops(){
         return this.availableTroops + 
-        this.availableTroopsSouthAmerica +
-        this.availableTroopsNorthAmerica +
-        this.availableTroopsEurope +
-        this.availableTroopsAsia +
-        this.availableTroopsAfrica +
-        this.availableTroopsOceania;
+        this.continentTroopsSouthAmerica +
+        this.continentTroopsNorthAmerica +
+        this.continentTroopsEurope +
+        this.continentTroopsAsia +
+        this.continentTroopsAfrica +
+        this.continentTroopsOceania;
     }
 
 }

@@ -94,4 +94,16 @@ export default class TurnManager extends Phaser.Events.EventEmitter {
         // Emitindo 'this' para que o GameController possa acessar getPreviousPlayer()
         this.emit("nextTurn", this);
     }
+
+    reorganize(queue){
+        for (let i = 0; i < queue.length; i++){
+                for (let j = i+1; j < this.players.length; j++){
+                    if (queue[i].name === this.players[j].name){
+                        let aux = this.players[i];
+                        this.players[i] = this.players[j];
+                        this.players[j] = aux;
+                    }
+                }
+        }
+    }
 }
