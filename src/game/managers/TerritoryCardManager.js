@@ -1,3 +1,4 @@
+import Phaser from 'phaser';
 import TerritoryCard from "../gameObjects/TerritoryCard";
 
 export default class TerritoryCardManager {
