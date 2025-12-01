@@ -4,7 +4,8 @@ export function storePlayers(players, currentPlayer){
         let n = players.indexOf(currentPlayer)
         localStorage.setItem('playerCount', pc);
         for(let i = n; i < playerCount+n; i++){
-            let p = 'player' + i.toString();
+            const j = i - n;
+            const p = 'player' + j.toString();
             let player = players [i%players.length]
             localStorage.setItem(p, JSON.stringify(player, replacerP))
         }
@@ -40,4 +41,14 @@ export function saveDataExists(){
 
 export function loadTerritories(){
     return JSON.parse(localStorage.getItem('territories'));
+}
+
+export function loadPlayers(){
+    const playerCount = Number(localStorage.getItem('playerCount'));
+    let players = []
+    for (let i = 0; i < playerCount; i++){
+        const string = 'player' + i.toString();
+        players.push(JSON.parse(localStorage.getItem(string)));
+    }
+    return players;
 }

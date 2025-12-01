@@ -6,6 +6,7 @@ import { storePlayers } from "../utils/store";
 import { storeTerritories } from "../utils/store";
 import { saveDataExists } from '../utils/store';
 import { loadTerritories } from '../utils/store';
+import { loadPlayers } from '../utils/store';
 
 export default class GameController {
     constructor(gsm) {
@@ -703,10 +704,11 @@ export default class GameController {
 // Carregar save
     loadGame(){
         this.loadMap();
+        this.loadQueue();
 
     }
 
-     loadMap(){
+    loadMap(){
 
         let data = loadTerritories();
         let dataArray = Object.values(data);
@@ -715,5 +717,11 @@ export default class GameController {
             this.gsm.mapManager.loadTroops(territory.id, Number(territory.troops));
         }
 
+    }
+
+    loadQueue(){
+        let data = loadPlayers();
+        this.gsm.turnManager.reorganize(data);
+        console.log(JSON.stringify(data));
     }
 }
