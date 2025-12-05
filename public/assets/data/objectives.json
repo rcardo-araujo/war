@@ -11,12 +11,12 @@
     }
   },
   "conquest": [
-    { "description": "conquistar na totalidade a AMÉRICA DO NORTE e a ÁFRICA", "main": { "continents": ["AMÉRICA DO NORTE", "ÁFRICA"] } },
-    { "description": "conquistar na totalidade a ÁSIA e a ÁFRICA", "main": { "continents": ["ÁSIA", "ÁFRICA"] } },
-    { "description": "conquistar na totalidade a AMÉRICA DO NORTE e a OCEANIA", "main": { "continents": ["AMÉRICA DO NORTE", "OCEANIA"] } },
-    { "description": "conquistar na totalidade a EUROPA, a AMÉRICA DO SUL e mais um continente à sua escolha", "main": { "continents": ["EUROPA", "AMÉRICA DO SUL", "X"] } },
-    { "description": "conquistar na totalidade a ÁSIA e a AMÉRICA DO SUL", "main": { "continents": ["ÁSIA", "AMÉRICA DO SUL"] } },
-    { "description": "conquistar na totalidade a EUROPA, a OCEANIA e mais um terceiro continente à sua escolha", "main": { "continents": ["EUROPA", "OCEANIA", "X"] } },
+    { "description": "conquistar na totalidade a AMÉRICA DO NORTE e a ÁFRICA", "main": { "continents": ["north_america", "africa"] } },
+    { "description": "conquistar na totalidade a ÁSIA e a ÁFRICA", "main": { "continents": ["asia", "africa"] } },
+    { "description": "conquistar na totalidade a AMÉRICA DO NORTE e a OCEANIA", "main": { "continents": ["north_america", "oceania"] } },
+    { "description": "conquistar na totalidade a EUROPA, a AMÉRICA DO SUL e mais um continente à sua escolha", "main": { "continents": ["europe", "south_america", "X"] } },
+    { "description": "conquistar na totalidade a ÁSIA e a AMÉRICA DO SUL", "main": { "continents": ["asia", "south_america"] } },
+    { "description": "conquistar na totalidade a EUROPA, a OCEANIA e mais um terceiro continente à sua escolha", "main": { "continents": ["europe", "oceania", "X"] } },
     { "description": "conquistar 18 TERRITÓRIOS e ocupar cada um deles com pelo menos dois exércitos", "main": { "accumulate": 18, "occupy": 2 } },
     { "description": "conquistar 24 TERRITÓRIOS à sua escolha", "main": { "accumulate": 24 } }
   ],
